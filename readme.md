@@ -12,3 +12,7 @@ IE latest beta suport<br>
 
 
 Qunit used for tests
+
+
+
+[Examples:]("https://truehot.github.io/smallGrid/)
