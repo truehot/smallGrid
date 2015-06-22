@@ -13,4 +13,4 @@ IE latest beta suport<br>
 
 Qunit used for tests
 
-Examples: <a href="https://truehot.github.io/smallGrid/">truehot.github.io/smallGrid/</a>
+Examples: <a href="http://truehot.github.io/smallGrid/">truehot.github.io/smallGrid/</a>
