@@ -33,7 +33,7 @@
 
 
         function handeCellKeyDown(e) {
-            console.log(e);//todo
+            //console.log(e);//todo
         }
 
         function selectRowById(id) {

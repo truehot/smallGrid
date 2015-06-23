@@ -84,8 +84,15 @@ email
 
         function handeCellKeyDown(e) {
             //enter pressed
-            if (e && e.event && e.event.keyCode == 13) {
-                applyEdit();
+            if (e && e.event) {
+                switch (e.event.keyCode) {
+                    case 13:
+                        applyEdit();
+                        break;
+                    case 27:
+                        cancelEdit();
+                        break;
+                }
             }
         }
 
@@ -172,6 +179,19 @@ email
 
         function cancelEdit() {
             if (editOptions.enabled == true) {
+
+                viewModel.columns.setColumnPropertyById(
+                    editOptions.column.id,
+                    'editMode',
+                    false
+                );
+
+                var row = viewModel.rows.getRowById(editOptions.row.id);
+                if (row) {
+                    row.editMode = false;
+                    viewModel.rows.updateItem(row);
+                }
+
                 //undo
                 editOptions.editor.destroy();
                 editOptions = {

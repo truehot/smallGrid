@@ -2591,8 +2591,6 @@
         /*
         Render part
         */
-
-
         function renderView(columnsHtml, colsHtml, rowsHtml) {
             self.onBeforeRowsRendered.notify({});
 
@@ -2725,7 +2723,6 @@
             return value;
         }
 
-
         /*
         Calc private funcs
         */
@@ -2740,7 +2737,6 @@
             }
             return type;
         }
-
 
         //todo: fix multiple types, edit && select, remove, add type registration
         function getCellEventType(targetClass, column, row) {
@@ -2776,7 +2772,6 @@
                 return e;
             }
         }
-
 
         /*
         Data handlers
@@ -2833,7 +2828,6 @@
 
             suspendRender(false);
         }
-
 
         /*
         Handle cell events
@@ -3056,8 +3050,6 @@
 
         init();
     }
-
-
 
 
     function CreateView($container, data, columns, settings) {
@@ -3418,8 +3410,15 @@ email
 
         function handeCellKeyDown(e) {
             //enter pressed
-            if (e && e.event && e.event.keyCode == 13) {
-                applyEdit();
+            if (e && e.event) {
+                switch (e.event.keyCode) {
+                    case 13:
+                        applyEdit();
+                        break;
+                    case 27:
+                        cancelEdit();
+                        break;
+                }
             }
         }
 
@@ -3506,6 +3505,19 @@ email
 
         function cancelEdit() {
             if (editOptions.enabled == true) {
+
+                viewModel.columns.setColumnPropertyById(
+                    editOptions.column.id,
+                    'editMode',
+                    false
+                );
+
+                var row = viewModel.rows.getRowById(editOptions.row.id);
+                if (row) {
+                    row.editMode = false;
+                    viewModel.rows.updateItem(row);
+                }
+
                 //undo
                 editOptions.editor.destroy();
                 editOptions = {
@@ -3981,7 +3993,7 @@ email
 
 
         function handeCellKeyDown(e) {
-            console.log(e);//todo
+            //console.log(e);//todo
         }
 
         function selectRowById(id) {
