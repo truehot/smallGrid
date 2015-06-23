@@ -8,13 +8,16 @@
     <script src="../small.grid.all.js"></script>
 </head>
 <body>
+    <form><input type="checkbox" class="auto-edit"/>Enable auto edit</form>
+
+
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
         var columns = [
             { 'name': "Column 1", 'field': "property1", 'width': 200, 'editor': 'Text' },
-            { 'name': "Column 2", 'field': "property2", 'width': 200, 'editor': 'Checkbox'},
+            { 'name': "Column 2", 'field': "property2", 'width': 200, 'editor': 'Checkbox' },
             { 'name': "Column 3", 'field': "property3", 'width': 200, 'editor': 'Integer' },
-            { 'name': "Column 4", 'field': "property4", 'width': 200, 'editor': 'Text'},
+            { 'name': "Column 4", 'field': "property4", 'width': 200, 'editor': 'Text' },
             { 'name': "Column 5", 'field': "property5", 'width': 200, 'editor': 'Text' },
         ];
         var items = [];
@@ -29,6 +32,12 @@
 
         $(document).ready(function () {
             var grid = new Small.Grid.Create($('.small-grid'), items, columns, {});
+
+            $('.auto-edit').change(function () {
+                var settings = grid.getSettings();
+                settings.edit.editOnClick = this.checked;
+            });
+
         });
     </script>
 </body>
