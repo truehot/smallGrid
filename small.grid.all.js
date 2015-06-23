@@ -52,8 +52,7 @@
         };
 
         this.focus = function () {
-            $element.val(self.getValue()).select();
-
+            $element.val(self.getValue()).focus();
             return this;
         };
 
@@ -187,8 +186,8 @@
     function NoneEditor(options) {
         var self = this,
             value = options.value,
-            $element = $("<span class='grid-none-editor' />");
-
+            $element = $("<span class='grid-none-editor' />").text(value);
+        
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
             return this;
@@ -208,11 +207,12 @@
         };
 
         this.getValue = function () {
-            return convertValue($element.val());
+            return convertValue($element.text());
         };
 
         this.setValue = function (value) {
-            $element.val(convertValue(value));
+            
+            $element.text(convertValue(value));
             self.onChange.notify({
                 "value": value
             });
@@ -220,8 +220,7 @@
         };
 
         this.focus = function () {
-            $element.val(self.getValue()).select();
-
+            $element.select();
             return this;
         };
 
