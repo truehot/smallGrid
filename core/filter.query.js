@@ -8,6 +8,7 @@
             }
         }
     });
+
     //add or / and?
     function FilterQuery(field, settings) {
         var self = this;
@@ -33,16 +34,9 @@
 
         function add(type, str) {
             if (type in this) {
-                if (str) {
-                    this[type](str);
-                } else {
-                    this[type]();
-                }
-            } else {
-                throw "Type " + type + " not found";
+                return this[type](str || "");
             }
-
-            return this;
+            throw "Type " + type + " not found";
         }
 
         //where

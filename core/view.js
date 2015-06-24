@@ -9,8 +9,6 @@
         }
     });
 
-
-
     function ViewData($container, settings) {
         var self = this;
         var viewModel;
@@ -30,7 +28,6 @@
 
         //handlers
         var handlers = [];
-
 
         //elements
         var $viewport,
@@ -248,7 +245,6 @@
             } catch (e) { }
         }
 
-
         /*
         Public api
         */
@@ -279,6 +275,7 @@
         function renderRequests() {
             if (suspend == false && suspendRenderRequests > 0) {
                 suspendRenderRequests = 0;
+
                 viewModel.requestDataFromRange(
                     {
                         top: $canvas[0].scrollTop,
@@ -512,7 +509,6 @@
         function handleRowsChange(e) {
             if (viewModel) {
                 var itemsHeight = viewModel.getRowsHeight(cellOuterSize);
-
                 $tableWrap.css({
                     'height': itemsHeight,
                 });
@@ -724,6 +720,8 @@
         }
 
         $.extend(this, {
+            "destroy": destroy,
+
             //Events
             "onScroll": new Small.Event.Handler(),
             "onScrollStart": new Small.Event.Handler(),
@@ -774,7 +772,6 @@
             "setColumnWidthByIndex": setColumnWidthByIndex,
             "removeAllTextSelections": removeAllTextSelections,
 
-            "destroy": destroy,
             "isRenderSuspended": isRenderSuspended,
             "render": render,
             "setModel": setModel,

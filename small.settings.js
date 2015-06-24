@@ -73,7 +73,6 @@ if (typeof jQuery === "undefined") {
         columns: {
             idProperty: undefined,
             mapProperties: true,
-            virtualization: true,
             header: {
                 height: 20,
             },
@@ -82,7 +81,6 @@ if (typeof jQuery === "undefined") {
         rows: {
             idProperty: undefined,//TODO: other fields mapping
             mapProperties: true,
-            virtualization: true,
             formatter: undefined,//todo: remove?
             editable: true,
             selectable: true,

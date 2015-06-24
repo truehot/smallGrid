@@ -14,6 +14,7 @@
         var self = this;
         var view = {};
         var plugins = {};
+        var version = "0.1";
 
         /*
         Init & Destroy
@@ -84,15 +85,24 @@
             }
         }
 
+        /*
+        Version
+        */
+        function getVersion() {
+            return version;
+        }
+
         $.extend(this, {
+            "init": init,
             "destroy": destroy,
+
             "getSettings": getSettings,
+            "getVersion": getVersion,
             "getView": getView,
             "getViewModel": getViewModel,
-            "init": init,
             "isRegisteredPlugin": isRegisteredPlugin,
-            "registerPlugins": registerPlugins,
             "registerPlugin": registerPlugin,
+            "registerPlugins": registerPlugins,
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
         });
@@ -117,7 +127,6 @@
         }
 
         return grid;
-
     }
 
 })(jQuery);

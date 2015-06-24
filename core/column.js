@@ -11,7 +11,6 @@
         }
     });
 
-
     function ColumnData(data) {
         if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
         if ("editable" in data) this.editable = data.editable;
@@ -451,7 +450,6 @@
             return column;
         }
 
-
         $.extend(this, {
             "onChange": new Small.Event.Handler(),
             "onChangeStart": new Small.Event.Handler(),
@@ -506,17 +504,11 @@
         init();
     }
 
-
-
     function CreateModel(data, settings) {
         return new ColumnModel(
             data,
             settings
         );
     }
-
-
-
-
 
 })(jQuery);

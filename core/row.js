@@ -24,7 +24,6 @@
         if ("rowCssClass" in data) this.rowCssClass = data.rowCssClass;
     }
 
-
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled for ????????????
     RowData.prototype.editable = true; // are row cells editable?
@@ -158,7 +157,6 @@
             }
             return this;
         }
-
 
         function addRow(row) {
             if (row instanceof RowData) {
@@ -466,7 +464,6 @@
         });
         init();
     }
-
 
     function CreateModel(data, settings) {
         return new RowModel(

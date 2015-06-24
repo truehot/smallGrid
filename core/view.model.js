@@ -9,7 +9,6 @@
         }
     });
 
-
     function ViewModel(rowsModel, columnsModel, settings) {
         var self = this;
         var columns = columnsModel;
@@ -163,28 +162,24 @@
         }
 
         function requestDataFromRange(point, size, outerSize) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) && settings.rows.virtualization;
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) && settings.columns.virtualization;
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop);
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft);
 
             if (rowsCached == false || columnsCached == false) {
                 self.onDataChangeStart.notify();
-            }
 
-            if (rowsCached == false) {
-                rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+                if (rowsCached == false) {
+                    rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+                    self.onRowsChange.notify();
+                }
 
-                self.onRowsChange.notify();
-            }
+                if (columnsCached == false) {
+                    columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
+                    self.onColumnsChange.notify();
+                }
 
-            if (columnsCached == false) {
-                columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
+                updateCacheRange(point, size, outerSize);
 
-                self.onColumnsChange.notify();
-            }
-
-            updateCacheRange(point, size, outerSize);
-
-            if (rowsCached == false || columnsCached == false) {
                 self.onDataChangeStop.notify({
                     rows: rowsCache,
                     columns: columnsCache,
@@ -201,11 +196,15 @@
                     minTop: rowsCache[0].calcHeight < size.height
                         ? rowsCache[0].calcHeight - rowsCache[0].height - outerSize.height
                         : rowsCache[0].calcHeight + size.height,
-                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight - size.height + settings.scrollbarDimensions.height,
+                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight < size.height
+                        ? size.height
+                        : rowsCache[(rowsCache.length - 1)].calcHeight - size.height + settings.scrollbarDimensions.height,
                     minLeft: columnsCache[0].calcWidth < size.width
                         ? columnsCache[0].calcWidth - columnsCache[0].width - outerSize.width
                         : columnsCache[0].calcWidth + size.width,
-                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
+                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width
+                        ? size.width
+                        : columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
                 }
             } else {
                 resetCacheRange();

@@ -35,9 +35,9 @@
             var resultQuery = "";
 
             for (var i = 0; i < filters.length; i++) {
-                var queries = filters[i].get();
-                var field = filters[i].getField();
-                var convertedQuery = "";
+                var queries = filters[i].get(),
+                    field = filters[i].getField(),
+                    convertedQuery = "";
                 for (var ii = 0; ii < queries.length; ii++) {
                     var query = queries[ii];
 
@@ -140,7 +140,6 @@
                         return true;
                     }
                 }
-
                 return false;
             };
         }

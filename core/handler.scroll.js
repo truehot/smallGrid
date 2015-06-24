@@ -21,7 +21,6 @@
         resetTop: true,
     }
 
-
     /*
     TODO: direction change
     https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
@@ -121,7 +120,6 @@
         $.extend(this, {
             "destroy": destroy
         });
-
     };
 
 })(jQuery);

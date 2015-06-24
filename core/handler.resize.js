@@ -68,7 +68,6 @@
         $.extend(this, {
             "destroy": destroy
         });
-
     };
 
 })(jQuery);
