@@ -356,7 +356,6 @@
         }
     });
 
-
     function ColumnData(data) {
         if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
         if ("editable" in data) this.editable = data.editable;
@@ -796,7 +795,6 @@
             return column;
         }
 
-
         $.extend(this, {
             "onChange": new Small.Event.Handler(),
             "onChangeStart": new Small.Event.Handler(),
@@ -851,18 +849,12 @@
         init();
     }
 
-
-
     function CreateModel(data, settings) {
         return new ColumnModel(
             data,
             settings
         );
     }
-
-
-
-
 
 })(jQuery);"use strict";
 
@@ -957,6 +949,7 @@
             }
         }
     });
+
     //add or / and?
     function FilterQuery(field, settings) {
         var self = this;
@@ -982,16 +975,9 @@
 
         function add(type, str) {
             if (type in this) {
-                if (str) {
-                    this[type](str);
-                } else {
-                    this[type]();
-                }
-            } else {
-                throw "Type " + type + " not found";
+                return this[type](str || "");
             }
-
-            return this;
+            throw "Type " + type + " not found";
         }
 
         //where
@@ -1091,9 +1077,9 @@
             var resultQuery = "";
 
             for (var i = 0; i < filters.length; i++) {
-                var queries = filters[i].get();
-                var field = filters[i].getField();
-                var convertedQuery = "";
+                var queries = filters[i].get(),
+                    field = filters[i].getField(),
+                    convertedQuery = "";
                 for (var ii = 0; ii < queries.length; ii++) {
                     var query = queries[ii];
 
@@ -1196,7 +1182,6 @@
                         return true;
                     }
                 }
-
                 return false;
             };
         }
@@ -1225,6 +1210,7 @@
         var self = this;
         var view = {};
         var plugins = {};
+        var version = "0.1";
 
         /*
         Init & Destroy
@@ -1295,15 +1281,24 @@
             }
         }
 
+        /*
+        Version
+        */
+        function getVersion() {
+            return version;
+        }
+
         $.extend(this, {
+            "init": init,
             "destroy": destroy,
+
             "getSettings": getSettings,
+            "getVersion": getVersion,
             "getView": getView,
             "getViewModel": getViewModel,
-            "init": init,
             "isRegisteredPlugin": isRegisteredPlugin,
-            "registerPlugins": registerPlugins,
             "registerPlugin": registerPlugin,
+            "registerPlugins": registerPlugins,
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
         });
@@ -1328,7 +1323,6 @@
         }
 
         return grid;
-
     }
 
 })(jQuery);"use strict";
@@ -1415,7 +1409,6 @@
         $.extend(this, {
             "destroy": destroy
         });
-
     };
 
 })(jQuery);"use strict";
@@ -1488,7 +1481,6 @@
         $.extend(this, {
             "destroy": destroy
         });
-
     };
 
 })(jQuery);"use strict";
@@ -1513,7 +1505,6 @@
         resetLeft: true,
         resetTop: true,
     }
-
 
     /*
     TODO: direction change
@@ -1614,7 +1605,6 @@
         $.extend(this, {
             "destroy": destroy
         });
-
     };
 
 })(jQuery);"use strict";
@@ -1714,7 +1704,6 @@
         if ("minHeight" in data) this.minHeight = data.minHeight;
         if ("rowCssClass" in data) this.rowCssClass = data.rowCssClass;
     }
-
 
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled for ????????????
@@ -1849,7 +1838,6 @@
             }
             return this;
         }
-
 
         function addRow(row) {
             if (row instanceof RowData) {
@@ -2158,7 +2146,6 @@
         init();
     }
 
-
     function CreateModel(data, settings) {
         return new RowModel(
             data,
@@ -2275,8 +2262,6 @@
         }
     });
 
-
-
     function ViewData($container, settings) {
         var self = this;
         var viewModel;
@@ -2296,7 +2281,6 @@
 
         //handlers
         var handlers = [];
-
 
         //elements
         var $viewport,
@@ -2514,7 +2498,6 @@
             } catch (e) { }
         }
 
-
         /*
         Public api
         */
@@ -2545,6 +2528,7 @@
         function renderRequests() {
             if (suspend == false && suspendRenderRequests > 0) {
                 suspendRenderRequests = 0;
+
                 viewModel.requestDataFromRange(
                     {
                         top: $canvas[0].scrollTop,
@@ -2778,7 +2762,6 @@
         function handleRowsChange(e) {
             if (viewModel) {
                 var itemsHeight = viewModel.getRowsHeight(cellOuterSize);
-
                 $tableWrap.css({
                     'height': itemsHeight,
                 });
@@ -2990,6 +2973,8 @@
         }
 
         $.extend(this, {
+            "destroy": destroy,
+
             //Events
             "onScroll": new Small.Event.Handler(),
             "onScrollStart": new Small.Event.Handler(),
@@ -3040,7 +3025,6 @@
             "setColumnWidthByIndex": setColumnWidthByIndex,
             "removeAllTextSelections": removeAllTextSelections,
 
-            "destroy": destroy,
             "isRenderSuspended": isRenderSuspended,
             "render": render,
             "setModel": setModel,
@@ -3070,7 +3054,6 @@
             }
         }
     });
-
 
     function ViewModel(rowsModel, columnsModel, settings) {
         var self = this;
@@ -3225,28 +3208,24 @@
         }
 
         function requestDataFromRange(point, size, outerSize) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) && settings.rows.virtualization;
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) && settings.columns.virtualization;
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop);
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft);
 
             if (rowsCached == false || columnsCached == false) {
                 self.onDataChangeStart.notify();
-            }
 
-            if (rowsCached == false) {
-                rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+                if (rowsCached == false) {
+                    rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+                    self.onRowsChange.notify();
+                }
 
-                self.onRowsChange.notify();
-            }
+                if (columnsCached == false) {
+                    columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
+                    self.onColumnsChange.notify();
+                }
 
-            if (columnsCached == false) {
-                columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
+                updateCacheRange(point, size, outerSize);
 
-                self.onColumnsChange.notify();
-            }
-
-            updateCacheRange(point, size, outerSize);
-
-            if (rowsCached == false || columnsCached == false) {
                 self.onDataChangeStop.notify({
                     rows: rowsCache,
                     columns: columnsCache,
@@ -3263,11 +3242,15 @@
                     minTop: rowsCache[0].calcHeight < size.height
                         ? rowsCache[0].calcHeight - rowsCache[0].height - outerSize.height
                         : rowsCache[0].calcHeight + size.height,
-                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight - size.height + settings.scrollbarDimensions.height,
+                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight < size.height
+                        ? size.height
+                        : rowsCache[(rowsCache.length - 1)].calcHeight - size.height + settings.scrollbarDimensions.height,
                     minLeft: columnsCache[0].calcWidth < size.width
                         ? columnsCache[0].calcWidth - columnsCache[0].width - outerSize.width
                         : columnsCache[0].calcWidth + size.width,
-                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
+                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width
+                        ? size.width
+                        : columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
                 }
             } else {
                 resetCacheRange();
@@ -4150,7 +4133,6 @@ if (typeof jQuery === "undefined") {
         columns: {
             idProperty: undefined,
             mapProperties: true,
-            virtualization: true,
             header: {
                 height: 20,
             },
@@ -4159,7 +4141,6 @@ if (typeof jQuery === "undefined") {
         rows: {
             idProperty: undefined,//TODO: other fields mapping
             mapProperties: true,
-            virtualization: true,
             formatter: undefined,//todo: remove?
             editable: true,
             selectable: true,
