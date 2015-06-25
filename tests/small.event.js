@@ -2,8 +2,8 @@ QUnit.test("Event.Handler", function (assert) {
 
     var counter = 0;
     var event = getEvent();
-    var eventArgs = new Small.Event.Args(event);
-    var handler = new Small.Event.Handler();
+    var eventArgs = new SmallGrid.Event.Args(event);
+    var handler = new SmallGrid.Event.Handler();
 
     assert.ok(eventArgs.isPropagationStopped() == false, "isPropagationStopped");
     assert.ok(eventArgs.isImmediatePropagationStopped() == false, "isImmediatePropagationStopped");

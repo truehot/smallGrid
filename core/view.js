@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "View": {
                 "Create": CreateView,
             }
@@ -723,38 +723,38 @@
             "destroy": destroy,
 
             //Events
-            "onScroll": new Small.Event.Handler(),
-            "onScrollStart": new Small.Event.Handler(),
-            "onScrollStop": new Small.Event.Handler(),
+            "onScroll": new SmallGrid.Event.Handler(),
+            "onScrollStart": new SmallGrid.Event.Handler(),
+            "onScrollStop": new SmallGrid.Event.Handler(),
 
-            "onMouseWheel": new Small.Event.Handler(),
-            "onMouseWheelStart": new Small.Event.Handler(),
-            "onMouseWheelStop": new Small.Event.Handler(),
+            "onMouseWheel": new SmallGrid.Event.Handler(),
+            "onMouseWheelStart": new SmallGrid.Event.Handler(),
+            "onMouseWheelStop": new SmallGrid.Event.Handler(),
 
-            "onBodyClick": new Small.Event.Handler(),
+            "onBodyClick": new SmallGrid.Event.Handler(),
 
-            "onHeaderClick": new Small.Event.Handler(),
-            "onHeaderContextMenu": new Small.Event.Handler(),
-            "onHeaderDblClick": new Small.Event.Handler(),
+            "onHeaderClick": new SmallGrid.Event.Handler(),
+            "onHeaderContextMenu": new SmallGrid.Event.Handler(),
+            "onHeaderDblClick": new SmallGrid.Event.Handler(),
 
-            "onHeaderFilter": new Small.Event.Handler(),
-            "onHeaderResize": new Small.Event.Handler(),
-            "onHeaderSort": new Small.Event.Handler(),
+            "onHeaderFilter": new SmallGrid.Event.Handler(),
+            "onHeaderResize": new SmallGrid.Event.Handler(),
+            "onHeaderSort": new SmallGrid.Event.Handler(),
 
-            "onCellClick": new Small.Event.Handler(),
-            "onCellContextMenu": new Small.Event.Handler(),
-            "onCellDblClick": new Small.Event.Handler(),
-            "onCellKeyDown": new Small.Event.Handler(),
+            "onCellClick": new SmallGrid.Event.Handler(),
+            "onCellContextMenu": new SmallGrid.Event.Handler(),
+            "onCellDblClick": new SmallGrid.Event.Handler(),
+            "onCellKeyDown": new SmallGrid.Event.Handler(),
 
-            "onColumnResize": new Small.Event.Handler(),
-            "onColumnResizeStart": new Small.Event.Handler(),
-            "onColumnResizeStop": new Small.Event.Handler(),
+            "onColumnResize": new SmallGrid.Event.Handler(),
+            "onColumnResizeStart": new SmallGrid.Event.Handler(),
+            "onColumnResizeStop": new SmallGrid.Event.Handler(),
 
-            "onAfterRowsRendered": new Small.Event.Handler(),
-            "onBeforeRowsRendered": new Small.Event.Handler(),
+            "onAfterRowsRendered": new SmallGrid.Event.Handler(),
+            "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
 
-            "onInitialize": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
 
             "getContainerNode": getContainerNode,
             "getViewPortNode": getViewPortNode,

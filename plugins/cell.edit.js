@@ -7,7 +7,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "CellEdit": CellEditPlugin,
             }

@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Event": {
                 "Args": EventArgs,
                 "Handler": EventHandler

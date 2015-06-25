@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Cell": {
                 "Editor": {
                     "Create": CreateEditor,
@@ -61,9 +61,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -117,9 +117,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -173,9 +173,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -229,9 +229,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -284,9 +284,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -304,7 +304,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Cell": {
                 "Formatter": {
                     "Checkbox": CheckboxFormatter,
@@ -347,7 +347,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Column": {
                 "Create": CreateModel,
                 "Model": ColumnModel,
@@ -796,9 +796,9 @@
         }
 
         $.extend(this, {
-            "onChange": new Small.Event.Handler(),
-            "onChangeStart": new Small.Event.Handler(),
-            "onChangeStop": new Small.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onChangeStart": new SmallGrid.Event.Handler(),
+            "onChangeStop": new SmallGrid.Event.Handler(),
 
             "filter": filter,
             "forEach": forEach,
@@ -860,7 +860,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Event": {
                 "Args": EventArgs,
                 "Handler": EventHandler
@@ -943,7 +943,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Filter": {
                 "FilterQuery": FilterQuery,
             }
@@ -1044,7 +1044,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Filter": {
                 "FilterRequest": FilterRequest,
             }
@@ -1198,7 +1198,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Grid": {
                 "Create": CreateModel,
                 "Model": GridModel,
@@ -1305,10 +1305,10 @@
     }
 
     function CreateModel($container, rows, columns, settings) {
-        var settings = new Small.Settings.Create(settings);
-        var viewModel = new Small.View.Model(
-            new Small.Row.Create(rows, settings),
-            new Small.Column.Create(columns, settings),
+        var settings = new SmallGrid.Settings.Create(settings);
+        var viewModel = new SmallGrid.View.Model(
+            new SmallGrid.Row.Create(rows, settings),
+            new SmallGrid.Column.Create(columns, settings),
             settings
         );
 
@@ -1329,7 +1329,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Handler": {
                 "Click": ClickHandler
             }
@@ -1415,7 +1415,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Handler": {
                 "Resize": ResizeHandler
             }
@@ -1487,7 +1487,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Handler": {
                 "Scroll": ScrollHandler
             }
@@ -1611,7 +1611,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Row": {
                 "Comparer": {
                     "Default": mixedComparer,
@@ -1683,7 +1683,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Row": {
                 "Create": CreateModel,
                 "Model": RowModel,
@@ -2094,9 +2094,9 @@
         }
 
         $.extend(this, {
-            "onChange": new Small.Event.Handler(),
-            "onChangeStart": new Small.Event.Handler(),
-            "onChangeStop": new Small.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onChangeStart": new SmallGrid.Event.Handler(),
+            "onChangeStop": new SmallGrid.Event.Handler(),
 
             "filter": filter,
             "forEach": forEach,
@@ -2237,7 +2237,7 @@
     }
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Utils": {
                 "changeSortOrder": changeSortOrder,
                 "getNewGuid": guid.newGuid,
@@ -2255,7 +2255,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "View": {
                 "Create": CreateView,
             }
@@ -2976,38 +2976,38 @@
             "destroy": destroy,
 
             //Events
-            "onScroll": new Small.Event.Handler(),
-            "onScrollStart": new Small.Event.Handler(),
-            "onScrollStop": new Small.Event.Handler(),
+            "onScroll": new SmallGrid.Event.Handler(),
+            "onScrollStart": new SmallGrid.Event.Handler(),
+            "onScrollStop": new SmallGrid.Event.Handler(),
 
-            "onMouseWheel": new Small.Event.Handler(),
-            "onMouseWheelStart": new Small.Event.Handler(),
-            "onMouseWheelStop": new Small.Event.Handler(),
+            "onMouseWheel": new SmallGrid.Event.Handler(),
+            "onMouseWheelStart": new SmallGrid.Event.Handler(),
+            "onMouseWheelStop": new SmallGrid.Event.Handler(),
 
-            "onBodyClick": new Small.Event.Handler(),
+            "onBodyClick": new SmallGrid.Event.Handler(),
 
-            "onHeaderClick": new Small.Event.Handler(),
-            "onHeaderContextMenu": new Small.Event.Handler(),
-            "onHeaderDblClick": new Small.Event.Handler(),
+            "onHeaderClick": new SmallGrid.Event.Handler(),
+            "onHeaderContextMenu": new SmallGrid.Event.Handler(),
+            "onHeaderDblClick": new SmallGrid.Event.Handler(),
 
-            "onHeaderFilter": new Small.Event.Handler(),
-            "onHeaderResize": new Small.Event.Handler(),
-            "onHeaderSort": new Small.Event.Handler(),
+            "onHeaderFilter": new SmallGrid.Event.Handler(),
+            "onHeaderResize": new SmallGrid.Event.Handler(),
+            "onHeaderSort": new SmallGrid.Event.Handler(),
 
-            "onCellClick": new Small.Event.Handler(),
-            "onCellContextMenu": new Small.Event.Handler(),
-            "onCellDblClick": new Small.Event.Handler(),
-            "onCellKeyDown": new Small.Event.Handler(),
+            "onCellClick": new SmallGrid.Event.Handler(),
+            "onCellContextMenu": new SmallGrid.Event.Handler(),
+            "onCellDblClick": new SmallGrid.Event.Handler(),
+            "onCellKeyDown": new SmallGrid.Event.Handler(),
 
-            "onColumnResize": new Small.Event.Handler(),
-            "onColumnResizeStart": new Small.Event.Handler(),
-            "onColumnResizeStop": new Small.Event.Handler(),
+            "onColumnResize": new SmallGrid.Event.Handler(),
+            "onColumnResizeStart": new SmallGrid.Event.Handler(),
+            "onColumnResizeStop": new SmallGrid.Event.Handler(),
 
-            "onAfterRowsRendered": new Small.Event.Handler(),
-            "onBeforeRowsRendered": new Small.Event.Handler(),
+            "onAfterRowsRendered": new SmallGrid.Event.Handler(),
+            "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
 
-            "onInitialize": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
 
             "getContainerNode": getContainerNode,
             "getViewPortNode": getViewPortNode,
@@ -3048,7 +3048,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "View": {
                 "Model": ViewModel
             }
@@ -3299,11 +3299,11 @@
             "clearFilter": clearFilter,
             "clearFilters": clearFilters,
 
-            "onRowsChange": new Small.Event.Handler(),//rename to onRowCountChange
-            "onColumnsChange": new Small.Event.Handler(),//rename to onColumnCountChange
-            "onDataChange": new Small.Event.Handler(),
-            "onDataChangeStart": new Small.Event.Handler(),
-            "onDataChangeStop": new Small.Event.Handler(),
+            "onRowsChange": new SmallGrid.Event.Handler(),//rename to onRowCountChange
+            "onColumnsChange": new SmallGrid.Event.Handler(),//rename to onColumnCountChange
+            "onDataChange": new SmallGrid.Event.Handler(),
+            "onDataChangeStart": new SmallGrid.Event.Handler(),
+            "onDataChangeStop": new SmallGrid.Event.Handler(),
         });
     }
 })(jQuery);"use strict";
@@ -3315,7 +3315,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "CellEdit": CellEditPlugin,
             }
@@ -3529,7 +3529,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "Filter": FilterMenuPlugin,
                 "FilterMenu": FilterMenu,
@@ -3661,8 +3661,8 @@ email
 
 
         $.extend(this, {
-            "onSubmit": new Small.Event.Handler(),
-            "onClear": new Small.Event.Handler(),
+            "onSubmit": new SmallGrid.Event.Handler(),
+            "onClear": new SmallGrid.Event.Handler(),
 
             "init": init,
             "destroy": destroy,
@@ -3818,7 +3818,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "ColumnResize": ColumnResizePlugin,
             }
@@ -3893,7 +3893,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "ColumnSort": ColumnSortPlugin,
             }
@@ -3945,7 +3945,7 @@ email
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "RowSelection": RowSelectionPlugin,
             }
@@ -4085,17 +4085,17 @@ if (typeof jQuery === "undefined") {
     }
 
     var shortcuts = {
-        Event: "Small.Event",
-        HandlerClick: "Small.Handler.Click",
-        HandlerResize: "Small.Handler.Resize",
-        HandlerScroll: "Small.Handler.Scroll",
-        Plugins: "Small.Plugins",
-        RowComparer: "Small.Row.Comparer",
-        Filter: "Small.Filter",
-        RowEditor: "Small.Cell.Editor",
-        RowFormatter: "Small.Cell.Formatter",
-        Utils: "Small.Utils",
-        View: "Small.View",
+        Event: "SmallGrid.Event",
+        HandlerClick: "SmallGrid.Handler.Click",
+        HandlerResize: "SmallGrid.Handler.Resize",
+        HandlerScroll: "SmallGrid.Handler.Scroll",
+        Plugins: "SmallGrid.Plugins",
+        RowComparer: "SmallGrid.Row.Comparer",
+        Filter: "SmallGrid.Filter",
+        RowEditor: "SmallGrid.Cell.Editor",
+        RowFormatter: "SmallGrid.Cell.Formatter",
+        Utils: "SmallGrid.Utils",
+        View: "SmallGrid.View",
     }
 
     var defaultSettings = {
@@ -4114,7 +4114,7 @@ if (typeof jQuery === "undefined") {
             cell: "grid-td grid-td-div",
             col: "grid-col",
             cursorPointer: "grid-cursor-pointer",
-            cursorResize: "grid-cursor-resize",
+            cursorResize: "grid-cursor-resize disable-text-selection",
             headerCell: "grid-header-cell",
             headerColumnName: "grid-column-name",
             headerFilter: "grid-header-filter",
@@ -4184,7 +4184,7 @@ if (typeof jQuery === "undefined") {
     loadShortcuts(defaultSettings);
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Settings": {
                 "Create": CreateObj,
                 "Default": defaultSettings,

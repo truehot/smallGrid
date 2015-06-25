@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Row": {
                 "Comparer": {
                     "Default": mixedComparer,

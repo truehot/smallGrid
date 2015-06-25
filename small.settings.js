@@ -25,17 +25,17 @@ if (typeof jQuery === "undefined") {
     }
 
     var shortcuts = {
-        Event: "Small.Event",
-        HandlerClick: "Small.Handler.Click",
-        HandlerResize: "Small.Handler.Resize",
-        HandlerScroll: "Small.Handler.Scroll",
-        Plugins: "Small.Plugins",
-        RowComparer: "Small.Row.Comparer",
-        Filter: "Small.Filter",
-        RowEditor: "Small.Cell.Editor",
-        RowFormatter: "Small.Cell.Formatter",
-        Utils: "Small.Utils",
-        View: "Small.View",
+        Event: "SmallGrid.Event",
+        HandlerClick: "SmallGrid.Handler.Click",
+        HandlerResize: "SmallGrid.Handler.Resize",
+        HandlerScroll: "SmallGrid.Handler.Scroll",
+        Plugins: "SmallGrid.Plugins",
+        RowComparer: "SmallGrid.Row.Comparer",
+        Filter: "SmallGrid.Filter",
+        RowEditor: "SmallGrid.Cell.Editor",
+        RowFormatter: "SmallGrid.Cell.Formatter",
+        Utils: "SmallGrid.Utils",
+        View: "SmallGrid.View",
     }
 
     var defaultSettings = {
@@ -54,7 +54,7 @@ if (typeof jQuery === "undefined") {
             cell: "grid-td grid-td-div",
             col: "grid-col",
             cursorPointer: "grid-cursor-pointer",
-            cursorResize: "grid-cursor-resize",
+            cursorResize: "grid-cursor-resize disable-text-selection",
             headerCell: "grid-header-cell",
             headerColumnName: "grid-column-name",
             headerFilter: "grid-header-filter",
@@ -124,7 +124,7 @@ if (typeof jQuery === "undefined") {
     loadShortcuts(defaultSettings);
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Settings": {
                 "Create": CreateObj,
                 "Default": defaultSettings,

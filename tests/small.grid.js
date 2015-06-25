@@ -2,7 +2,7 @@ QUnit.test("Grid", function (assert) {
 
     var $div = $('<div/>');
 
-    var grid = new Small.Grid.Create($div, [], [], { "explicitInitialization": true, plugins: ["ColumnSort"] });
+    var grid = new SmallGrid.Grid.Create($div, [], [], { "explicitInitialization": true, plugins: ["ColumnSort"] });
     var settings = grid.getSettings();
     assert.ok(settings["explicitInitialization"] == true, "getSettings");
 
@@ -11,7 +11,7 @@ QUnit.test("Grid", function (assert) {
     assert.notDeepEqual(grid.getView(), {}, "getView 2");
 
     assert.notDeepEqual(grid.getViewModel(), {}, "getViewModel 1");
-    assert.ok(grid.getViewModel() instanceof Small.View.Model, "getViewModel 2");
+    assert.ok(grid.getViewModel() instanceof SmallGrid.View.Model, "getViewModel 2");
 
     assert.ok(grid.isRegisteredPlugin('ColumnSort'), "isRegisteredPlugin 1");
     assert.ok(grid.isRegisteredPlugin('ColumnSort1') == false, "isRegisteredPlugin 2");

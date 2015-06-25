@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Column": {
                 "Create": CreateModel,
                 "Model": ColumnModel,
@@ -451,9 +451,9 @@
         }
 
         $.extend(this, {
-            "onChange": new Small.Event.Handler(),
-            "onChangeStart": new Small.Event.Handler(),
-            "onChangeStop": new Small.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onChangeStart": new SmallGrid.Event.Handler(),
+            "onChangeStop": new SmallGrid.Event.Handler(),
 
             "filter": filter,
             "forEach": forEach,

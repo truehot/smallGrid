@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Grid": {
                 "Create": CreateModel,
                 "Model": GridModel,
@@ -109,10 +109,10 @@
     }
 
     function CreateModel($container, rows, columns, settings) {
-        var settings = new Small.Settings.Create(settings);
-        var viewModel = new Small.View.Model(
-            new Small.Row.Create(rows, settings),
-            new Small.Column.Create(columns, settings),
+        var settings = new SmallGrid.Settings.Create(settings);
+        var viewModel = new SmallGrid.View.Model(
+            new SmallGrid.Row.Create(rows, settings),
+            new SmallGrid.Column.Create(columns, settings),
             settings
         );
 

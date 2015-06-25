@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Cell": {
                 "Formatter": {
                     "Checkbox": CheckboxFormatter,

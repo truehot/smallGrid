@@ -3,7 +3,7 @@
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "Filter": FilterMenuPlugin,
                 "FilterMenu": FilterMenu,
@@ -135,8 +135,8 @@
 
 
         $.extend(this, {
-            "onSubmit": new Small.Event.Handler(),
-            "onClear": new Small.Event.Handler(),
+            "onSubmit": new SmallGrid.Event.Handler(),
+            "onClear": new SmallGrid.Event.Handler(),
 
             "init": init,
             "destroy": destroy,

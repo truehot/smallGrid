@@ -1,6 +1,6 @@
 QUnit.test("Columns", function (assert) {
 
-    var model = new Small.Column.Create({}, Small.Settings.Default);
+    var model = new SmallGrid.Column.Create({}, SmallGrid.Settings.Default);
 
     assert.ok(model.getItems().length == 0, "Column.Create");
     assert.ok(model.isEmpty() == true, "isEmpty");
@@ -30,7 +30,7 @@ QUnit.test("Columns", function (assert) {
     assert.ok(model.getColumns().length == 0, "getColumns");
 
     var item = getItem();
-    var model = new Small.Column.Create([item], Small.Settings.Default);
+    var model = new SmallGrid.Column.Create([item], SmallGrid.Settings.Default);
     assert.ok(model.getItems().length == 1, "Data.Create");
     assert.ok(model.getColumns().length == 1, "Data.Create");
     assert.deepEqual(model.getColumns()[0].item, item, "Data.Create");

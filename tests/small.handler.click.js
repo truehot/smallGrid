@@ -29,7 +29,7 @@ QUnit.test("Handler.Click", function (assert) {
     var handleCellDblClickExecuted = false;
     var handleCellKeyDownExecuted = false;
 
-    var handler = new Small.Handler.Click($wrapper, {
+    var handler = new SmallGrid.Handler.Click($wrapper, {
         "rowIdentifier": ".row",
         "cellIdentifier": "DIV",
         "handleClick": handleCellClick,

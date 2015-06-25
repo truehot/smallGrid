@@ -1,8 +1,8 @@
 QUnit.test("Comparer", function (assert) {
     assert.ok(
-        Small.Utils.changeSortOrder(-1) == 1 &&
-        Small.Utils.changeSortOrder(1) == -1 &&
-        Small.Utils.changeSortOrder(0) == -1, "changeSortOrder");
+        SmallGrid.Utils.changeSortOrder(-1) == 1 &&
+        SmallGrid.Utils.changeSortOrder(1) == -1 &&
+        SmallGrid.Utils.changeSortOrder(0) == -1, "changeSortOrder");
 
     /*
     Number
@@ -10,7 +10,7 @@ QUnit.test("Comparer", function (assert) {
     var val = [0, 1, 2];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.Number(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Number(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -18,7 +18,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.Number(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Number(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&
@@ -30,7 +30,7 @@ QUnit.test("Comparer", function (assert) {
     var val = ["ab", "bc", "cd"];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.String(settings));
+    items.sort(new SmallGrid.Cell.Comparer.String(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -39,7 +39,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.String(settings));
+    items.sort(new SmallGrid.Cell.Comparer.String(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&
@@ -51,7 +51,7 @@ QUnit.test("Comparer", function (assert) {
     var val = [new Date(2014, 1, 1), new Date(2014, 1, 2), new Date(2014, 1, 3)];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.Date(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Date(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -60,7 +60,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.Date(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Date(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&
@@ -72,7 +72,7 @@ QUnit.test("Comparer", function (assert) {
     var val = [0, 1, 2];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -80,7 +80,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&
@@ -93,7 +93,7 @@ QUnit.test("Comparer", function (assert) {
     var val = [new Date(2014, 1, 1), new Date(2014, 1, 2), new Date(2014, 1, 3)];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -101,7 +101,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&
@@ -113,7 +113,7 @@ QUnit.test("Comparer", function (assert) {
     var val = ["ab", "bc", "cd"];
     var settings = getSettings("!", -1);
     var items = [{ item: { "!": val[0] } }, { item: { "!": val[1] } }, { item: { "!": val[2] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[2] &&
         items[1].item["!"] == val[1] &&
@@ -122,7 +122,7 @@ QUnit.test("Comparer", function (assert) {
 
     var settings = getSettings("!", 1);
     var items = [{ item: { "!": val[2] } }, { item: { "!": val[1] } }, { item: { "!": val[0] } }];
-    items.sort(new Small.Cell.Comparer.Default(settings));
+    items.sort(new SmallGrid.Cell.Comparer.Default(settings));
     assert.ok(
         items[0].item["!"] == val[0] &&
         items[1].item["!"] == val[1] &&

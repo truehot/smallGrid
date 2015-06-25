@@ -1,8 +1,8 @@
 QUnit.test("Settings", function (assert) {
 
-    var settings = new Small.Settings.Create({});
+    var settings = new SmallGrid.Settings.Create({});
     assert.ok(settings.length != 0, "Settings.Create");
-    assert.ok(settings["Utils"] == Small.Utils, "getSettings");
+    assert.ok(settings["Utils"] == SmallGrid.Utils, "getSettings");
 
     var value = Math.random();
     settings["maxSupportedCssHeight"] = value;

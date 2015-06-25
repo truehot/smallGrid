@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "View": {
                 "Model": ViewModel
             }
@@ -253,11 +253,11 @@
             "clearFilter": clearFilter,
             "clearFilters": clearFilters,
 
-            "onRowsChange": new Small.Event.Handler(),//rename to onRowCountChange
-            "onColumnsChange": new Small.Event.Handler(),//rename to onColumnCountChange
-            "onDataChange": new Small.Event.Handler(),
-            "onDataChangeStart": new Small.Event.Handler(),
-            "onDataChangeStop": new Small.Event.Handler(),
+            "onRowsChange": new SmallGrid.Event.Handler(),//rename to onRowCountChange
+            "onColumnsChange": new SmallGrid.Event.Handler(),//rename to onColumnCountChange
+            "onDataChange": new SmallGrid.Event.Handler(),
+            "onDataChangeStart": new SmallGrid.Event.Handler(),
+            "onDataChangeStop": new SmallGrid.Event.Handler(),
         });
     }
 })(jQuery);

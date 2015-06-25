@@ -82,7 +82,7 @@
     }
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Utils": {
                 "changeSortOrder": changeSortOrder,
                 "getNewGuid": guid.newGuid,

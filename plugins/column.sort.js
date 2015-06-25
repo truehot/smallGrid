@@ -3,7 +3,7 @@
 (function ($) {
 
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Plugins": {
                 "ColumnSort": ColumnSortPlugin,
             }

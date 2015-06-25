@@ -2,7 +2,7 @@
 
 (function ($) {
     $.extend(true, window, {
-        "Small": {
+        "SmallGrid": {
             "Cell": {
                 "Editor": {
                     "Create": CreateEditor,
@@ -61,9 +61,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -117,9 +117,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -173,9 +173,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -229,9 +229,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
@@ -284,9 +284,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new Small.Event.Handler(),
-            "onChange": new Small.Event.Handler(),
-            "onDestroy": new Small.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onChange": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler(),
         });
 
         self.onInitialize.notify({
