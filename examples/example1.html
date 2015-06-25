@@ -7,7 +7,7 @@
 
 
     <script src="../libs/jquery-2.1.3.min.js"></script>
-    <script src="../small.grid.all.js"></script>
+    <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
     <div class="small-grid" style="width: 537px; height: 162px;"></div>
@@ -27,7 +27,7 @@
             { "task1": "Task 1 row 5", "task2": "Task 2 row 5", "task3": "Task 3 row 5", "task4": "Task 4 row 5", "task5": "Task 5 row 5" },
         ];
         $(document).ready(function () {
-            var grid = new Small.Grid.Create($('.small-grid'), items, columns, {});
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
         });
     </script>
 </body>
