@@ -8,23 +8,23 @@
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
-    <form><input type="checkbox" class="auto-edit"/>Enable auto edit</form>
+    <form><input type="checkbox" class="auto-edit" />Enable auto edit</form>
 
 
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
         var columns = [
-            { 'name': "Column 1", 'field': "property1", 'width': 200, 'editor': 'Text' },
-            { 'name': "Column 2", 'field': "property2", 'width': 200, 'editor': 'Checkbox' },
-            { 'name': "Column 3", 'field': "property3", 'width': 200, 'editor': 'Integer' },
-            { 'name': "Column 4", 'field': "property4", 'width': 200, 'editor': 'Text' },
-            { 'name': "Column 5", 'field': "property5", 'width': 200, 'editor': 'None' },
+            { 'name': "Editor Text", 'field': "property1", 'width': 200, 'editor': 'Text' },
+            { 'name': "Editor Checkbox", 'field': "property2", 'width': 200, 'editor': 'Checkbox' },
+            { 'name': "Editor Integer", 'field': "property3", 'width': 200, 'editor': 'Integer' },
+            { 'name': "Editor Text", 'field': "property4", 'width': 200, 'editor': 'Text' },
+            { 'name': "Editor None", 'field': "property5", 'width': 200, 'editor': 'None' },
         ];
         var items = [];
         for (var i = 0; i < 600; i++) {
             var item = {};
             for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = ii + "" + i + ", editor " + (columns[ii - 1].editor);
+                item["property" + ii] = i + ' '+ii;
             }
 
             items.push(item);
