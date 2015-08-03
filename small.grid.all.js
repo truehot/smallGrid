@@ -295,7 +295,7 @@
     }
 
     function CreateEditor(name, options, settings) {
-        if (settings.Utils.isFunction(name, settings.RowEditor) == true) {
+        if (settings.Utils.isFunction(name, settings.RowEditor) === true) {
             return new settings.RowEditor[name](options);
         }
     }
@@ -320,7 +320,7 @@
     });
 
     function DefaultFormatter(value, column, row, settings) {
-        return (value != undefined) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+        return (value !== undefined) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
     }
 
     function CheckboxFormatter(value, column, row, settings) {
@@ -431,7 +431,7 @@
         }
 
         function isEmpty() {
-            return data.length == 0;
+            return data.length === 0;
         }
 
         function total() {
@@ -470,7 +470,7 @@
         }
 
         function getItems() {
-            var result = []
+            var result = [];
             for (var i = 0; i < data.length; i++) {
                 result.push(data[i].item);
             }
@@ -485,7 +485,7 @@
                     ids.push(data[i].id);
                 }
                 data = [];
-                for (var i = 0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     addItem(items[i]);
                 }
                 self.onChangeStop.notify();
@@ -695,7 +695,7 @@
                 }
                 data = [];
 
-                for (var i = 0; i < columns.length; i++) {
+                for (i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
                 self.onChangeStop.notify();
@@ -712,8 +712,10 @@
 
         function updateColumn(column) {
             if (column instanceof ColumnData) {
-                data[idx] = column;
-                self.onChange.notify({ "id": [column.id] });
+                var idProperty = settings.columns.idProperty;
+                if (settings.Utils.isProperty(idProperty, column)) {
+                    updateColumnById(column[idProperty], column);
+                }
             }
             return this;
         }
@@ -749,12 +751,10 @@
         }
 
         function createItemData(item) {
-            if (settings.columns.mapProperties == true) {
-                var itemData = $.extend({ item: item }, item);
-                //itemData.item = item;//TODO: extend?
-                return itemData;
+            if (settings.columns.mapProperties === true) {
+                return $.extend({ item: item }, item);
             }
-            return itemData = {
+            return {
                 "name": item.name,
                 "field": item.field,
                 "item": item
@@ -780,15 +780,15 @@
             );
 
 
-            if (column.sortComparer && settings.Utils.isFunction(column.sortComparer, settings.RowComparer) == false) {
+            if (column.sortComparer && settings.Utils.isFunction(column.sortComparer, settings.RowComparer) === false) {
                 delete column.sortComparer;
             }
 
-            if (column.formatter && settings.Utils.isFunction(column.formatter, settings.RowFormatter) == false) {
+            if (column.formatter && settings.Utils.isFunction(column.formatter, settings.RowFormatter) === false) {
                 delete column.formatter;
             }
 
-            if (column.editor && settings.Utils.isFunction(column.editor, settings.RowEditor) == false) {
+            if (column.editor && settings.Utils.isFunction(column.editor, settings.RowEditor) === false) {
                 delete column.editor;
             }
 
@@ -893,7 +893,7 @@
 
         this.isImmediatePropagationStopped = function () {
             return isImmediatePropagationStopped;
-        }
+        };
     }
 
     function EventHandler() {
@@ -936,7 +936,7 @@
                     break;
                 }
             }
-        }
+        };
     }
 
 })(jQuery);"use strict";
@@ -1092,39 +1092,38 @@
                             break;
 
                         case 'eq':
-                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') == true ";
+                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') === true ";
                             break;
 
                         case 'neq':
-                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') == false ";
+                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') === false ";
                             break;
 
                         case 'startsWith':
-                            convertedQuery += " startsWith(item.item['" + field + "'], '" + query.value + "') == true ";
+                            convertedQuery += " startsWith(item.item['" + field + "'], '" + query.value + "') === true ";
                             break;
 
                         case 'endsWith':
-                            convertedQuery += " endsWith(item.item['" + field + "'], '" + query.value + "') == true ";
+                            convertedQuery += " endsWith(item.item['" + field + "'], '" + query.value + "') === true ";
                             break;
 
                         case 'contains':
-                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') == true ";
+                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') === true ";
                             break;
 
                         case 'doesNotContain':
-                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') == false ";
+                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') === false ";
                             break;
                     }
                 };
 
                 if (convertedQuery.length) {
-                    if (i != 0) {
+                    if (i !== 0) {
                         resultQuery += " && ";
                     }
                     resultQuery += '(' + convertedQuery + ')';
                 }
             }
-
             return resultQuery;
         }
 
@@ -1133,7 +1132,7 @@
         }
 
         function startsWith(str, suffix) {
-            return ('' + str).indexOf(suffix) == 0;
+            return ('' + str).indexOf(suffix) === 0;
         }
 
         function endsWith(str, suffix) {
@@ -1145,45 +1144,88 @@
         }
 
         function columnsFullWidth(outerWidth, filter) {
-            return function (prev, item) {
-                if (filter && eval(filter) == false) return prev;
-                return prev + item.width + outerWidth;
-            };
+            if (filter) {
+                var f = new Function('item', 'return ' + resultQuery);
+                return function (prev, item) {
+                    if (f(item) === false) return prev;
+                    return prev + item.width + outerWidth;
+                };
+            } else {
+                return function (prev, item) {
+                    return prev + item.width + outerWidth;
+                };
+            }
+
         }
 
         function itemFullHeight(outerHeight, filter) {
-            return function (prev, item) {
-                if (filter && eval(filter) == false) return prev;
-                return prev + item.height + outerHeight;
-            };
+            if (filter) {
+                var f = new Function('item', 'return ' + resultQuery);
+                return function (prev, item) {
+                    if (f(item) === false) return prev;
+                    return prev + item.height + outerHeight;
+                };
+            } else {
+                return function (prev, item) {
+                    return prev + item.height + outerHeight;
+                };
+            }
         }
 
         function columnsRangeByWidth(center, width, outerWidth, filter) {
             var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth;
-            return function (item, index, array) {
-                if (!(filter && eval(filter) == false)) {
+            if (filter) {
+                var f = new Function('item', 'return ' + resultQuery);
+                return function (item, index, array) {
+                    if (!(f(item) === false)) {
+                        calcWidth += outerWidth + item.width;
+                        if (min <= calcWidth && calcWidth <= max) {
+                            item.calcWidth = calcWidth;
+                            item.calcIndex = index;
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+            } else {
+                return function (item, index, array) {
                     calcWidth += outerWidth + item.width;
                     if (min <= calcWidth && calcWidth <= max) {
                         item.calcWidth = calcWidth;
+                        item.calcIndex = index;
                         return true;
                     }
-                }
-                return false;
-            };
+                    return false;
+                };
+            }
         }
 
         function rowsRangeByHeight(center, height, outerHeight, filter) {
             var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight;
-            return function (item, index, array) {
-                if (!(filter && eval(filter) == false)) {
+            if (filter) {
+                return function (item, index, array) {
+                    if (!(f(item) === false)) {
+                        calcHeight += outerHeight + item.height;
+                        if (min <= calcHeight && calcHeight <= max) {
+                            item.calcHeight = calcHeight;
+                            item.calcIndex = index;
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+            } else {
+                return function (item, index, array) {
                     calcHeight += outerHeight + item.height;
                     if (min <= calcHeight && calcHeight <= max) {
                         item.calcHeight = calcHeight;
+                        item.calcIndex = index;
                         return true;
                     }
-                }
-                return false;
-            };
+
+                    return false;
+                };
+            }
         }
 
         $.extend(this, {
@@ -1210,7 +1252,8 @@
         var self = this;
         var view = {};
         var plugins = {};
-        var version = "0.1";
+        var version = "0.2";
+        var id = settings.Utils.getNewGuid();
 
         /*
         Init & Destroy
@@ -1251,7 +1294,7 @@
         Plugins
         */
         function isRegisteredPlugin(name) {
-            return plugins[name] != undefined;
+            return plugins[name] !== undefined;
         }
 
         function registerPlugin(name) {
@@ -1282,16 +1325,21 @@
         }
 
         /*
-        Version
+        Other
         */
         function getVersion() {
             return version;
+        }
+
+        function getId() {
+            return id;
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
+            "getId": getId,
             "getSettings": getSettings,
             "getVersion": getVersion,
             "getView": getView,
@@ -1305,20 +1353,20 @@
     }
 
     function CreateModel($container, rows, columns, settings) {
-        var settings = new SmallGrid.Settings.Create(settings);
+        var newSettings = new SmallGrid.Settings.Create(settings);
         var viewModel = new SmallGrid.View.Model(
-            new SmallGrid.Row.Create(rows, settings),
-            new SmallGrid.Column.Create(columns, settings),
-            settings
+            new SmallGrid.Row.Create(rows, newSettings),
+            new SmallGrid.Column.Create(columns, newSettings),
+            newSettings
         );
 
         var grid = new GridModel(
             $container,
             viewModel,
-            settings
+            newSettings
         );
 
-        if (settings.explicitInitialization == false) {
+        if (newSettings.explicitInitialization === false) {
             grid.init();
         }
 
@@ -1343,7 +1391,7 @@
         "handleDblClick": undefined,
         "handleContextMenu": undefined,
         "handleKeyDown": undefined,
-    }
+    };
 
     function ClickHandler($container, settings) {
         var settings = jQuery.extend({}, defaultSettings, settings);
@@ -1364,7 +1412,7 @@
                             cellIndex: $cellElement.index(),
                             rowIndex: $rowElement.index(),
                             event: e,
-                        }
+                        };
                     }
                 }
             }
@@ -1428,7 +1476,7 @@
         "handleResizeStart": undefined,
         "handleResizeStop": undefined,
         "handlerIdentifier": undefined,
-    }
+    };
 
     function ResizeHandler($container, settings) {
         var settings = jQuery.extend({}, defaultSettings, settings);
@@ -1520,8 +1568,8 @@
             $element[0].scrollLeft = 0;
         }
 
-        var scrollTimer,
-            wheelTimer,
+        var scrollStopTimer, wheelStopTimer,
+            isScrollMoved = false, isWheelMoved = false,
             last = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
@@ -1531,18 +1579,20 @@
         $element.on('wheel', handleMouseWheel);
 
         function handleMouseWheel(e) {
-            if (wheelTimer) {
-                clearTimeout(wheelTimer);
-            } else {
+            clearTimeout(wheelStopTimer);
+
+            if (isWheelMoved == false) {
+                isWheelMoved = true;
                 settings.handleMouseWheelStart({ event: e });
             }
 
             settings.handleMouseWheel({ event: e });
 
-            wheelTimer = setTimeout(function () {
-                wheelTimer = null;
+            wheelStopTimer = setTimeout(function () {
                 settings.handleMouseWheelStop({ event: e });
+                isWheelMoved = false;
             }, settings.latency);
+
         }
 
         function handleScroll(e) {
@@ -1550,11 +1600,12 @@
             var dim = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
-            }
+            };
 
-            if (scrollTimer) {
-                clearTimeout(scrollTimer);
-            } else {
+            clearTimeout(scrollStopTimer);
+
+            if (isScrollMoved == false) {
+                isScrollMoved = true;
                 settings.handleScrollStart({
                     scrollTop: dim.scrollTop,
                     scrollLeft: dim.scrollLeft,
@@ -1572,8 +1623,7 @@
                 event: e,
             });
 
-            scrollTimer = setTimeout(function () {
-                scrollTimer = null;
+            scrollStopTimer = setTimeout(function () {
                 settings.handleScrollStop({
                     scrollTop: dim.scrollTop,
                     scrollLeft: dim.scrollLeft,
@@ -1581,22 +1631,18 @@
                     leftDelta: dim.scrollLeft - last.scrollLeft,
                     event: e,
                 });
-
+                isScrollMoved = false;
             }, settings.latency);
 
             last = {
                 scrollTop: dim.scrollTop,
                 scrollLeft: dim.scrollLeft,
-            }
+            };
         }
 
         function destroy() {
-            if (scrollTimer) {
-                clearTimeout(scrollTimer);
-            }
-            if (wheelTimer) {
-                clearTimeout(wheelTimer);
-            }
+            clearTimeout(scrollStopTimer);
+            clearTimeout(wheelStopTimer);
 
             $element.off('scroll', handleScroll);
             $element.off('wheel', handleMouseWheel);
@@ -1624,7 +1670,6 @@
     });
 
     function mixedComparer(settings) {
-        var sortOrder = settings.sortOrder;
         return function (a, b) {
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
@@ -1639,7 +1684,7 @@
                 y = y.toString().toLowerCase();
             }
             return (x == y ? 0 : (x > y ? settings.sortOrder : -settings.sortOrder));
-        }
+        };
     }
 
     function numberComparer(settings) {
@@ -1648,7 +1693,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
             return (x - y) * sortOrder;
-        }
+        };
     }
 
     function localeStringComparer(settings) {
@@ -1657,7 +1702,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field].toLowerCase() : null,
                 y = (settings.field in b.item) ? b.item[settings.field].toLowerCase() : null;
             return x.localeCompare(y) * sortOrder;
-        }
+        };
     }
 
     function stringComparer(settings) {
@@ -1667,7 +1712,7 @@
                 y = (settings.field in b.item) ? b.item[settings.field].toLowerCase() : null;
 
             return (x == y ? 0 : (x > y ? 1 * sortOrder : -1 * sortOrder));
-        }
+        };
     }
 
     function dateComparer(settings) {
@@ -1676,7 +1721,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
             return (new Date(x) - new Date(y)) * sortOrder;
-        }
+        };
     }
 
 })(jQuery);"use strict";
@@ -1750,7 +1795,7 @@
         }
 
         function isEmpty() {
-            return data.length == 0;
+            return data.length === 0;
         }
 
         function total() {
@@ -1787,7 +1832,7 @@
         }
 
         function getItems() {
-            var result = []
+            var result = [];
             for (var i = 0; i < data.length; i++) {
                 result.push(data[i].item);
             }
@@ -1802,7 +1847,7 @@
                     ids.push(data[i].id);
                 }
                 data = [];
-                for (var i = 0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     addItem(items[i]);
                 }
                 self.onChangeStop.notify();
@@ -2010,7 +2055,7 @@
                 }
                 data = [];
 
-                for (var i = 0; i < rows.length; i++) {
+                for (i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
                 self.onChangeStop.notify();
@@ -2027,8 +2072,10 @@
 
         function updateRow(row) {
             if (row instanceof RowData) {
-                data[idx] = row;
-                self.onChange.notify({ "id": [row.id] });
+                var idProperty = settings.rows.idProperty;
+                if (settings.Utils.isProperty(idProperty, row)) {
+                    updateRowById(row[idProperty], row);
+                }
             }
             return this;
         }
@@ -2064,7 +2111,7 @@
         }
 
         function createItemData(item) {
-            if (settings.rows.mapProperties == true) {
+            if (settings.rows.mapProperties === true) {
                 var itemData = $.extend({}, item);
                 itemData.item = item;//TODO: extend?
                 return itemData;
@@ -2171,7 +2218,7 @@
             return t[e & 255] + t[e >> 8 & 255] + t[e >> 16 & 255] + t[e >> 24 & 255] + "-" + t[n & 255] + t[n >> 8 & 255] + "-" + t[n >> 16 & 15 | 64] + t[n >> 24 & 255] + "-" + t[r & 63 | 128] + t[r >> 8 & 255] + "-" + t[r >> 16 & 255] + t[r >> 24 & 255] + t[i & 255] + t[i >> 8 & 255] + t[i >> 16 & 255] + t[i >> 24 & 255];
         };
         return e;
-    }()
+    }();
 
     function isFunction(funcName, obj) {
         return (obj && funcName && funcName in obj && typeof (obj[funcName]) === "function");
@@ -2186,45 +2233,42 @@
     }
 
     function measureMaxSupportedCssHeight() {
-        var supportedHeight = 1000000,
-            testUpTo = navigator.userAgent.toLowerCase().match(/firefox/) ? 6000000 : 1000000000,
-            div = $('<div style="display:none" />').appendTo(document.body);
-
+        var incHeight = 1000000, supportedHeight = 1000000, el = $('<div style="display:none; " />').appendTo(document.body);
         while (true) {
-            var test = supportedHeight * 2;
-            div.css("height", test);
-            if (test > testUpTo || div.height() !== test) {
-                break;
-            } else {
-                supportedHeight = test;
+            el.css("height", supportedHeight);
+            if (el.height() === supportedHeight) {
+                supportedHeight += incHeight;
+                if (supportedHeight < 17000000) {
+                    continue;
+                }
             }
+            break;
         }
-
-        div.remove();
-        return supportedHeight;
+        el.remove();
+        return supportedHeight - incHeight;
     }
 
     function measureScrollbar() {
-        var $c = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo('body');
+        var $el = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo('body');
 
         var dim = {
-            width: $c.width() - $c[0].clientWidth,
-            height: $c.height() - $c[0].clientHeight
+            width: $el.width() - $el[0].clientWidth,
+            height: $el.height() - $el[0].clientHeight
         };
 
-        $c.remove();
+        $el.remove();
         return dim;
     }
 
 
     function measureCellDiff($element) {
-        var $row = $("<tr />").appendTo($element);
-        var $cell = $("<td style='width:5px; height:5px;'>-</td>").appendTo($row);
+        var $row = $("<tr />").appendTo($element),
+            $cell = $("<td style='width:5px; height:5px;'>-</td>").appendTo($row);
 
         var cellDiff = {
             width: $cell.outerWidth() - $cell.width(),
             height: $cell.outerHeight() - $cell.height(),
-        }
+        };
 
         $cell.remove();
         $row.remove();
@@ -2266,18 +2310,23 @@
         var self = this;
         var viewModel;
 
+        var requestDataTimer = null;
+        var requestRenderTimer = null;
+
+        var heightRatio = 1;
+
         var suspend = true;
         var suspendRenderRequests = 0;
 
         var canvasSize = {
             width: 0,
             height: 0,
-        }
+        };
 
         var cellOuterSize = {
             width: 0,
             height: 0,
-        }
+        };
 
         //handlers
         var handlers = [];
@@ -2483,20 +2532,6 @@
             $viewport.removeClass(cssClass);
         }
 
-        function removeAllTextSelections() {
-            var selection = ('getSelection' in window)
-                ? window.getSelection()
-                : ('selection' in document)
-                    ? document.selection
-                    : null;
-            try {
-                if ('removeAllRanges' in selection) {
-                    selection.removeAllRanges();
-                } else if ('empty' in selection) {
-                    selection.empty();
-                }
-            } catch (e) { }
-        }
 
         /*
         Public api
@@ -2518,7 +2553,7 @@
         function render() {
             suspendRenderRequests++;
 
-            if (suspend == false) {
+            if (suspend === false) {
                 renderRequests();
             }
 
@@ -2526,17 +2561,28 @@
         }
 
         function renderRequests() {
-            if (suspend == false && suspendRenderRequests > 0) {
-                suspendRenderRequests = 0;
+            if (suspend === false && suspendRenderRequests > 0) {
 
-                viewModel.requestDataFromRange(
-                    {
-                        top: $canvas[0].scrollTop,
-                        left: $canvas[0].scrollLeft
-                    },
-                    canvasSize,
-                    cellOuterSize
-                );
+                if (requestDataTimer == null) {
+                    suspendRenderRequests = 0;
+
+                    requestDataTimer = setTimeout(function () {
+                        viewModel.requestDataFromRange(
+                            {
+                                top: $canvas[0].scrollTop * heightRatio,
+                                left: $canvas[0].scrollLeft
+                            },
+                            canvasSize,
+                            cellOuterSize,
+                            heightRatio == 1
+                        );
+                        requestDataTimer = null;
+                        requestRenderTimer = null;
+                    }, 30);
+
+                } else if (requestRenderTimer == null) {
+                    requestRenderTimer = setTimeout(render, 300);
+                }
             }
             return this;
         }
@@ -2565,7 +2611,7 @@
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].destroy();
                 }
-                $container.empty().removeClass(uid);
+                $container.empty().removeClass(settings.uid);
             }
             $(document.body).off("click", handleBodyClick);
             self.onDestroy.notify({});
@@ -2616,10 +2662,10 @@
                 cellCssClass += " " + settings.cssClass.cursorPointer;
             }
 
-            var html = "<td style='width:" + (column.width) + "px;height:" + settings.columns.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerRowDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
+            html = "<td style='width:" + (column.width) + "px;height:" + settings.columns.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerRowDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
 
 
-            if (column.sortable && column.sortOrder != 0) {
+            if (column.sortable && column.sortOrder !== 0) {
                 html += "<span class='" + ((column.sortOrder == 1) ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
             }
 
@@ -2649,7 +2695,7 @@
         function buildColHtml(column) {
             var cellCssClass = settings.cssClass.col;
             if (column.headerCssClass) {
-                cellCssClass += " " + columns.headerCssClass;
+                cellCssClass += " " + column.headerCssClass;
             }
 
             return "<col style='width:" + (column.width + cellOuterSize.width) + "px;' class='" + cellCssClass + "'/>";
@@ -2664,7 +2710,7 @@
         }
 
         function buildRowHtml(columns, row, index) {
-            var rowCssClass = settings.cssClass.row + ((index & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
             if (row.rowCssClass) {
                 rowCssClass += " " + row.rowCssClass;
             }
@@ -2724,9 +2770,9 @@
         //todo: fix multiple types, edit && select, remove, add type registration
         function getCellEventType(targetClass, column, row) {
             var type = "";
-            if (row.editable == true && column.editable == true) {
+            if (row.editable === true && column.editable === true) {
                 type = "edit";
-            } else if (row.disabled == true) {
+            } else if (row.disabled === true) {
                 type = "disabled";
             }
             return type;
@@ -2736,7 +2782,7 @@
             var column = viewModel.getColumnByIndex(e.cellIndex);
             if (column) {
                 e.type = getColumnEventType($(e.event.target).attr("class"), column);
-                e.targetClass = $(e.event.target).attr("class"),
+                e.targetClass = $(e.event.target).attr("class");
                 e.column = column;
                 return e;
             }
@@ -2759,9 +2805,17 @@
         /*
         Data handlers
         */
+
+
         function handleRowsChange(e) {
             if (viewModel) {
                 var itemsHeight = viewModel.getRowsHeight(cellOuterSize);
+
+                if (itemsHeight > settings['maxSupportedCssHeight']) {
+                    heightRatio = (itemsHeight - canvasSize.height + settings['scrollbarDimensions'].height) / (settings['maxSupportedCssHeight'] - canvasSize.height + settings['scrollbarDimensions'].height);
+                    itemsHeight = settings['maxSupportedCssHeight'];
+                }
+
                 $tableWrap.css({
                     'height': itemsHeight,
                 });
@@ -2797,7 +2851,7 @@
                 });
 
                 $table.css({
-                    'top': e.rows[0].calcHeight - e.rows[0].height - cellOuterSize.height,
+                    'top': e.rows[0].calcHeight - e.rows[0].height - cellOuterSize.width - ($canvas[0].scrollTop * heightRatio) + $canvas[0].scrollTop,
                     'left': e.columns[0].calcWidth - e.columns[0].width - cellOuterSize.width
                 });
 
@@ -2899,7 +2953,7 @@
             suspendRender(true);
             self.onMouseWheel.notify(e);
             suspendRender(false);
-            renderRequests();
+            render();
         }
 
         /*
@@ -3023,7 +3077,7 @@
             "enableHeaderClass": enableHeaderClass,
             "removeViewPortClass": removeViewPortClass,
             "setColumnWidthByIndex": setColumnWidthByIndex,
-            "removeAllTextSelections": removeAllTextSelections,
+
 
             "isRenderSuspended": isRenderSuspended,
             "render": render,
@@ -3035,8 +3089,8 @@
     }
 
 
-    function CreateView($container, data, columns, settings) {
-        $container = $($container);
+    function CreateView(container, data, columns, settings) {
+        var $container = $(container);
         if ($container.length < 1) {
             throw new Error("Small grid requires a valid container, " + container + " does not exist in the DOM.");
         }
@@ -3073,7 +3127,7 @@
             maxTop: -1,
             minLeft: -1,
             maxLeft: -1,
-        }
+        };
 
         /*
         Init && destroy
@@ -3207,19 +3261,19 @@
             return new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsWidth(cellOuterSize.width);
         }
 
-        function requestDataFromRange(point, size, outerSize) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop);
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft);
+        function requestDataFromRange(point, size, outerSize, allowCache) {
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) & allowCache;
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) & allowCache;
 
-            if (rowsCached == false || columnsCached == false) {
+            if (rowsCached === 0 || columnsCached === 0) {
                 self.onDataChangeStart.notify();
 
-                if (rowsCached == false) {
+                if (rowsCached === 0) {
                     rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
                     self.onRowsChange.notify();
                 }
 
-                if (columnsCached == false) {
+                if (columnsCached === 0) {
                     columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
                     self.onColumnsChange.notify();
                 }
@@ -3251,7 +3305,7 @@
                     maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width
                         ? size.width
                         : columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
-                }
+                };
             } else {
                 resetCacheRange();
             }

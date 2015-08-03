@@ -16,7 +16,7 @@
         "handleDblClick": undefined,
         "handleContextMenu": undefined,
         "handleKeyDown": undefined,
-    }
+    };
 
     function ClickHandler($container, settings) {
         var settings = jQuery.extend({}, defaultSettings, settings);
@@ -37,7 +37,7 @@
                             cellIndex: $cellElement.index(),
                             rowIndex: $rowElement.index(),
                             event: e,
-                        }
+                        };
                     }
                 }
             }

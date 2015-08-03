@@ -14,7 +14,8 @@
         var self = this;
         var view = {};
         var plugins = {};
-        var version = "0.1";
+        var version = "0.2";
+        var id = settings.Utils.getNewGuid();
 
         /*
         Init & Destroy
@@ -55,7 +56,7 @@
         Plugins
         */
         function isRegisteredPlugin(name) {
-            return plugins[name] != undefined;
+            return plugins[name] !== undefined;
         }
 
         function registerPlugin(name) {
@@ -86,16 +87,21 @@
         }
 
         /*
-        Version
+        Other
         */
         function getVersion() {
             return version;
+        }
+
+        function getId() {
+            return id;
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
+            "getId": getId,
             "getSettings": getSettings,
             "getVersion": getVersion,
             "getView": getView,
@@ -109,20 +115,20 @@
     }
 
     function CreateModel($container, rows, columns, settings) {
-        var settings = new SmallGrid.Settings.Create(settings);
+        var newSettings = new SmallGrid.Settings.Create(settings);
         var viewModel = new SmallGrid.View.Model(
-            new SmallGrid.Row.Create(rows, settings),
-            new SmallGrid.Column.Create(columns, settings),
-            settings
+            new SmallGrid.Row.Create(rows, newSettings),
+            new SmallGrid.Column.Create(columns, newSettings),
+            newSettings
         );
 
         var grid = new GridModel(
             $container,
             viewModel,
-            settings
+            newSettings
         );
 
-        if (settings.explicitInitialization == false) {
+        if (newSettings.explicitInitialization === false) {
             grid.init();
         }
 

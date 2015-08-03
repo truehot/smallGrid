@@ -35,8 +35,8 @@
             $element[0].scrollLeft = 0;
         }
 
-        var scrollTimer,
-            wheelTimer,
+        var scrollStopTimer, wheelStopTimer,
+            isScrollMoved = false, isWheelMoved = false,
             last = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
@@ -46,18 +46,20 @@
         $element.on('wheel', handleMouseWheel);
 
         function handleMouseWheel(e) {
-            if (wheelTimer) {
-                clearTimeout(wheelTimer);
-            } else {
+            clearTimeout(wheelStopTimer);
+
+            if (isWheelMoved == false) {
+                isWheelMoved = true;
                 settings.handleMouseWheelStart({ event: e });
             }
 
             settings.handleMouseWheel({ event: e });
 
-            wheelTimer = setTimeout(function () {
-                wheelTimer = null;
+            wheelStopTimer = setTimeout(function () {
                 settings.handleMouseWheelStop({ event: e });
+                isWheelMoved = false;
             }, settings.latency);
+
         }
 
         function handleScroll(e) {
@@ -65,11 +67,12 @@
             var dim = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
-            }
+            };
 
-            if (scrollTimer) {
-                clearTimeout(scrollTimer);
-            } else {
+            clearTimeout(scrollStopTimer);
+
+            if (isScrollMoved == false) {
+                isScrollMoved = true;
                 settings.handleScrollStart({
                     scrollTop: dim.scrollTop,
                     scrollLeft: dim.scrollLeft,
@@ -87,8 +90,7 @@
                 event: e,
             });
 
-            scrollTimer = setTimeout(function () {
-                scrollTimer = null;
+            scrollStopTimer = setTimeout(function () {
                 settings.handleScrollStop({
                     scrollTop: dim.scrollTop,
                     scrollLeft: dim.scrollLeft,
@@ -96,22 +98,18 @@
                     leftDelta: dim.scrollLeft - last.scrollLeft,
                     event: e,
                 });
-
+                isScrollMoved = false;
             }, settings.latency);
 
             last = {
                 scrollTop: dim.scrollTop,
                 scrollLeft: dim.scrollLeft,
-            }
+            };
         }
 
         function destroy() {
-            if (scrollTimer) {
-                clearTimeout(scrollTimer);
-            }
-            if (wheelTimer) {
-                clearTimeout(wheelTimer);
-            }
+            clearTimeout(scrollStopTimer);
+            clearTimeout(wheelStopTimer);
 
             $element.off('scroll', handleScroll);
             $element.off('wheel', handleMouseWheel);

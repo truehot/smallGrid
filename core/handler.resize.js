@@ -15,7 +15,7 @@
         "handleResizeStart": undefined,
         "handleResizeStop": undefined,
         "handlerIdentifier": undefined,
-    }
+    };
 
     function ResizeHandler($container, settings) {
         var settings = jQuery.extend({}, defaultSettings, settings);

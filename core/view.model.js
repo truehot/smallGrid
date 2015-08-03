@@ -27,7 +27,7 @@
             maxTop: -1,
             minLeft: -1,
             maxLeft: -1,
-        }
+        };
 
         /*
         Init && destroy
@@ -161,19 +161,19 @@
             return new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsWidth(cellOuterSize.width);
         }
 
-        function requestDataFromRange(point, size, outerSize) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop);
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft);
+        function requestDataFromRange(point, size, outerSize, allowCache) {
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) & allowCache;
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) & allowCache;
 
-            if (rowsCached == false || columnsCached == false) {
+            if (rowsCached === 0 || columnsCached === 0) {
                 self.onDataChangeStart.notify();
 
-                if (rowsCached == false) {
+                if (rowsCached === 0) {
                     rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
                     self.onRowsChange.notify();
                 }
 
-                if (columnsCached == false) {
+                if (columnsCached === 0) {
                     columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
                     self.onColumnsChange.notify();
                 }
@@ -205,7 +205,7 @@
                     maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width
                         ? size.width
                         : columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
-                }
+                };
             } else {
                 resetCacheRange();
             }

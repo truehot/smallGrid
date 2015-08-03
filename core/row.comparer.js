@@ -15,7 +15,6 @@
     });
 
     function mixedComparer(settings) {
-        var sortOrder = settings.sortOrder;
         return function (a, b) {
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
@@ -30,7 +29,7 @@
                 y = y.toString().toLowerCase();
             }
             return (x == y ? 0 : (x > y ? settings.sortOrder : -settings.sortOrder));
-        }
+        };
     }
 
     function numberComparer(settings) {
@@ -39,7 +38,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
             return (x - y) * sortOrder;
-        }
+        };
     }
 
     function localeStringComparer(settings) {
@@ -48,7 +47,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field].toLowerCase() : null,
                 y = (settings.field in b.item) ? b.item[settings.field].toLowerCase() : null;
             return x.localeCompare(y) * sortOrder;
-        }
+        };
     }
 
     function stringComparer(settings) {
@@ -58,7 +57,7 @@
                 y = (settings.field in b.item) ? b.item[settings.field].toLowerCase() : null;
 
             return (x == y ? 0 : (x > y ? 1 * sortOrder : -1 * sortOrder));
-        }
+        };
     }
 
     function dateComparer(settings) {
@@ -67,7 +66,7 @@
             var x = (settings.field in a.item) ? a.item[settings.field] : null,
                 y = (settings.field in b.item) ? b.item[settings.field] : null;
             return (new Date(x) - new Date(y)) * sortOrder;
-        }
+        };
     }
 
 })(jQuery);

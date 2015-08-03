@@ -35,7 +35,7 @@
 
         this.isImmediatePropagationStopped = function () {
             return isImmediatePropagationStopped;
-        }
+        };
     }
 
     function EventHandler() {
@@ -78,7 +78,7 @@
                     break;
                 }
             }
-        }
+        };
     }
 
 })(jQuery);

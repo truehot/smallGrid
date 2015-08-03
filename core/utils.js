@@ -16,7 +16,7 @@
             return t[e & 255] + t[e >> 8 & 255] + t[e >> 16 & 255] + t[e >> 24 & 255] + "-" + t[n & 255] + t[n >> 8 & 255] + "-" + t[n >> 16 & 15 | 64] + t[n >> 24 & 255] + "-" + t[r & 63 | 128] + t[r >> 8 & 255] + "-" + t[r >> 16 & 255] + t[r >> 24 & 255] + t[i & 255] + t[i >> 8 & 255] + t[i >> 16 & 255] + t[i >> 24 & 255];
         };
         return e;
-    }()
+    }();
 
     function isFunction(funcName, obj) {
         return (obj && funcName && funcName in obj && typeof (obj[funcName]) === "function");
@@ -31,45 +31,42 @@
     }
 
     function measureMaxSupportedCssHeight() {
-        var supportedHeight = 1000000,
-            testUpTo = navigator.userAgent.toLowerCase().match(/firefox/) ? 6000000 : 1000000000,
-            div = $('<div style="display:none" />').appendTo(document.body);
-
+        var incHeight = 1000000, supportedHeight = 1000000, el = $('<div style="display:none; " />').appendTo(document.body);
         while (true) {
-            var test = supportedHeight * 2;
-            div.css("height", test);
-            if (test > testUpTo || div.height() !== test) {
-                break;
-            } else {
-                supportedHeight = test;
+            el.css("height", supportedHeight);
+            if (el.height() === supportedHeight) {
+                supportedHeight += incHeight;
+                if (supportedHeight < 17000000) {
+                    continue;
+                }
             }
+            break;
         }
-
-        div.remove();
-        return supportedHeight;
+        el.remove();
+        return supportedHeight - incHeight;
     }
 
     function measureScrollbar() {
-        var $c = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo('body');
+        var $el = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo('body');
 
         var dim = {
-            width: $c.width() - $c[0].clientWidth,
-            height: $c.height() - $c[0].clientHeight
+            width: $el.width() - $el[0].clientWidth,
+            height: $el.height() - $el[0].clientHeight
         };
 
-        $c.remove();
+        $el.remove();
         return dim;
     }
 
 
     function measureCellDiff($element) {
-        var $row = $("<tr />").appendTo($element);
-        var $cell = $("<td style='width:5px; height:5px;'>-</td>").appendTo($row);
+        var $row = $("<tr />").appendTo($element),
+            $cell = $("<td style='width:5px; height:5px;'>-</td>").appendTo($row);
 
         var cellDiff = {
             width: $cell.outerWidth() - $cell.width(),
             height: $cell.outerHeight() - $cell.height(),
-        }
+        };
 
         $cell.remove();
         $row.remove();

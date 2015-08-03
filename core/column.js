@@ -86,7 +86,7 @@
         }
 
         function isEmpty() {
-            return data.length == 0;
+            return data.length === 0;
         }
 
         function total() {
@@ -125,7 +125,7 @@
         }
 
         function getItems() {
-            var result = []
+            var result = [];
             for (var i = 0; i < data.length; i++) {
                 result.push(data[i].item);
             }
@@ -140,7 +140,7 @@
                     ids.push(data[i].id);
                 }
                 data = [];
-                for (var i = 0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     addItem(items[i]);
                 }
                 self.onChangeStop.notify();
@@ -350,7 +350,7 @@
                 }
                 data = [];
 
-                for (var i = 0; i < columns.length; i++) {
+                for (i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
                 self.onChangeStop.notify();
@@ -367,8 +367,10 @@
 
         function updateColumn(column) {
             if (column instanceof ColumnData) {
-                data[idx] = column;
-                self.onChange.notify({ "id": [column.id] });
+                var idProperty = settings.columns.idProperty;
+                if (settings.Utils.isProperty(idProperty, column)) {
+                    updateColumnById(column[idProperty], column);
+                }
             }
             return this;
         }
@@ -404,12 +406,10 @@
         }
 
         function createItemData(item) {
-            if (settings.columns.mapProperties == true) {
-                var itemData = $.extend({ item: item }, item);
-                //itemData.item = item;//TODO: extend?
-                return itemData;
+            if (settings.columns.mapProperties === true) {
+                return $.extend({ item: item }, item);
             }
-            return itemData = {
+            return {
                 "name": item.name,
                 "field": item.field,
                 "item": item
@@ -435,15 +435,15 @@
             );
 
 
-            if (column.sortComparer && settings.Utils.isFunction(column.sortComparer, settings.RowComparer) == false) {
+            if (column.sortComparer && settings.Utils.isFunction(column.sortComparer, settings.RowComparer) === false) {
                 delete column.sortComparer;
             }
 
-            if (column.formatter && settings.Utils.isFunction(column.formatter, settings.RowFormatter) == false) {
+            if (column.formatter && settings.Utils.isFunction(column.formatter, settings.RowFormatter) === false) {
                 delete column.formatter;
             }
 
-            if (column.editor && settings.Utils.isFunction(column.editor, settings.RowEditor) == false) {
+            if (column.editor && settings.Utils.isFunction(column.editor, settings.RowEditor) === false) {
                 delete column.editor;
             }
 

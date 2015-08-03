@@ -13,18 +13,23 @@
         var self = this;
         var viewModel;
 
+        var requestDataTimer = null;
+        var requestRenderTimer = null;
+
+        var heightRatio = 1;
+
         var suspend = true;
         var suspendRenderRequests = 0;
 
         var canvasSize = {
             width: 0,
             height: 0,
-        }
+        };
 
         var cellOuterSize = {
             width: 0,
             height: 0,
-        }
+        };
 
         //handlers
         var handlers = [];
@@ -230,20 +235,6 @@
             $viewport.removeClass(cssClass);
         }
 
-        function removeAllTextSelections() {
-            var selection = ('getSelection' in window)
-                ? window.getSelection()
-                : ('selection' in document)
-                    ? document.selection
-                    : null;
-            try {
-                if ('removeAllRanges' in selection) {
-                    selection.removeAllRanges();
-                } else if ('empty' in selection) {
-                    selection.empty();
-                }
-            } catch (e) { }
-        }
 
         /*
         Public api
@@ -265,7 +256,7 @@
         function render() {
             suspendRenderRequests++;
 
-            if (suspend == false) {
+            if (suspend === false) {
                 renderRequests();
             }
 
@@ -273,17 +264,28 @@
         }
 
         function renderRequests() {
-            if (suspend == false && suspendRenderRequests > 0) {
-                suspendRenderRequests = 0;
+            if (suspend === false && suspendRenderRequests > 0) {
 
-                viewModel.requestDataFromRange(
-                    {
-                        top: $canvas[0].scrollTop,
-                        left: $canvas[0].scrollLeft
-                    },
-                    canvasSize,
-                    cellOuterSize
-                );
+                if (requestDataTimer == null) {
+                    suspendRenderRequests = 0;
+
+                    requestDataTimer = setTimeout(function () {
+                        viewModel.requestDataFromRange(
+                            {
+                                top: $canvas[0].scrollTop * heightRatio,
+                                left: $canvas[0].scrollLeft
+                            },
+                            canvasSize,
+                            cellOuterSize,
+                            heightRatio == 1
+                        );
+                        requestDataTimer = null;
+                        requestRenderTimer = null;
+                    }, 30);
+
+                } else if (requestRenderTimer == null) {
+                    requestRenderTimer = setTimeout(render, 300);
+                }
             }
             return this;
         }
@@ -312,7 +314,7 @@
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].destroy();
                 }
-                $container.empty().removeClass(uid);
+                $container.empty().removeClass(settings.uid);
             }
             $(document.body).off("click", handleBodyClick);
             self.onDestroy.notify({});
@@ -363,10 +365,10 @@
                 cellCssClass += " " + settings.cssClass.cursorPointer;
             }
 
-            var html = "<td style='width:" + (column.width) + "px;height:" + settings.columns.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerRowDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
+            html = "<td style='width:" + (column.width) + "px;height:" + settings.columns.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerRowDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
 
 
-            if (column.sortable && column.sortOrder != 0) {
+            if (column.sortable && column.sortOrder !== 0) {
                 html += "<span class='" + ((column.sortOrder == 1) ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
             }
 
@@ -396,7 +398,7 @@
         function buildColHtml(column) {
             var cellCssClass = settings.cssClass.col;
             if (column.headerCssClass) {
-                cellCssClass += " " + columns.headerCssClass;
+                cellCssClass += " " + column.headerCssClass;
             }
 
             return "<col style='width:" + (column.width + cellOuterSize.width) + "px;' class='" + cellCssClass + "'/>";
@@ -411,7 +413,7 @@
         }
 
         function buildRowHtml(columns, row, index) {
-            var rowCssClass = settings.cssClass.row + ((index & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
             if (row.rowCssClass) {
                 rowCssClass += " " + row.rowCssClass;
             }
@@ -471,9 +473,9 @@
         //todo: fix multiple types, edit && select, remove, add type registration
         function getCellEventType(targetClass, column, row) {
             var type = "";
-            if (row.editable == true && column.editable == true) {
+            if (row.editable === true && column.editable === true) {
                 type = "edit";
-            } else if (row.disabled == true) {
+            } else if (row.disabled === true) {
                 type = "disabled";
             }
             return type;
@@ -483,7 +485,7 @@
             var column = viewModel.getColumnByIndex(e.cellIndex);
             if (column) {
                 e.type = getColumnEventType($(e.event.target).attr("class"), column);
-                e.targetClass = $(e.event.target).attr("class"),
+                e.targetClass = $(e.event.target).attr("class");
                 e.column = column;
                 return e;
             }
@@ -506,9 +508,17 @@
         /*
         Data handlers
         */
+
+
         function handleRowsChange(e) {
             if (viewModel) {
                 var itemsHeight = viewModel.getRowsHeight(cellOuterSize);
+
+                if (itemsHeight > settings['maxSupportedCssHeight']) {
+                    heightRatio = (itemsHeight - canvasSize.height + settings['scrollbarDimensions'].height) / (settings['maxSupportedCssHeight'] - canvasSize.height + settings['scrollbarDimensions'].height);
+                    itemsHeight = settings['maxSupportedCssHeight'];
+                }
+
                 $tableWrap.css({
                     'height': itemsHeight,
                 });
@@ -544,7 +554,7 @@
                 });
 
                 $table.css({
-                    'top': e.rows[0].calcHeight - e.rows[0].height - cellOuterSize.height,
+                    'top': e.rows[0].calcHeight - e.rows[0].height - cellOuterSize.width - ($canvas[0].scrollTop * heightRatio) + $canvas[0].scrollTop,
                     'left': e.columns[0].calcWidth - e.columns[0].width - cellOuterSize.width
                 });
 
@@ -646,7 +656,7 @@
             suspendRender(true);
             self.onMouseWheel.notify(e);
             suspendRender(false);
-            renderRequests();
+            render();
         }
 
         /*
@@ -770,7 +780,7 @@
             "enableHeaderClass": enableHeaderClass,
             "removeViewPortClass": removeViewPortClass,
             "setColumnWidthByIndex": setColumnWidthByIndex,
-            "removeAllTextSelections": removeAllTextSelections,
+
 
             "isRenderSuspended": isRenderSuspended,
             "render": render,
@@ -782,8 +792,8 @@
     }
 
 
-    function CreateView($container, data, columns, settings) {
-        $container = $($container);
+    function CreateView(container, data, columns, settings) {
+        var $container = $(container);
         if ($container.length < 1) {
             throw new Error("Small grid requires a valid container, " + container + " does not exist in the DOM.");
         }

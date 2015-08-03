@@ -69,7 +69,7 @@
         }
 
         function isEmpty() {
-            return data.length == 0;
+            return data.length === 0;
         }
 
         function total() {
@@ -106,7 +106,7 @@
         }
 
         function getItems() {
-            var result = []
+            var result = [];
             for (var i = 0; i < data.length; i++) {
                 result.push(data[i].item);
             }
@@ -121,7 +121,7 @@
                     ids.push(data[i].id);
                 }
                 data = [];
-                for (var i = 0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     addItem(items[i]);
                 }
                 self.onChangeStop.notify();
@@ -329,7 +329,7 @@
                 }
                 data = [];
 
-                for (var i = 0; i < rows.length; i++) {
+                for (i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
                 self.onChangeStop.notify();
@@ -346,8 +346,10 @@
 
         function updateRow(row) {
             if (row instanceof RowData) {
-                data[idx] = row;
-                self.onChange.notify({ "id": [row.id] });
+                var idProperty = settings.rows.idProperty;
+                if (settings.Utils.isProperty(idProperty, row)) {
+                    updateRowById(row[idProperty], row);
+                }
             }
             return this;
         }
@@ -383,7 +385,7 @@
         }
 
         function createItemData(item) {
-            if (settings.rows.mapProperties == true) {
+            if (settings.rows.mapProperties === true) {
                 var itemData = $.extend({}, item);
                 itemData.item = item;//TODO: extend?
                 return itemData;

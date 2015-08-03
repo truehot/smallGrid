@@ -295,7 +295,7 @@
     }
 
     function CreateEditor(name, options, settings) {
-        if (settings.Utils.isFunction(name, settings.RowEditor) == true) {
+        if (settings.Utils.isFunction(name, settings.RowEditor) === true) {
             return new settings.RowEditor[name](options);
         }
     }

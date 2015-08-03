@@ -11,17 +11,17 @@
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
         var columns = [
-            { 'name': "Column 1", 'field': "property1", 'width': 200, 'filterable': true },
-            { 'name': "Column 2", 'field': "property2", 'width': 200, },
-            { 'name': "Column 3", 'field': "property3", 'width': 200, 'filterable': true },
-            { 'name': "Column 4", 'field': "property4", 'width': 200, },
-            { 'name': "Column 5", 'field': "property5", 'width': 200, 'filterable': true },
+            { 'name': "Filterable", 'field': "property1", 'width': 200, 'filterable': true },
+            { 'name': "Column", 'field': "property2", 'width': 200, },
+            { 'name': "Filterable", 'field': "property3", 'width': 200, 'filterable': true },
+            { 'name': "Column", 'field': "property4", 'width': 200, },
+            { 'name': "Filterable", 'field': "property5", 'width': 200, 'filterable': true },
         ];
         var items = [];
         for (var i = 0; i < 600; i++) {
             var item = {};
             for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = ii +""+ i + ", filterable " + (columns[ii-1].filterable ? "yes" : "no");
+                item["property" + ii] = i + ' '+ii;
             }
 
             items.push(item);

@@ -18,7 +18,7 @@
     });
 
     function DefaultFormatter(value, column, row, settings) {
-        return (value != undefined) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
+        return (value !== undefined) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
     }
 
     function CheckboxFormatter(value, column, row, settings) {
