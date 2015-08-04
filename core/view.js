@@ -407,13 +407,13 @@
         function buildRowsHtml(columns, rows) {
             var html = '';
             for (var i = 0; i < rows.length; i++) {
-                html += buildRowHtml(columns, rows[i], i);
+                html += buildRowHtml(columns, rows[i], rows[0].calcIndex + i);
             }
             return html;
         }
 
         function buildRowHtml(columns, row, index) {
-            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = settings.cssClass.row + ((index & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
             if (row.rowCssClass) {
                 rowCssClass += " " + row.rowCssClass;
             }

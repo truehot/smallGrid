@@ -1091,28 +1091,28 @@
                             convertedQuery += " || ";
                             break;
 
-                        case 'eq':
-                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') === true ";
+                        case 'eq': 
+                            convertedQuery += " (item.item['" + field + "'] == '" + query.value + "') === true ";
                             break;
 
                         case 'neq':
-                            convertedQuery += " isEqual(item.item['" + field + "'], '" + query.value + "') === false ";
+                            convertedQuery += " (item.item['" + field + "'] == '" + query.value + "') === false ";
                             break;
 
-                        case 'startsWith':
-                            convertedQuery += " startsWith(item.item['" + field + "'], '" + query.value + "') === true ";
+                        case 'startsWith': 
+                            convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') === 0) === true ";
                             break;
 
-                        case 'endsWith':
-                            convertedQuery += " endsWith(item.item['" + field + "'], '" + query.value + "') === true ";
+                        case 'endsWith': 
+                            convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "', item.item['" + field + "'].length - '" + query.value + "'.length) !== -1) === true ";
                             break;
 
-                        case 'contains':
-                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') === true ";
+                        case 'contains': 
+                            convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') !== -1) === true ";
                             break;
 
                         case 'doesNotContain':
-                            convertedQuery += " contains(item.item['" + field + "'], '" + query.value + "') === false ";
+                            convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') !== -1) === false ";
                             break;
                     }
                 };
@@ -1127,25 +1127,9 @@
             return resultQuery;
         }
 
-        function isEqual(str1, str2) {
-            return (str1 == str2);
-        }
-
-        function startsWith(str, suffix) {
-            return ('' + str).indexOf(suffix) === 0;
-        }
-
-        function endsWith(str, suffix) {
-            return ('' + str).indexOf(suffix, str.length - suffix.length) !== -1;
-        }
-
-        function contains(str, search) {
-            return ('' + str).indexOf(search) !== -1;
-        }
-
         function columnsFullWidth(outerWidth, filter) {
             if (filter) {
-                var f = new Function('item', 'return ' + resultQuery);
+                var f = new Function('item', 'return ' + filter);
                 return function (prev, item) {
                     if (f(item) === false) return prev;
                     return prev + item.width + outerWidth;
@@ -1160,7 +1144,7 @@
 
         function itemFullHeight(outerHeight, filter) {
             if (filter) {
-                var f = new Function('item', 'return ' + resultQuery);
+                var f = new Function('item', 'return ' + filter);
                 return function (prev, item) {
                     if (f(item) === false) return prev;
                     return prev + item.height + outerHeight;
@@ -1175,7 +1159,7 @@
         function columnsRangeByWidth(center, width, outerWidth, filter) {
             var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth;
             if (filter) {
-                var f = new Function('item', 'return ' + resultQuery);
+                var f = new Function('item', 'return ' + filter);
                 return function (item, index, array) {
                     if (!(f(item) === false)) {
                         calcWidth += outerWidth + item.width;
@@ -1203,6 +1187,7 @@
         function rowsRangeByHeight(center, height, outerHeight, filter) {
             var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight;
             if (filter) {
+                var f = new Function('item', 'return ' + filter);
                 return function (item, index, array) {
                     if (!(f(item) === false)) {
                         calcHeight += outerHeight + item.height;
@@ -2704,13 +2689,13 @@
         function buildRowsHtml(columns, rows) {
             var html = '';
             for (var i = 0; i < rows.length; i++) {
-                html += buildRowHtml(columns, rows[i], i);
+                html += buildRowHtml(columns, rows[i], rows[0].calcIndex + i);
             }
             return html;
         }
 
         function buildRowHtml(columns, row, index) {
-            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = settings.cssClass.row + ((index & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
             if (row.rowCssClass) {
                 rowCssClass += " " + row.rowCssClass;
             }
