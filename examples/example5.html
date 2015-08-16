@@ -18,10 +18,10 @@
             { 'name': "Column", 'field': "property5", 'width': 200, 'resizeable': false },
         ];
         var items = [];
-        for (var i = 0; i < 600; i++) {
+        for (var i = 1; i <= 600; i++) {
             var item = {};
             for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = i + ' '+ii;
+                item["property" + ii] = i + '' + ii;
             }
 
             items.push(item);

@@ -10,18 +10,18 @@
 <body>
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-        var columns = [
-            { 'name': "Column 1", 'field': "property1", 'width': 100 * Math.round((Math.random() * 5), 2) },
-            { 'name': "Column 2", 'field': "property2", 'width': 100 * Math.round((Math.random() * 5), 2) },
-            { 'name': "Column 3", 'field': "property3", 'width': 100 * Math.round((Math.random() * 5), 2) },
-            { 'name': "Column 4", 'field': "property4", 'width': 100 * Math.round((Math.random() * 5), 2) },
-            { 'name': "Column 5", 'field': "property5", 'width': 100 * Math.round((Math.random() * 5), 2) },
-        ];
+        var columns = [];
+
+        for (var i = 1; i < 6; i++) {
+            var width = 100 * Math.round((Math.random() * 5), 2);
+            columns.push({ 'name': "Width " + width, 'field': "property" + i, 'width': width });
+        }
+
         var items = [];
-        for (var i = 0; i < 600; i++) {
+        for (var i = 1; i <= 600; i++) {
             var item = { height: Math.round(25 * (Math.random() * 5), 2) };
             for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = ii + "" + i + ", width " + columns[ii - 1].width + ",  height " + item.height;
+                item["property" + ii] = "height " + item.height;
             }
 
             items.push(item);
