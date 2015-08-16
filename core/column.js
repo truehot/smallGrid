@@ -12,6 +12,7 @@
     });
 
     function ColumnData(data) {
+        if ("align" in data) this.align = data.align;
         if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
         if ("editable" in data) this.editable = data.editable;
         if ("editor" in data) this.editor = data.editor;
@@ -32,6 +33,7 @@
         if ("width" in data) this.width = data.width;
     }
 
+    ColumnData.prototype.align = "";//column cells align - "" / center / right
     ColumnData.prototype.cellCssClass = "";//css class for column cells
     ColumnData.prototype.editable = true; // are column cells editable
     ColumnData.prototype.editor = undefined; // name of editor

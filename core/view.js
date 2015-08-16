@@ -356,6 +356,13 @@
             if (column.headerCssClass) {
                 cellCssClass += " " + column.headerCssClass;
             }
+            if (column.align == "center") {
+                cellCssClass += " " + settings.cssClass.cellAlignCenter;
+            }
+            if (column.align == "right") {
+                cellCssClass += " " + settings.cssClass.cellAlignRight;
+            }
+
 
             if (column.name) {
                 value += column.name;
@@ -407,16 +414,17 @@
         function buildRowsHtml(columns, rows) {
             var html = '';
             for (var i = 0; i < rows.length; i++) {
-                html += buildRowHtml(columns, rows[i], rows[0].calcIndex + i);
+                html += buildRowHtml(columns, rows[i], i);
             }
             return html;
         }
 
         function buildRowHtml(columns, row, index) {
-            var rowCssClass = settings.cssClass.row + ((index & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
             if (row.rowCssClass) {
                 rowCssClass += " " + row.rowCssClass;
             }
+
             //todo: remove
             if (settings.rows.formatter) {
                 row = settings.rows.formatter(row, columns);
@@ -437,6 +445,12 @@
             var cellCssClass = settings.cssClass.cell;
             if (column.cellCssClass) {
                 cellCssClass += " " + column.cellCssClass;
+            }
+            if (column.align == "center") {
+                cellCssClass += " " + settings.cssClass.cellAlignCenter;
+            }
+            if (column.align == "right") {
+                cellCssClass += " " + settings.cssClass.cellAlignRight;
             }
 
             if (row.cellCssClass && column.field in row.cellCssClass) {
@@ -508,8 +522,6 @@
         /*
         Data handlers
         */
-
-
         function handleRowsChange(e) {
             if (viewModel) {
                 var itemsHeight = viewModel.getRowsHeight(cellOuterSize);
@@ -564,7 +576,6 @@
                     buildRowsHtml(e.columns, e.rows)
                 );
             }
-
             suspendRender(false);
         }
 

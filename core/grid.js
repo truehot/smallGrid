@@ -115,20 +115,20 @@
     }
 
     function CreateModel($container, rows, columns, settings) {
-        var newSettings = new SmallGrid.Settings.Create(settings);
+        var settings = new SmallGrid.Settings.Create(settings);
         var viewModel = new SmallGrid.View.Model(
-            new SmallGrid.Row.Create(rows, newSettings),
-            new SmallGrid.Column.Create(columns, newSettings),
-            newSettings
+            new SmallGrid.Row.Create(rows, settings),
+            new SmallGrid.Column.Create(columns, settings),
+            settings
         );
 
         var grid = new GridModel(
             $container,
             viewModel,
-            newSettings
+            settings
         );
 
-        if (newSettings.explicitInitialization === false) {
+        if (settings.explicitInitialization === false) {
             grid.init();
         }
 

@@ -67,7 +67,9 @@ if (typeof jQuery === "undefined") {
             row: "grid-tr",
             rowEven: "grid-tr-even",
             rowOdd: "grid-tr-odd",
-            rowSelected: "grid-row-selected"
+            rowSelected: "grid-row-selected",
+            cellAlignCenter: "grid-cell-align-center",
+            cellAlignRight:"grid-cell-align-right"
         },
 
         columns: {

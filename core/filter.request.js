@@ -28,7 +28,7 @@
         }
 
         function getColumnFilter() {
-
+            return "";
         }
 
         function getRowFilter() {
@@ -49,7 +49,7 @@
                             convertedQuery += " || ";
                             break;
 
-                        case 'eq': 
+                        case 'eq':
                             convertedQuery += " (item.item['" + field + "'] == '" + query.value + "') === true ";
                             break;
 
@@ -57,15 +57,15 @@
                             convertedQuery += " (item.item['" + field + "'] == '" + query.value + "') === false ";
                             break;
 
-                        case 'startsWith': 
+                        case 'startsWith':
                             convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') === 0) === true ";
                             break;
 
-                        case 'endsWith': 
+                        case 'endsWith':
                             convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "', item.item['" + field + "'].length - '" + query.value + "'.length) !== -1) === true ";
                             break;
 
-                        case 'contains': 
+                        case 'contains':
                             convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') !== -1) === true ";
                             break;
 
@@ -80,95 +80,58 @@
                         resultQuery += " && ";
                     }
                     resultQuery += '(' + convertedQuery + ')';
+                    resultQuery = new Function('item', 'return ' + resultQuery);
                 }
             }
             return resultQuery;
         }
 
         function columnsFullWidth(outerWidth, filter) {
-            if (filter) {
-                var f = new Function('item', 'return ' + filter);
-                return function (prev, item) {
-                    if (f(item) === false) return prev;
-                    return prev + item.width + outerWidth;
-                };
-            } else {
-                return function (prev, item) {
-                    return prev + item.width + outerWidth;
-                };
-            }
-
+            return function (prev, item) {
+                if (filter && (filter(item) === false)) return prev;
+                return prev + item.width + outerWidth;
+            };
         }
 
         function itemFullHeight(outerHeight, filter) {
-            if (filter) {
-                var f = new Function('item', 'return ' + filter);
-                return function (prev, item) {
-                    if (f(item) === false) return prev;
-                    return prev + item.height + outerHeight;
-                };
-            } else {
-                return function (prev, item) {
-                    return prev + item.height + outerHeight;
-                };
-            }
+            return function (prev, item) {
+                if (filter && (filter(item) === false)) return prev;
+                return prev + item.height + outerHeight;
+            };
         }
 
         function columnsRangeByWidth(center, width, outerWidth, filter) {
-            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth;
-            if (filter) {
-                var f = new Function('item', 'return ' + filter);
-                return function (item, index, array) {
-                    if (!(f(item) === false)) {
-                        calcWidth += outerWidth + item.width;
-                        if (min <= calcWidth && calcWidth <= max) {
-                            item.calcWidth = calcWidth;
-                            item.calcIndex = index;
-                            return true;
-                        }
-                    }
-                    return false;
-                };
-            } else {
-                return function (item, index, array) {
-                    calcWidth += outerWidth + item.width;
-                    if (min <= calcWidth && calcWidth <= max) {
-                        item.calcWidth = calcWidth;
-                        item.calcIndex = index;
-                        return true;
-                    }
-                    return false;
-                };
-            }
+            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
+            return function (item, index, array) {
+                if (filter && (filter(item) === false)) return false;
+                filterIndex++;
+                calcWidth += outerWidth + item.width;
+
+                if (min <= calcWidth && calcWidth <= max) {
+                    item.calcWidth = calcWidth;
+                    item.calcIndex = filterIndex;
+                    return true;
+                }
+
+                return false;
+            };
         }
 
         function rowsRangeByHeight(center, height, outerHeight, filter) {
-            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight;
-            if (filter) {
-                var f = new Function('item', 'return ' + filter);
-                return function (item, index, array) {
-                    if (!(f(item) === false)) {
-                        calcHeight += outerHeight + item.height;
-                        if (min <= calcHeight && calcHeight <= max) {
-                            item.calcHeight = calcHeight;
-                            item.calcIndex = index;
-                            return true;
-                        }
-                    }
-                    return false;
-                };
-            } else {
-                return function (item, index, array) {
-                    calcHeight += outerHeight + item.height;
-                    if (min <= calcHeight && calcHeight <= max) {
-                        item.calcHeight = calcHeight;
-                        item.calcIndex = index;
-                        return true;
-                    }
+            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
+            return function (item, index, array) {
+                if (filter && (filter(item) === false)) return false;
+                filterIndex++;
+                calcHeight += outerHeight + item.height;
 
-                    return false;
-                };
-            }
+                if (min <= calcHeight && calcHeight <= max) {
+                    item.calcHeight = calcHeight;
+                    item.calcIndex = filterIndex;
+                    return true;
+                }
+
+                return false;
+            };
         }
 
         $.extend(this, {

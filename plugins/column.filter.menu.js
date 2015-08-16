@@ -124,7 +124,7 @@
         }
 
         function handleMenuClear(e) {
-            e.preventDefault();
+            //e.preventDefault();
             self.onClear.notify({});
             hide();
         }

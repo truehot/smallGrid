@@ -28,7 +28,7 @@
     RowData.prototype.disabled = false; // is row disabled for ????????????
     RowData.prototype.editable = true; // are row cells editable?
     RowData.prototype.editMode = false; // are row cells in edit mode
-    RowData.prototype.height = 25;// row height
+    RowData.prototype.height = 20;// row height
     RowData.prototype.id = undefined;// unique indicator
     RowData.prototype.item = null;//
     RowData.prototype.maxHeight = 200;// max row height

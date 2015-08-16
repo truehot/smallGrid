@@ -37,7 +37,7 @@
 
         var scrollStopTimer, wheelStopTimer,
             isScrollMoved = false, isWheelMoved = false,
-            last = {
+            lastScroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
             };
@@ -64,46 +64,31 @@
 
         function handleScroll(e) {
 
-            var dim = {
+            var scroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
+                topDelta: $element[0].scrollTop - lastScroll.scrollTop,
+                leftDelta: $element[0].scrollLeft - lastScroll.scrollLeft,
+                event: e,
             };
 
             clearTimeout(scrollStopTimer);
 
             if (isScrollMoved == false) {
                 isScrollMoved = true;
-                settings.handleScrollStart({
-                    scrollTop: dim.scrollTop,
-                    scrollLeft: dim.scrollLeft,
-                    topDelta: dim.scrollTop - last.scrollTop,
-                    leftDelta: dim.scrollLeft - last.scrollLeft,
-                    event: e,
-                });
+                settings.handleScrollStart(scroll);
             }
 
-            settings.handleScroll({
-                scrollTop: dim.scrollTop,
-                scrollLeft: dim.scrollLeft,
-                topDelta: dim.scrollTop - last.scrollTop,
-                leftDelta: dim.scrollLeft - last.scrollLeft,
-                event: e,
-            });
+            settings.handleScroll(scroll);
 
             scrollStopTimer = setTimeout(function () {
-                settings.handleScrollStop({
-                    scrollTop: dim.scrollTop,
-                    scrollLeft: dim.scrollLeft,
-                    topDelta: dim.scrollTop - last.scrollTop,
-                    leftDelta: dim.scrollLeft - last.scrollLeft,
-                    event: e,
-                });
+                settings.handleScrollStop(scroll);
                 isScrollMoved = false;
             }, settings.latency);
 
-            last = {
-                scrollTop: dim.scrollTop,
-                scrollLeft: dim.scrollLeft,
+            lastScroll = {
+                scrollTop: scroll.scrollTop,
+                scrollLeft: scroll.scrollLeft,
             };
         }
 

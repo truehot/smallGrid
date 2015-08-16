@@ -20,8 +20,6 @@
         var rowsFilters = [];
         var columnsFilters = [];
 
-        var sorters = [];
-
         var cachedRange = {
             minTop: -1,
             maxTop: -1,
@@ -116,6 +114,7 @@
                 rowsFilters.push(filterObj);
 
                 resetCacheRangeHeight();
+                self.onRowsChange.notify();
                 self.onDataChange.notify();
             }
         }
@@ -126,6 +125,7 @@
                 rowsFilters.push(filters[i]);
             }
             resetCacheRangeHeight();
+            self.onRowsChange.notify();
             self.onDataChange.notify();
         }
 
@@ -134,8 +134,8 @@
                 for (var i = 0; i < rowsFilters.length; i++) {
                     if (rowsFilters[i].getId() == filterObj.getId()) {
                         rowsFilters.splice(i, 1);
-
                         resetCacheRangeHeight();
+                        self.onRowsChange.notify();
                         self.onDataChange.notify();
                         break;
                     }
@@ -145,8 +145,8 @@
 
         function clearFilters() {
             rowsFilters = [];
-
             resetCacheRangeHeight();
+            self.onRowsChange.notify();
             self.onDataChange.notify();
         }
 
@@ -170,6 +170,7 @@
 
                 if (rowsCached === 0) {
                     rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+
                     self.onRowsChange.notify();
                 }
 
@@ -178,7 +179,7 @@
                     self.onColumnsChange.notify();
                 }
 
-                updateCacheRange(point, size, outerSize);
+                updateCacheRange(size, outerSize);
 
                 self.onDataChangeStop.notify({
                     rows: rowsCache,
@@ -190,7 +191,7 @@
         /*
         Cache range
         */
-        function updateCacheRange(point, size, outerSize) {
+        function updateCacheRange(size, outerSize) {
             if (columnsCache.length && rowsCache.length) {
                 cachedRange = {
                     minTop: rowsCache[0].calcHeight < size.height

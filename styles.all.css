@@ -170,6 +170,14 @@
     background-color: #9fc2f3;
 }
 
+
+.grid-cell-align-center {
+    text-align: center;
+}
+
+.grid-cell-align-right {
+    text-align: right;
+}
 /* Custom styles */
 
 /* Plugins styles */

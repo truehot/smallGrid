@@ -36,7 +36,7 @@
             el.css("height", supportedHeight);
             if (el.height() === supportedHeight) {
                 supportedHeight += incHeight;
-                if (supportedHeight < 17000000) {
+                if (supportedHeight < 16000000) {
                     continue;
                 }
             }
