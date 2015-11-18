@@ -63,7 +63,7 @@
         function handleColumnsChange(event) {
 
             if (bulkColumns.length == 0 && event.id) {
-                if (isInColumnsCache([event.id]) === true) {
+                if (event.type == "add" || isInColumnsCache([event.id]) === true) {
                     resetCacheRangeWidth();
                     self.onColumnsChange.notify();
                 }
@@ -74,7 +74,7 @@
 
         function handleRowsChange(event) {
             if (bulkRows.length == 0 && event.id) {
-                if (isInRowsCache([event.id]) === true) {
+                if (event.type == "add" || isInRowsCache([event.id]) === true) {
                     resetCacheRangeHeight();
                     self.onRowsChange.notify();
                 }

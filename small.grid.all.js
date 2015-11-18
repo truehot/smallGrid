@@ -543,7 +543,7 @@
             var column = addColumn(
                 createColumn(item)
             );
-            self.onChange.notify({ "id": column.id });
+            self.onChange.notify({ "id": column.id, "type": "add" });
             return column;
         }
 
@@ -595,7 +595,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data[i].item = item;
-                    self.onChange.notify({ "id": id });
+                    self.onChange.notify({ "id": id, "type": "update" });
                     break;
                 }
             }
@@ -605,7 +605,7 @@
         function updateItemByIndex(idx, item) {
             if (data[idx]) {
                 data[idx].item = item;
-                self.onChange.notify({ "id": data[idx].id });
+                self.onChange.notify({ "id": data[idx].id, "type": "update" });
             }
             return self;
         }
@@ -626,7 +626,7 @@
         function addColumn(column) {
             if (column instanceof ColumnData) {
                 data.push(column);
-                self.onChange.notify({ "id": column.id });
+                self.onChange.notify({ "id": column.id, "type": "add" });
             }
             return self;
         }
@@ -654,7 +654,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data.splice(i, 1);
-                    self.onChange.notify({ "id": id });
+                    self.onChange.notify({ "id": id, "type": "delete" });
                     break;
                 }
             }
@@ -665,7 +665,7 @@
             if (data[idx]) {
                 var id = data[idx].id;
                 data.splice(idx, 1);
-                self.onChange.notify({ "id": id });
+                self.onChange.notify({ "id": id, "type": "delete" });
             }
             return self;
         }
@@ -674,8 +674,7 @@
             if (data.length) {
                 self.onChangeStart.notify();
                 data = [];
-                self.onChange.notify({ "mode": "all" });
-                self.onChangeStop.notify();
+                self.onChangeStop.notify({ "mode": "all" });
             }
             return self;
         }
@@ -738,7 +737,7 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": column.id });
+                self.onChange.notify({ "id": column.id, "type": "add" });
             }
             return self;
         }
@@ -758,7 +757,7 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": column.id });
+                self.onChange.notify({ "id": column.id, "type": "add" });
             }
             return self;
         }
@@ -768,7 +767,7 @@
                 if (data[i].id == id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
-                        self.onChange.notify({ "id": id });
+                        self.onChange.notify({ "id": id, "type": "update" });
                     }
                     break;
                 }
@@ -779,7 +778,7 @@
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
             if (propertyName && propertyName in data[idx]) {
                 data[idx][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[idx].id });
+                self.onChange.notify({ "id": data[idx].id, "type": "update" });
             }
             return self;
         }
@@ -800,7 +799,7 @@
             self.onChangeStart.notify();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[i].id });
+                self.onChange.notify({ "id": data[i].id, "type": "update" });
             }
             self.onChangeStop.notify();
             return self;
@@ -818,7 +817,7 @@
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].id == id) {
                         data[i] = column;
-                        self.onChange.notify({ "id": id });
+                        self.onChange.notify({ "id": id, "type": "update" });
                         break;
                     }
                 }
@@ -830,7 +829,7 @@
             if (column instanceof ColumnData) {
                 if (data[idx]) {
                     data[idx] = column;
-                    self.onChange.notify({ "id": column.id });
+                    self.onChange.notify({ "id": column.id, "type": "update" });
                 }
             }
             return self;
@@ -1909,7 +1908,7 @@
         function addRow(row) {
             if (row instanceof RowData) {
                 data.push(row);
-                self.onChange.notify({ "id": row.id });
+                self.onChange.notify({ "id": row.id, "type": "add" });
             }
             return self;
         }
@@ -1930,7 +1929,7 @@
             var row = addRow(
                 createRow(item)
             );
-            self.onChange.notify({ "id": row.id });
+            self.onChange.notify({ "id": row.id, "type": "add" });
             return row;
         }
 
@@ -1995,7 +1994,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data[i].item = item;
-                    self.onChange.notify({ "id": id });
+                    self.onChange.notify({ "id": id, "type": "update" });
                     break;
                 }
             }
@@ -2005,7 +2004,7 @@
         function updateItemByIndex(idx, item) {
             if (data[idx]) {
                 data[idx].item = item;
-                self.onChange.notify({ "id": data[idx].id });
+                self.onChange.notify({ "id": data[idx].id, "type": "update" });
             }
             return self;
         }
@@ -2035,7 +2034,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data.splice(i, 1);
-                    self.onChange.notify({ "id": id });
+                    self.onChange.notify({ "id": id, "type": "delete" });
                     break;
                 }
             }
@@ -2046,7 +2045,7 @@
             if (data[idx]) {
                 var id = data[idx].id;
                 data.splice(idx, 1);
-                self.onChange.notify({ "id": id });
+                self.onChange.notify({ "id": id, "type": "delete" });
             }
             return self;
         }
@@ -2118,7 +2117,7 @@
                     0,
                     row
                 );
-                self.onChange.notify({ "id": row.id });
+                self.onChange.notify({ "id": row.id, "type": "add" });
             }
             return self;
         }
@@ -2138,7 +2137,7 @@
                     0,
                     row
                 );
-                self.onChange.notify({ "id": row.id });
+                self.onChange.notify({ "id": row.id, "type": "add" });
             }
             return self;
         }
@@ -2148,7 +2147,7 @@
                 if (data[i].id == id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
-                        self.onChange.notify({ "id": id });
+                        self.onChange.notify({ "id": id, "type": "update" });
                     }
                     break;
                 }
@@ -2159,7 +2158,7 @@
         function setRowPropertyByIndex(idx, propertyName, propertyValue) {
             if (propertyName && propertyName in data[idx]) {
                 data[idx][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[idx].id });
+                self.onChange.notify({ "id": data[idx].id, "type": "update" });
             }
             return self;
         }
@@ -2180,7 +2179,7 @@
             self.onChangeStart.notify();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[i].id });
+                self.onChange.notify({ "id": data[i].id, "type": "update" });
             }
             self.onChangeStop.notify();
             return self;
@@ -2198,7 +2197,7 @@
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].id == id) {
                         data[i] = row;
-                        self.onChange.notify({ "id": id });
+                        self.onChange.notify({ "id": id, "type": "update" });
                         break;
                     }
                 }
@@ -2210,7 +2209,7 @@
             if (row instanceof RowData) {
                 if (data[idx]) {
                     data[idx] = row;
-                    self.onChange.notify({ "id": row.id });
+                    self.onChange.notify({ "id": row.id, "type": "update" });
                 }
             }
             return self;
@@ -3158,7 +3157,7 @@
         function handleColumnsChange(event) {
 
             if (bulkColumns.length == 0 && event.id) {
-                if (isInColumnsCache([event.id]) === true) {
+                if (event.type == "add" || isInColumnsCache([event.id]) === true) {
                     resetCacheRangeWidth();
                     self.onColumnsChange.notify();
                 }
@@ -3169,7 +3168,7 @@
 
         function handleRowsChange(event) {
             if (bulkRows.length == 0 && event.id) {
-                if (isInRowsCache([event.id]) === true) {
+                if (event.type == "add" || isInRowsCache([event.id]) === true) {
                     resetCacheRangeHeight();
                     self.onRowsChange.notify();
                 }
