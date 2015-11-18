@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Few grids on the same page</title>
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.all.css" type="text/css" />
+    <script src="../libs/jquery-2.1.4.min.js"></script>
+    <script src="../small.grid.all.min.js"></script>
+</head>
+<body>
+    <p class="small-grid" style="width: 600px; height: 300px;clear:both;float:left;margin-right:10px"></p>
+    <p class="small-grid2" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
+    <p class="small-grid3" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
+    <p class="small-grid4" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
+    <script>
+
+
+        $(document).ready(function () {
+			var columns = [
+				{ 'name': "Column 1", 'field': "property1", 'width': 200},
+				{ 'name': "Column 2", 'field': "property2", 'width': 200},
+				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
+				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
+				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
+			];
+			var items = [];
+			for (var i = 1; i <= 100000; i++) {
+				var item = {};
+				for (var ii = 1; ii < 6; ii++) {
+					item["property" + ii] = i + '' + ii;
+				}
+
+				items.push(item);
+			}
+			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+			var grid2 = new SmallGrid.Grid.Create($('.small-grid2'), items, columns, {});
+			var grid3 = new SmallGrid.Grid.Create($('.small-grid3'), items, columns, {});
+			var grid4 = new SmallGrid.Grid.Create($('.small-grid4'), items, columns, {});
+
+
+        });
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>100 000 rows</title>
+    <title>Column picker example</title>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
@@ -9,28 +9,33 @@
 </head>
 <body>
 
+Right click on the header to view Column picker
+    <div class="small-grid" style="width: 600px; height: 300px;"></div>
 
-
-    <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
+
+
         $(document).ready(function () {
 			var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200 },
-				{ 'name': "Column 2", 'field': "property2", 'width': 200 },
+				{ 'name': "Column 1", 'field': "property1", 'width': 200},
+				{ 'name': "Column 2", 'field': "property2", 'width': 200},
 				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
 				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
 				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
 			];
 			var items = [];
-			for (var i = 1; i <= 100000; i++) {
+			for (var i = 1; i <= 10; i++) {
 				var item = {};
 				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + ' '+ii;
+					item["property" + ii] = i + '' + ii;
 				}
 
 				items.push(item);
 			}
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+			grid.unregisterPlugins();
+			grid.registerPlugin('ColumnPickerMenu', {});
+
         });
     </script>
 </body>

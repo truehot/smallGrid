@@ -4,30 +4,31 @@
     <title>Filterable columns</title>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
-    <script src="../libs/jquery-2.1.3.min.js"></script>
+    <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-        var columns = [
-            { 'name': "Filterable", 'field': "property1", 'width': 200, 'filterable': true },
-            { 'name': "Column", 'field': "property2", 'width': 200, },
-            { 'name': "Filterable", 'field': "property3", 'width': 200, 'filterable': true },
-            { 'name': "Column", 'field': "property4", 'width': 200, },
-            { 'name': "Filterable", 'field': "property5", 'width': 200, 'filterable': true },
-        ];
-        var items = [];
-        for (var i = 0; i < 600; i++) {
-            var item = {};
-            for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = i + '' + ii;
-            }
 
-            items.push(item);
-        }
 
         $(document).ready(function () {
+			var columns = [
+				{ 'name': "Filterable", 'field': "property1", 'width': 200, 'filterable': true },
+				{ 'name': "Column", 'field': "property2", 'width': 200, },
+				{ 'name': "Filterable", 'field': "property3", 'width': 200, 'filterable': true },
+				{ 'name': "Column", 'field': "property4", 'width': 200, },
+				{ 'name': "Filterable", 'field': "property5", 'width': 200, 'filterable': true },
+			];
+			var items = [];
+			for (var i = 0; i < 600; i++) {
+				var item = {};
+				for (var ii = 1; ii < 6; ii++) {
+					item["property" + ii] = i + '' + ii;
+				}
+
+				items.push(item);
+			}
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
         });
     </script>
