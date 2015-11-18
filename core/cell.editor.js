@@ -1,6 +1,6 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Cell": {
@@ -16,27 +16,29 @@
         }
     });
 
-    function CheckboxEditor(options) {
+    function CheckboxEditor(options, settings) {
         var self = this,
             value = options.value,
-            $element = $('<input type="checkbox" class="grid-checkbox-editor" />').val(value);
+            $label = $('<label/>'),
+            $element = $('<input type="checkbox" class="grid-checkbox-editor" ' + (convertValue(value)?'checked':'') + '/>').val(value);
 
         this.append = function (cellNode) {
-            $element.appendTo(cellNode);
-            return this;
+            $element.appendTo($label);
+            $label.appendTo(cellNode);
+            return self;
         };
 
         this.remove = function () {
             if ($element && $element.length) {
                 $element.detach();
             }
-            return this;
+            return self;
         };
 
         this.destroy = function () {
-            $element.remove();
+            $label.remove();
             self.onDestroy.notify({});
-            return this;
+            return self;
         };
 
         this.getValue = function () {
@@ -48,17 +50,17 @@
             self.onChange.notify({
                 "value": value
             });
-            return this;
+            return self;
         };
 
         this.focus = function () {
             $element.val(self.getValue()).focus();
-            return this;
+            return self;
         };
 
         function convertValue(value) {
             return (/^true$/i).test(value);
-        };
+        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -71,27 +73,27 @@
         });
     }
 
-    function FloatEditor(options) {
+    function FloatEditor(options, settings) {
         var self = this,
             value = options.value,
             $element = $('<input type="text" class="grid-float-editor" />').val(value);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
-            return this;
+            return self;
         };
 
         this.remove = function () {
             if ($element && $element.length) {
                 $element.detach();
             }
-            return this;
+            return self;
         };
 
         this.destroy = function () {
             $element.remove();
             self.onDestroy.notify({});
-            return this;
+            return self;
         };
 
         this.getValue = function () {
@@ -103,18 +105,18 @@
             self.onChange.notify({
                 "value": value
             });
-            return this;
+            return self;
         };
 
         this.focus = function () {
             $element.val(self.getValue()).select();
 
-            return this;
+            return self;
         };
 
         function convertValue(value) {
             return parseFloat(value, 10) || 0;
-        };
+        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -127,27 +129,27 @@
         });
     }
 
-    function IntegerEditor(options) {
+    function IntegerEditor(options, settings) {
         var self = this,
             value = options.value,
             $element = $('<input type="text" class="grid-integer-editor" />').val(value);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
-            return this;
+            return self;
         };
 
         this.remove = function () {
             if ($element && $element.length) {
                 $element.detach();
             }
-            return this;
+            return self;
         };
 
         this.destroy = function () {
             $element.remove();
             self.onDestroy.notify({});
-            return this;
+            return self;
         };
 
         this.getValue = function () {
@@ -159,18 +161,18 @@
             self.onChange.notify({
                 "value": value
             });
-            return this;
+            return self;
         };
 
         this.focus = function () {
             $element.val(self.getValue()).select();
 
-            return this;
+            return self;
         };
 
         function convertValue(value) {
             return parseInt(value, 10) || 0;
-        };
+        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -183,27 +185,27 @@
         });
     }
 
-    function NoneEditor(options) {
+    function NoneEditor(options, settings) {
         var self = this,
             value = options.value,
             $element = $("<span class='grid-none-editor' />").text(value);
-        
+
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
-            return this;
+            return self;
         };
 
         this.remove = function () {
             if ($element && $element.length) {
                 $element.detach();
             }
-            return this;
+            return self;
         };
 
         this.destroy = function () {
             $element.remove();
             self.onDestroy.notify({});
-            return this;
+            return self;
         };
 
         this.getValue = function () {
@@ -211,22 +213,22 @@
         };
 
         this.setValue = function (value) {
-            
+
             $element.text(convertValue(value));
             self.onChange.notify({
                 "value": value
             });
-            return this;
+            return self;
         };
 
         this.focus = function () {
             $element.select();
-            return this;
+            return self;
         };
 
         function convertValue(value) {
             return value;
-        };
+        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -239,27 +241,27 @@
         });
     }
 
-    function TextEditor(options) {
+    function TextEditor(options, settings) {
         var self = this,
             value = options.value,
             $element = $('<input type="text" class="grid-text-editor"/>').val(value);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
-            return this;
+            return self;
         };
 
         this.remove = function () {
             if ($element && $element.length) {
                 $element.detach();
             }
-            return this;
+            return self;
         };
 
         this.destroy = function () {
             $element.remove();
             self.onDestroy.notify({});
-            return this;
+            return self;
         };
 
         this.getValue = function () {
@@ -271,17 +273,17 @@
             self.onChange.notify({
                 "value": value
             });
-            return this;
+            return self;
         };
 
         this.focus = function () {
             $element.val(self.getValue()).select();
-            return this;
+            return self;
         };
 
         function convertValue(value) {
             return value;
-        };
+        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -295,8 +297,8 @@
     }
 
     function CreateEditor(name, options, settings) {
-        if (settings.Utils.isFunction(name, settings.RowEditor) === true) {
-            return new settings.RowEditor[name](options);
+        if (SmallGrid.Utils.isFunction(name, SmallGrid.Cell.Editor) === true) {
+            return new SmallGrid.Cell.Editor[name](options, settings);
         }
     }
 

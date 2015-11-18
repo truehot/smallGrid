@@ -1,6 +1,6 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Filter": {
@@ -9,11 +9,11 @@
         }
     });
 
-    //add or / and?
+
     function FilterQuery(field, settings) {
         var self = this;
         var query = [];
-        var id = settings.Utils.getNewGuid();
+        var id = SmallGrid.Utils.createGuid();
 
         function getId() {
             return id;
@@ -25,7 +25,7 @@
 
         function clear() {
             query = [];
-            return this;
+            return self;
         }
 
         function get() {
@@ -33,51 +33,50 @@
         }
 
         function add(type, str) {
-            if (type in this) {
-                return this[type](str || "");
+            if (type in self) {
+                return self[type](str || "");
             }
             throw "Type " + type + " not found";
         }
 
-        //where
         function and() {
             query.push({ action: "and" });
-            return this;
+            return self;
         }
 
         function or() {
             query.push({ action: "or" });
-            return this;
+            return self;
         }
 
         function eq(value) {
             query.push({ action: "eq", "value": value });
-            return this;
+            return self;
         }
 
         function neq(value) {
             query.push({ action: "neq", "value": value });
-            return this;
+            return self;
         }
 
         function startswith(value) {
             query.push({ action: "startsWith", "value": value });
-            return this;
+            return self;
         }
 
         function endswith(value) {
             query.push({ action: "endsWith", "value": value });
-            return this;
+            return self;
         }
 
         function contains(value) {
             query.push({ action: "contains", "value": value });
-            return this;
+            return self;
         }
 
         function doesnotcontain(value) {
             query.push({ action: "doesNotContain", "value": value });
-            return this;
+            return self;
         }
 
         $.extend(this, {

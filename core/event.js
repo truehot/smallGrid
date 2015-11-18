@@ -1,19 +1,19 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Event": {
-                "Args": EventArgs,
+                "Data": EventData,
                 "Handler": EventHandler
             }
         }
     });
 
-    function EventArgs(args) {
-        for (var key in args) {
-            if (args.hasOwnProperty(key)) {
-                this[key] = args[key];
+    function EventData(data) {
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                this[key] = data[key];
             }
         }
 
@@ -40,41 +40,42 @@
 
     function EventHandler() {
         var handlers = [];
+        var self = this;
 
-        this.subscribe = function (fn) {
-            handlers.push(fn);
-            return this;
+        this.subscribe = function (func) {
+            handlers.push(func);
+            return self;
         };
 
-        this.unsubscribe = function (fn) {
+        this.unsubscribe = function (func) {
             for (var i = handlers.length - 1; i >= 0; i--) {
-                if (handlers[i] === fn) {
+                if (handlers[i] === func) {
                     handlers.splice(i, 1);
                 }
             }
-            return this;
+            return self;
         };
 
         this.unsubscribeLast = function () {
             if (handlers.length) {
                 handlers.pop();
             }
-            return this;
+            return self;
         };
 
         this.unsubscribeAll = function () {
             handlers = [];
-            return this;
+            return self;
         };
 
-        this.notify = function (e) {
-            if (typeof (e) != EventArgs) {
-                e = new EventArgs(e);
+        this.notify = function (eventData) {
+            if (typeof (eventData) != EventData) {
+                eventData = new EventData(eventData);
             }
 
-            for (var i = 0; i < handlers.length && !(e.isPropagationStopped() || e.isImmediatePropagationStopped()) ; i++) {
-                if (handlers[i].call(this, e) === false) {
-                    e.stopImmediatePropagation();
+            for (var i = 0; i < handlers.length && !(eventData.isPropagationStopped() || eventData.isImmediatePropagationStopped()) ; i++) {
+                if (handlers[i].call(this, eventData) === false) {
+                    eventData.stopImmediatePropagation();
                     break;
                 }
             }

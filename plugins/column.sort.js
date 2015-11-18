@@ -1,6 +1,5 @@
-"use strict";
-
 (function ($) {
+    "use strict";
 
     $.extend(true, window, {
         "SmallGrid": {
@@ -10,7 +9,7 @@
         }
     });
 
-    function ColumnSortPlugin(viewModel, view, settings) {
+    function ColumnSortPlugin(view, windowManager, settings) {
         var self = this;
         function init() {
             view.onHeaderClick.subscribe(handleHeaderClick);
@@ -20,26 +19,23 @@
             view.onHeaderClick.unsubscribe(handleHeaderClick);
         }
 
-        function handleHeaderClick(e) {
-            if (e && e.type && e.type == "sort") {
-                viewModel.resetCacheRange();
-
-                var column = e.column;
-                var sortOrder = settings.Utils.changeSortOrder(column.sortOrder);//todo: remade
-                viewModel.columns.setColumnsProperty("sortOrder", 0);//reset sorting
-                viewModel.columns.setColumnPropertyById(column.id, "sortOrder", sortOrder);
-                viewModel.rows.sort(
-                    settings.RowComparer[column.sortComparer]({
+        function handleHeaderClick(event) {
+            if (event && event.type && event.type == "sort") {
+                var request = view.suspendRender();
+                var column = event.column;
+                var sortOrder = SmallGrid.Utils.changeSortOrder(column.sortOrder);
+                view.getModel().columns.setColumnsProperty("sortOrder", 0);//reset sorting
+                view.getModel().columns.setColumnPropertyById(column.id, "sortOrder", sortOrder);
+                view.getModel().rows.sort(
+                    SmallGrid.Column.Comparer[column.sortComparer]({
                         "sortOrder": sortOrder,
                         "field": column.field
                     })
                 );
+
+                view.resumeRender(request);
+                view.render();
             }
-        }
-
-        //todo
-        function sortColumnByIndex(idx, sortOrder) {
-
         }
 
         $.extend(this, {
@@ -47,7 +43,6 @@
             "destroy": destroy,
         });
 
-        init();
     }
 
 })(jQuery);

@@ -1,6 +1,6 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Filter": {
@@ -12,19 +12,19 @@
     function FilterRequest(filters, dataModel) {
 
         function getRowsInRange(top, height, outerHeight) {
-            return dataModel.filter(new rowsRangeByHeight(top, height, outerHeight, getRowFilter()));
+            return dataModel.filter(new RowsRangeByHeight(top, height, outerHeight, getRowFilter()));
         }
 
         function getColumnsInRange(left, width, outerWidth) {
-            return dataModel.filter(new columnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
+            return dataModel.filter(new ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
         }
 
         function getColumnsWidth(width) {
-            return dataModel.reduce(new columnsFullWidth(width, getColumnFilter()), 0);
+            return dataModel.reduce(new ColumnsFullWidth(width, getColumnFilter()), 0);
         }
 
         function getRowsHeight(height) {
-            return dataModel.reduce(new itemFullHeight(height, getRowFilter()), 0);
+            return dataModel.reduce(new RowsFullHeight(height, getRowFilter()), 0);
         }
 
         function getColumnFilter() {
@@ -73,7 +73,7 @@
                             convertedQuery += " (('' + item.item['" + field + "']).indexOf('" + query.value + "') !== -1) === false ";
                             break;
                     }
-                };
+                }
 
                 if (convertedQuery.length) {
                     if (i !== 0) {
@@ -86,28 +86,31 @@
             return resultQuery;
         }
 
-        function columnsFullWidth(outerWidth, filter) {
+        function ColumnsFullWidth(outerWidth, filter) {
             return function (prev, item) {
-                if (filter && (filter(item) === false)) return prev;
+                if ((filter && (filter(item) === false)) || (item.hidden === true)) return prev;
                 return prev + item.width + outerWidth;
             };
         }
 
-        function itemFullHeight(outerHeight, filter) {
+        function RowsFullHeight(outerHeight, filter) {
             return function (prev, item) {
                 if (filter && (filter(item) === false)) return prev;
                 return prev + item.height + outerHeight;
             };
         }
 
-        function columnsRangeByWidth(center, width, outerWidth, filter) {
-            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
+        function ColumnsRangeByWidth(center, width, outerWidth, filter) {
+            var calcWidth = 0, min = center - width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
             return function (item, index, array) {
-                if (filter && (filter(item) === false)) return false;
+                if ((filter && (filter(item) === false)) || (item.hidden === true)) return false;
                 filterIndex++;
+
+                var inRange = min <= calcWidth && calcWidth <= max;
+
                 calcWidth += outerWidth + item.width;
 
-                if (min <= calcWidth && calcWidth <= max) {
+                if (inRange || (min <= calcWidth && calcWidth <= max)) {
                     item.calcWidth = calcWidth;
                     item.calcIndex = filterIndex;
                     return true;
@@ -117,14 +120,17 @@
             };
         }
 
-        function rowsRangeByHeight(center, height, outerHeight, filter) {
-            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
+        function RowsRangeByHeight(center, height, outerHeight, filter) {
+            var calcHeight = 0, min = center - height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
             return function (item, index, array) {
                 if (filter && (filter(item) === false)) return false;
                 filterIndex++;
+
+                var inRange = min <= calcHeight && calcHeight <= max;
+
                 calcHeight += outerHeight + item.height;
 
-                if (min <= calcHeight && calcHeight <= max) {
+                if (inRange || (min <= calcHeight && calcHeight <= max)) {
                     item.calcHeight = calcHeight;
                     item.calcIndex = filterIndex;
                     return true;
@@ -140,6 +146,5 @@
             "getRowsHeight": getRowsHeight,
             "getRowsInRange": getRowsInRange,
         });
-
     }
 })(jQuery);

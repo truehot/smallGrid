@@ -1,6 +1,6 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Column": {
@@ -21,6 +21,7 @@
         if ("filterable" in data) this.filterable = data.filterable;
         if ("formatter" in data) this.formatter = data.formatter;
         if ("headerCssClass" in data) this.headerCssClass = data.headerCssClass;
+        if ("hidden" in data) this.hidden = data.hidden;
         if ("id" in data) this.id = data.id;
         if ("item" in data) this.item = data.item;
         if ("maxWidth" in data) this.maxWidth = data.maxWidth;
@@ -42,6 +43,7 @@
     ColumnData.prototype.filterable = false;//bool
     ColumnData.prototype.formatter = "Default";//default cell content formatter
     ColumnData.prototype.headerCssClass = "";//css class for column header cell  
+    ColumnData.prototype.hidden = false;//is column hidden?
     ColumnData.prototype.id = undefined;//unique indicator
     ColumnData.prototype.item = null;
     ColumnData.prototype.maxWidth = 9999;
@@ -62,7 +64,7 @@
             if (data.length) {
                 data.forEach(callback);
             }
-            return this;
+            return self;
         }
 
         function filter(callback) {
@@ -82,9 +84,9 @@
             if (data.length) {
                 self.onChangeStart.notify();
                 data.sort(comparer);
-                self.onChangeStop.notify();
+                self.onChangeStop.notify({ "mode": "all" });
             }
-            return this;
+            return self;
         }
 
         function isEmpty() {
@@ -102,9 +104,11 @@
 
 
         function addItem(item) {
-            return addColumn(
+            var column = addColumn(
                 createColumn(item)
             );
+            self.onChange.notify({ "id": column.id });
+            return column;
         }
 
         function addItems(items) {
@@ -115,15 +119,14 @@
                 }
                 self.onChangeStop.notify();
             }
-            return this;
+            return self;
         }
 
         function deleteItem(item) {
-            var idProperty = settings.columns.idProperty;
-            if (settings.Utils.isProperty(idProperty, item)) {
-                deleteColumnById(item[idProperty]);
+            if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
+                deleteColumnById(item[settings.columns.idProperty]);
             }
-            return this;
+            return self;
         }
 
         function getItems() {
@@ -137,23 +140,18 @@
         function setItems(items) {
             if (items.length) {
                 self.onChangeStart.notify();
-                var ids = [];
-                for (var i = 0; i < data.length; i++) {
-                    ids.push(data[i].id);
-                }
                 data = [];
-                for (i = 0; i < items.length; i++) {
+                for (var i = 0; i < items.length; i++) {
                     addItem(items[i]);
                 }
-                self.onChangeStop.notify();
+                self.onChangeStop.notify({ "mode": "all" });
             }
-            return this;
+            return self;
         }
 
         function updateItem(item) {
-            var idProperty = settings.columns.idProperty;
-            if (settings.Utils.isProperty(idProperty, item)) {
-                updateItemById(item[idProperty], item);
+            if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
+                updateItemById(item[settings.columns.idProperty], item);
             }
         }
 
@@ -161,12 +159,21 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data[i].item = item;
-                    self.onChange.notify({ "id": [id] });
+                    self.onChange.notify({ "id": id });
                     break;
                 }
             }
-            return this;
+            return self;
         }
+
+        function updateItemByIndex(idx, item) {
+            if (data[idx]) {
+                data[idx].item = item;
+                self.onChange.notify({ "id": data[idx].id });
+            }
+            return self;
+        }
+
 
         function updateItems(items) {
             if (items.length) {
@@ -176,16 +183,16 @@
                 }
                 self.onChangeStop.notify();
             }
-            return this;
+            return self;
         }
 
 
         function addColumn(column) {
             if (column instanceof ColumnData) {
                 data.push(column);
-                self.onChange.notify({ "id": [column.id] });
+                self.onChange.notify({ "id": column.id });
             }
-            return this;
+            return self;
         }
 
         function addColumns(columns) {
@@ -197,46 +204,44 @@
 
                 self.onChangeStop.notify();
             }
-            return this;
+            return self;
         }
 
         function deleteColumn(column) {
             if (column instanceof ColumnData) {
                 deleteColumnById(column.id);
             }
-            return this;
+            return self;
         }
 
         function deleteColumnById(id) {
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data.splice(i, 1);
-                    self.onChange.notify({ "id": [id] });
+                    self.onChange.notify({ "id": id });
                     break;
                 }
             }
-            return this;
+            return self;
         }
 
         function deleteColumnByIndex(idx) {
-            var id = data[idx].id;
-            data.splice(idx, 1);
-            self.onChange.notify({ "id": [id] });
-            return this;
+            if (data[idx]) {
+                var id = data[idx].id;
+                data.splice(idx, 1);
+                self.onChange.notify({ "id": id });
+            }
+            return self;
         }
 
         function deleteColumns() {
             if (data.length) {
-                self.onChangeStop.notify();
-                var ids = [];
-                for (var i = 0; i < data.length; i++) {
-                    ids.push(data[i].id);
-                }
+                self.onChangeStart.notify();
                 data = [];
-                self.onChange.notify({ "id": ids });
+                self.onChange.notify({ "mode": "all" });
                 self.onChangeStop.notify();
             }
-            return this;
+            return self;
         }
 
         function getColumnById(id) {
@@ -287,7 +292,7 @@
                 getColumnIndexById(id),
                 column
             );
-            return this;
+            return self;
         }
 
         function insertColumnAfterIndex(idx, column) {
@@ -297,9 +302,9 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": [column.id] });
+                self.onChange.notify({ "id": column.id });
             }
-            return this;
+            return self;
         }
 
         function insertColumnBeforeId(id, column) {
@@ -307,7 +312,7 @@
                 getColumnIndexById(id),
                 column
             );
-            return this;
+            return self;
         }
 
         function insertColumnBeforeIndex(idx, column) {
@@ -317,9 +322,9 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": [column.id] });
+                self.onChange.notify({ "id": column.id });
             }
-            return this;
+            return self;
         }
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
@@ -327,73 +332,72 @@
                 if (data[i].id == id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
-                        self.onChange.notify({ "id": [id] });
+                        self.onChange.notify({ "id": id });
                     }
                     break;
                 }
             }
-            return this;
+            return self;
         }
 
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
             if (propertyName && propertyName in data[idx]) {
                 data[idx][propertyName] = propertyValue;
-                self.onChange.notify({ "id": [data[idx].id] });
+                self.onChange.notify({ "id": data[idx].id });
             }
-            return this;
+            return self;
         }
 
         function setColumns(columns) {
             if (columns.length) {
                 self.onChangeStart.notify();
-                var ids = [];
-                for (var i = 0; i < data.length; i++) {
-                    ids.push(data[i].id);
-                }
                 data = [];
-
                 for (i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
-                self.onChangeStop.notify();
+                self.onChangeStop.notify({ "mode": "all" });
             }
-            return this;
+            return self;
         }
 
         function setColumnsProperty(propertyName, propertyValue) {
+            self.onChangeStart.notify();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
+                self.onChange.notify({ "id": data[i].id });
             }
-            return this;
+            self.onChangeStop.notify();
+            return self;
         }
 
         function updateColumn(column) {
-            if (column instanceof ColumnData) {
-                var idProperty = settings.columns.idProperty;
-                if (settings.Utils.isProperty(idProperty, column)) {
-                    updateColumnById(column[idProperty], column);
-                }
+            if (column instanceof ColumnData && SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) {
+                updateColumnById(column[settings.columns.idProperty], column);
             }
-            return this;
+            return self;
         }
 
         function updateColumnById(id, column) {
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
-                    data[i] = column;
-                    self.onChange.notify({ "id": [id] });
-                    break;
+            if (column instanceof ColumnData) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == id) {
+                        data[i] = column;
+                        self.onChange.notify({ "id": id });
+                        break;
+                    }
                 }
             }
-            return this;
+            return self;
         }
 
         function updateColumnByIndex(idx, column) {
-            if (data[idx]) {
-                data[idx] = column;
-                self.onChange.notify({ "id": [column.id] });
+            if (column instanceof ColumnData) {
+                if (data[idx]) {
+                    data[idx] = column;
+                    self.onChange.notify({ "id": column.id });
+                }
             }
-            return this;
+            return self;
         }
 
         function updateColumns(columns) {
@@ -404,52 +408,49 @@
                 }
                 self.onChangeStop.notify();
             }
-            return this;
+            return self;
         }
 
         function createItemData(item) {
-            if (settings.columns.mapProperties === true) {
-                return $.extend({ item: item }, item);
+            if (item instanceof Object) {
+                if (settings.columns.mapProperties === true) {
+                    return $.extend({ item: item }, item);
+                }
+                return {
+                    "name": item.name,
+                    "field": item.field,
+                    "item": item
+                };
             }
-            return {
-                "name": item.name,
-                "field": item.field,
-                "item": item
-            };
         }
 
         function createColumn(item) {
-            var column = new ColumnData(createItemData(item));
+            var itemData = createItemData(item);
+            if (itemData != undefined) {
+                var column = new ColumnData(itemData);
+                column.id = (SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
+                column.width = Math.max(
+                    Math.min(
+                        parseInt(column.width, 10),
+                        column.maxWidth
+                    ),
+                    column.minWidth
+                );
 
-            var idProperty = settings.columns.idProperty;
-            if (settings.Utils.isProperty(idProperty, column)) {
-                column.id = column[idProperty];
-            } else {
-                column.id = settings.Utils.getNewGuid();
+                if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
+                    delete column.sortComparer;
+                }
+
+                if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
+                    delete column.formatter;
+                }
+
+                if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
+                    delete column.editor;
+                }
+
+                return column;
             }
-
-            column.width = Math.max(
-                Math.min(
-                    parseInt(column.width, 10),
-                    column.maxWidth
-                ),
-                column.minWidth
-            );
-
-
-            if (column.sortComparer && settings.Utils.isFunction(column.sortComparer, settings.RowComparer) === false) {
-                delete column.sortComparer;
-            }
-
-            if (column.formatter && settings.Utils.isFunction(column.formatter, settings.RowFormatter) === false) {
-                delete column.formatter;
-            }
-
-            if (column.editor && settings.Utils.isFunction(column.editor, settings.RowEditor) === false) {
-                delete column.editor;
-            }
-
-            return column;
         }
 
         $.extend(this, {
@@ -472,6 +473,7 @@
             "setItems": setItems,
             "updateItem": updateItem,
             "updateItemById": updateItemById,
+            "updateItemByIndex": updateItemByIndex,
             "updateItems": updateItems,
 
             "addColumn": addColumn,
@@ -507,6 +509,9 @@
     }
 
     function CreateModel(data, settings) {
+        if (!Array.isArray(data)) {
+            throw "Array expected";
+        }
         return new ColumnModel(
             data,
             settings

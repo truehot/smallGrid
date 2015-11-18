@@ -1,10 +1,5 @@
-"use strict";
-/*
-Required
-email
-
-*/
 (function ($) {
+    "use strict";
 
     $.extend(true, window, {
         "SmallGrid": {
@@ -15,54 +10,54 @@ email
     });
 
 
-
-    function CellEditPlugin(viewModel, view, settings) {
+    function CellEditPlugin(view, windowManager, settings) {
         var self = this;
-
-        var history = [];//todo: history
-
         var editOptions = {
             enabled: false
         };
 
         function init() {
-            view.onAfterRowsRendered.subscribe(handelAfterRowsRendered);
-            view.onBeforeRowsRendered.subscribe(handelBeforeRowsRendered);
+            view.onAfterRowsRendered.subscribe(handleAfterRowsRendered);
+            view.onBeforeRowsRendered.subscribe(handleBeforeRowsRendered);
             view.onCellClick.subscribe(handleCellClick);
             view.onCellDblClick.subscribe(handleCellDblClick);
-            view.onCellKeyDown.subscribe(handeCellKeyDown);
+            view.onCellKeyDown.subscribe(handleCellKeyDown);
             view.onScrollStop.subscribe(handleScrollStop);
         }
 
         function destroy() {
-            view.onAfterRowsRendered.unsubscribe(handelAfterRowsRendered);
-            view.onBeforeRowsRendered.unsubscribe(handelBeforeRowsRendered);
+            view.onAfterRowsRendered.unsubscribe(handleAfterRowsRendered);
+            view.onBeforeRowsRendered.unsubscribe(handleBeforeRowsRendered);
             view.onCellClick.unsubscribe(handleCellClick);
             view.onCellDblClick.unsubscribe(handleCellDblClick);
-            view.onCellKeyDown.unsubscribe(handeCellKeyDown);
+            view.onCellKeyDown.unsubscribe(handleCellKeyDown);
             view.onScrollStop.unsubscribe(handleScrollStop);
         }
 
-        function handleScrollStop(e) {
-            if (isEditMode() == true && settings.edit.autoFocus == true) {
+        /*
+         Handlers
+         */
+        function handleScrollStop(event) {
+            if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
                 if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
                     editOptions.editor.focus();
                 }
             }
         }
 
-        function handelBeforeRowsRendered(e) {
-            if (isEditMode() == true) {
+        function handleBeforeRowsRendered(event) {
+            if (isEditMode() === true) {
                 editOptions.editor.remove();
             }
         }
 
-        function handelAfterRowsRendered(e) {
-            if (isEditMode() == true) {
+        function handleAfterRowsRendered(event) {
+            if (isEditMode() === true) {
                 var cellNode = view.getCellNodeById(editOptions.column.id, editOptions.row.id);
                 if (cellNode) {
+                    cellNode.className += " " + settings.cssClass.cellEdit;
                     editOptions.editor.append(cellNode);
-                    if (editOptions.addFocus == true) {
+                    if (editOptions.addFocus === true) {
                         editOptions.addFocus = false;
                         editOptions.editor.focus();
                     }
@@ -70,20 +65,19 @@ email
             }
         }
 
-        function handleCellDblClick(e) {
-            if (settings.edit.editOnClick == false) {
-                editCellById(e.column.id, e.row.id);
+        function handleCellDblClick(event) {
+            if (settings.plugins.CellEdit.editOnClick === false) {
+                editCellById(event.column.id, event.row.id);
             }
         }
 
-        function handleCellClick(e) {
-            if (settings.edit.editOnClick == true) {
-                editCellById(e.column.id, e.row.id);
+        function handleCellClick(event) {
+            if (settings.plugins.CellEdit.editOnClick === true) {
+                editCellById(event.column.id, event.row.id);
             }
         }
 
-        function handeCellKeyDown(e) {
-            //enter pressed
+        function handleCellKeyDown(event) {
             if (e && e.event) {
                 switch (e.event.keyCode) {
                     case 13:
@@ -100,24 +94,22 @@ email
         Public api
         */
         function editCellById(columnId, rowId) {
-            if (isEditMode() == true) {
+            if (isEditMode() === true) {
                 if (editOptions.column.id != columnId || editOptions.row.id != rowId) {
                     applyEdit();
                 }
             }
 
-            if (isEditMode() == false) {
-
-                var column = viewModel.getColumnById(columnId);
-                var row = viewModel.getRowById(rowId);
-
+            if (isEditMode() === false) {
+                var column = view.getModel().getColumnById(columnId);
+                var row = view.getModel().getRowById(rowId);
                 if (row && column && row.editable && column.editable && column.editor) {
                     editOptions = {
                         enabled: true,
                         addFocus: true,
                         row: row,
                         column: column,
-                        editor: new settings.RowEditor.Create(
+                        editor: new SmallGrid.Cell.Editor.Create(
                             column.editor,
                             {
                                 "value": row.item[column.field],
@@ -126,46 +118,47 @@ email
                         ),
                     }
 
-                    viewModel.columns.setColumnPropertyById(
+                    view.getModel().columns.setColumnPropertyById(
                         column.id,
                         'editMode',
                         true
                     );
 
-                    viewModel.rows.setRowPropertyById(
+                    view.getModel().rows.setRowPropertyById(
                         row.id,
                         'editMode',
                         true
                     );
+
                 }
             }
         }
 
 
         function getEditor() {
-            if (editOptions.enabled == true) {
+            if (editOptions.enabled === true) {
                 return editOptions.editor;
             }
         }
 
         function isEditMode() {
-            return (editOptions.enabled == true);
+            return (editOptions.enabled === true);
         }
 
         function applyEdit() {
-            if (editOptions.enabled == true) {
+            if (editOptions.enabled === true) {
 
-                viewModel.columns.setColumnPropertyById(
+                view.getModel().columns.setColumnPropertyById(
                     editOptions.column.id,
                     'editMode',
                     false
                 );
 
-                var row = viewModel.rows.getRowById(editOptions.row.id);
+                var row = view.getModel().rows.getRowById(editOptions.row.id);
                 if (row) {
                     row.item[editOptions.column.field] = editOptions.editor.getValue();
                     row.editMode = false;
-                    viewModel.rows.updateItem(row);
+                    view.getModel().rows.updateItem(row);
                 }
 
                 //apply
@@ -174,22 +167,22 @@ email
                     enabled: false
                 }
             }
-            return this;
+            return self;
         }
 
         function cancelEdit() {
-            if (editOptions.enabled == true) {
+            if (editOptions.enabled === true) {
 
-                viewModel.columns.setColumnPropertyById(
+                view.getModel().columns.setColumnPropertyById(
                     editOptions.column.id,
                     'editMode',
                     false
                 );
 
-                var row = viewModel.rows.getRowById(editOptions.row.id);
+                var row = view.getModel().rows.getRowById(editOptions.row.id);
                 if (row) {
                     row.editMode = false;
-                    viewModel.rows.updateItem(row);
+                    view.getModel().rows.updateItem(row);
                 }
 
                 //undo
@@ -198,7 +191,7 @@ email
                     enabled: false
                 }
             }
-            return this;
+            return self;
         }
 
 
@@ -212,8 +205,6 @@ email
             "getEditor": getEditor,
             "isEditMode": isEditMode,
         });
-
-        init();
     }
 
 })(jQuery);

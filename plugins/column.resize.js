@@ -1,6 +1,5 @@
-"use strict";
-
 (function ($) {
+    "use strict";
 
     $.extend(true, window, {
         "SmallGrid": {
@@ -10,10 +9,20 @@
         }
     });
 
-    function ColumnResizePlugin(viewModel, view, settings) {
+    function ColumnResizePlugin(view, windowManager, settings) {
         var self = this;
-        var column;
-        var width;
+
+        var column,
+            $headerTable,
+            $contentCell,
+            $contentCol,
+            $headerCell,
+            $headerCursorCells,
+            $headerCol,
+            $lastContentCol,
+            $lastHeaderCol,
+            headerWidth,
+            width;
 
         function init() {
             view.onColumnResize.subscribe(handleColumnResize);
@@ -27,42 +36,78 @@
             view.onColumnResizeStop.subscribe(handleColumnResizeStop);
         }
 
-        function handleColumnResize(e) {
-            if (column) {
+        function handleColumnResize(event) {
+            if (column && $lastHeaderCol.length) {
                 width = Math.max(
                     Math.min(
-                        parseInt(e.width, 10),
+                        parseInt(event.width, 10),
                         column.maxWidth
                     ),
                     column.minWidth
                 );
-                //change visual width
-                view.setColumnWidthByIndex(e.cellIndex + 1, width);
+
+                if ($headerCol.length) $headerCol.css("width", width + settings.cellOuterSize.width);
+                if ($contentCol.length) $contentCol.css("width", width + settings.cellOuterSize.width);
+
+                var wrapWidth = Math.max(view.getNode('headerTable').width(), headerWidth);
+                view.getNode('headerWrap').width(wrapWidth);
+                view.getNode('contentWrap').width(wrapWidth);
             }
         }
 
-        function handleColumnResizeStart(e) {
-            column = viewModel.getColumnByIndex(e.cellIndex);
+        function handleColumnResizeStart(event) {
+            headerWidth = view.getNode('header').width();
+            column = view.getModel().getColumnByIndex(event.cellIndex);
+            $headerCursorCells = view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer);
+            $headerCol = view.getNode('headerTable').find("colgroup > col:nth-child(" + (event.cellIndex + 1) + ")");
+            $contentCol = view.getNode('contentTable').find("colgroup > col:nth-child(" + (event.cellIndex + 1) + ")");
+            $lastHeaderCol = view.getNode('headerTable').find("colgroup > col:last");
+            $lastContentCol = view.getNode('contentTable').find("colgroup > col:last");
 
-            if (column) {
-                view.disableHeaderClass(settings.cssClass.cursorPointer);
-                view.addViewPortClass(settings.cssClass.cursorResize);
+            if (column && $lastHeaderCol.length) {
+
+                if (settings.showLastColumn == true && $lastHeaderCol.hasClass(settings.cssClass.collLast)) {
+                    $lastHeaderCol.width(0);
+                    if ($lastContentCol.length) $lastContentCol.width(0);
+                }
+
+                $headerCell = view.getNode('headerTable').find('td.' + settings.cssClass.cellLast);
+                if ($headerCell.length) toggleDisabled($headerCell, settings.cssClass.cellLast);
+
+                $contentCell = view.getNode('contentTable').find('td.' + settings.cssClass.cellLast);
+                if ($contentCell.length) toggleDisabled($contentCell, settings.cssClass.cellLast);
+
+                toggleDisabled($headerCursorCells, settings.cssClass.cursorPointer);
+                view.getNode('viewport').addClass(settings.cssClass.cursorResize);
             }
         }
 
-        function handleColumnResizeStop(e) {
-            
+        function handleColumnResizeStop() {
             if (column) {
+
+                if ($headerCell.length) toggleEnabled($headerCell, settings.cssClass.cellLast);
+                if ($contentCell.length) toggleEnabled($contentCell, settings.cssClass.cellLast);
+
+
+                toggleEnabled($headerCursorCells, settings.cssClass.cursorPointer);
+                view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
+
                 if (width) {
-                    viewModel.columns.setColumnPropertyById(
+                    view.getModel().columns.setColumnPropertyById(
                         column.id,
                         'width',
                         width
                     );
                 }
-                view.enableHeaderClass(settings.cssClass.cursorPointer);
-                view.removeViewPortClass(settings.cssClass.cursorResize);
             }
+        }
+
+        function toggleEnabled($elements, cssClass) {
+            $elements.toggleClass(cssClass + ' ' + cssClass + '-disabled');
+        }
+
+        function toggleDisabled($elements, cssClass) {
+            $elements.toggleClass(cssClass + '-disabled' + ' ' + cssClass);
         }
 
         $.extend(this, {
@@ -70,7 +115,6 @@
             "destroy": destroy,
         });
 
-        init();
     }
 
 })(jQuery);

@@ -4,30 +4,31 @@
     <title>Random rows height and columns width</title>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
-    <script src="../libs/jquery-2.1.3.min.js"></script>
+    <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-        var columns = [];
 
-        for (var i = 1; i < 6; i++) {
-            var width = 100 * Math.round((Math.random() * 5), 2);
-            columns.push({ 'name': "Width " + width, 'field': "property" + i, 'width': width });
-        }
-
-        var items = [];
-        for (var i = 1; i <= 600; i++) {
-            var item = { height: Math.round(25 * (Math.random() * 5), 2) };
-            for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = "height " + item.height;
-            }
-
-            items.push(item);
-        }
 
         $(document).ready(function () {
+			var columns = [];
+
+			for (var i = 1; i < 6; i++) {
+				var width = 100 * Math.round((Math.random() * 5), 2) || 20;
+				columns.push({ 'name': "Width " + width, 'field': "property" + i, 'width': width });
+			}
+
+			var items = [];
+			for (var i = 1; i <= 600; i++) {
+				var item = { height: Math.round(25 * (Math.random() * 5), 2) };
+				for (var ii = 1; ii < 6; ii++) {
+					item["property" + ii] = "height " + item.height;
+				}
+
+				items.push(item);
+			}
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
         });
     </script>

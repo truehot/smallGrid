@@ -1,32 +1,22 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Handler": {
-                "Scroll": ScrollHandler
+                "Scroll": {
+                    "Create": Create,
+                    "Handler": ScrollHandler,
+                }
             }
         }
     });
-
-    var defaultSettings = {
-        "handleMouseWheel": undefined,
-        "handleMouseWheelStart": undefined,
-        "handleMouseWheelStop": undefined,
-        "handlescroll": undefined,
-        "handlescrollStart": undefined,
-        "handlescrollStop": undefined,
-        latency: 300,
-        resetLeft: true,
-        resetTop: true,
-    }
 
     /*
     TODO: direction change
     https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
     */
     function ScrollHandler($element, settings) {
-        var settings = jQuery.extend({}, defaultSettings, settings);
 
         if (settings.resetTop) {
             $element[0].scrollTop = 0;
@@ -45,36 +35,36 @@
         $element.on('scroll', handleScroll);
         $element.on('wheel', handleMouseWheel);
 
-        function handleMouseWheel(e) {
+        function handleMouseWheel(event) {
             clearTimeout(wheelStopTimer);
 
-            if (isWheelMoved == false) {
+            if (isWheelMoved === false) {
                 isWheelMoved = true;
-                settings.handleMouseWheelStart({ event: e });
+                settings.handleMouseWheelStart({ event: event });
             }
 
-            settings.handleMouseWheel({ event: e });
+            settings.handleMouseWheel({ event: event });
 
             wheelStopTimer = setTimeout(function () {
-                settings.handleMouseWheelStop({ event: e });
+                settings.handleMouseWheelStop({ event: event });
                 isWheelMoved = false;
             }, settings.latency);
 
         }
 
-        function handleScroll(e) {
+        function handleScroll(event) {
 
             var scroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
                 topDelta: $element[0].scrollTop - lastScroll.scrollTop,
                 leftDelta: $element[0].scrollLeft - lastScroll.scrollLeft,
-                event: e,
+                event: event,
             };
 
             clearTimeout(scrollStopTimer);
 
-            if (isScrollMoved == false) {
+            if (isScrollMoved === false) {
                 isScrollMoved = true;
                 settings.handleScrollStart(scroll);
             }
@@ -103,6 +93,25 @@
         $.extend(this, {
             "destroy": destroy
         });
-    };
+    }
+
+    function Create($container, settings) {
+
+        var defaultSettings = {
+            "handleMouseWheel": undefined,
+            "handleMouseWheelStart": undefined,
+            "handleMouseWheelStop": undefined,
+            "handlescroll": undefined,
+            "handlescrollStart": undefined,
+            "handlescrollStop": undefined,
+            latency: 300,
+            resetLeft: true,
+            resetTop: true,
+        };
+
+        settings = $.extend({}, defaultSettings, settings);
+
+        return new ScrollHandler($container, settings);
+    }
 
 })(jQuery);

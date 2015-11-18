@@ -1,71 +1,72 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Handler": {
-                "Click": ClickHandler
+                "Click": {
+                    "Create": Create,
+                    "Handler": ClickHandler,
+                }
             }
         }
     });
 
-    var defaultSettings = {
-        "rowIdentifier": "TR",
-        "cellIdentifier": "TD",
-        "handleClick": undefined,
-        "handleDblClick": undefined,
-        "handleContextMenu": undefined,
-        "handleKeyDown": undefined,
-    };
-
     function ClickHandler($container, settings) {
-        var settings = jQuery.extend({}, defaultSettings, settings);
-
         $container
             .on("click", handleClick)
+            .on("mousedown", handleMouseDown)
             .on("contextmenu", handleContextMenu)
             .on("dblclick", handleDblClick)
             .on("keydown", handleKeyDown);
 
-        function getCellEvent(e) {
-            if (e && e.target) {
-                var $cellElement = $(e.target).closest(settings.cellIdentifier);
+        function getCellEvent(event) {
+            if (event && event.target) {
+                var $cellElement = $(event.target).closest(settings.cellIdentifier);
                 if ($cellElement.length) {
                     var $rowElement = $cellElement.closest(settings.rowIdentifier);
                     if ($rowElement.length) {
                         return {
                             cellIndex: $cellElement.index(),
                             rowIndex: $rowElement.index(),
-                            event: e,
+                            event: event,
                         };
                     }
                 }
             }
         }
 
-        function handleClick(e) {
-            var event = getCellEvent(e);
+        function handleMouseDown(event) {
+            if (event.ctrlKey || event.shiftKey) {
+                document.getSelection().removeAllRanges();
+                event.preventDefault();
+            }
+        }
+
+        function handleClick(event) {
+            event = getCellEvent(event);
             if (event && settings.handleClick) {
                 settings.handleClick(event);
             }
         }
 
-        function handleContextMenu(e) {
-            var event = getCellEvent(e);
+        function handleContextMenu(event) {
+            event = getCellEvent(event);
             if (event && settings.handleContextMenu) {
                 settings.handleContextMenu(event);
             }
+            return false;
         }
 
-        function handleDblClick(e) {
-            var event = getCellEvent(e);
+        function handleDblClick(event) {
+            event = getCellEvent(event);
             if (event && settings.handleDblClick) {
                 settings.handleDblClick(event);
             }
         }
 
-        function handleKeyDown(e) {
-            var event = getCellEvent(e);
+        function handleKeyDown(event) {
+            event = getCellEvent(event);
             if (event && settings.handleKeyDown) {
                 settings.handleKeyDown(event);
             }
@@ -82,6 +83,21 @@
         $.extend(this, {
             "destroy": destroy
         });
-    };
+    }
+
+    function Create($container, settings) {
+        var defaultSettings = {
+            "rowIdentifier": "TR",
+            "cellIdentifier": "TD",
+            "handleClick": undefined,
+            "handleDblClick": undefined,
+            "handleContextMenu": undefined,
+            "handleKeyDown": undefined,
+        };
+
+        settings = $.extend({}, defaultSettings, settings);
+
+        return new ClickHandler($container, settings);
+    }
 
 })(jQuery);

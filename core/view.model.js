@@ -1,10 +1,13 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "View": {
-                "Model": ViewModel
+                "Model": {
+                    "Model": ViewModel,
+                    "Create": CreateModel,
+                }
             }
         }
     });
@@ -20,6 +23,9 @@
         var rowsFilters = [];
         var columnsFilters = [];
 
+        var bulkColumns = [];
+        var bulkRows = [];
+
         var cachedRange = {
             minTop: -1,
             maxTop: -1,
@@ -32,33 +38,104 @@
         */
         function init() {
             rowsModel.onChange.subscribe(handleRowsChange);
+            rowsModel.onChangeStart.subscribe(handleRowsChangeStart);
+            rowsModel.onChangeStop.subscribe(handleRowsChangeStop);
+
             columnsModel.onChange.subscribe(handleColumnsChange);
-            return this;
+            columnsModel.onChangeStart.subscribe(handleColumnsChangeStart);
+            columnsModel.onChangeStop.subscribe(handleColumnsChangeStop);
+            return self;
         }
 
         function destroy() {
             rowsModel.onChange.unsubscribe(handleRowsChange);
+            rowsModel.onChangeStart.unsubscribe(handleRowsChangeStart);
+            rowsModel.onChangeStop.unsubscribe(handleRowsChangeStop);
+
             columnsModel.onChange.unsubscribe(handleColumnsChange);
+            columnsModel.onChangeStart.unsubscribe(handleColumnsChangeStart);
+            columnsModel.onChangeStop.unsubscribe(handleColumnsChangeStop);
         }
 
         /*
         Handlers
         */
-        function handleColumnsChange() {
-            //self.onColumnsChange.notify();
-            resetCacheRangeWidth();
-            self.onDataChange.notify();
+        function handleColumnsChange(event) {
+
+            if (bulkColumns.length == 0 && event.id) {
+                if (isInColumnsCache([event.id]) === true) {
+                    resetCacheRangeWidth();
+                    self.onColumnsChange.notify();
+                }
+            } else if (event.id) {
+                bulkColumns.push(event.id);
+            }
         }
 
-        function handleRowsChange() {
-            //self.onRowsChange.notify();
-            resetCacheRangeHeight();
-            self.onDataChange.notify();
+        function handleRowsChange(event) {
+            if (bulkRows.length == 0 && event.id) {
+                if (isInRowsCache([event.id]) === true) {
+                    resetCacheRangeHeight();
+                    self.onRowsChange.notify();
+                }
+            } else if (event.id) {
+                bulkRows.push(event.id);
+            }
         }
+
+        function handleColumnsChangeStart() {
+            bulkColumns = [];
+        }
+
+        function handleRowsChangeStart() {
+            bulkRows = [];
+        }
+
+        function handleColumnsChangeStop(event) {
+            if ((event.mode && event.mode == "all") || (bulkColumns.length && isInColumnsCache(bulkRows))) {
+                bulkColumns = [];
+                resetCacheRangeWidth();
+                self.onColumnsChange.notify();
+            }
+        }
+
+        function handleRowsChangeStop(event) {
+            if ((event.mode && event.mode == "all") || (bulkRows.length && isInRowsCache(bulkRows))) {
+                bulkRows = [];
+                resetCacheRangeHeight();
+                self.onRowsChange.notify();
+            }
+        }
+
+        function isInRowsCache(ids) {
+            for (var i = 0; i < ids.length; i++) {
+                if (getRowIndexById(ids[i]) !== -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function isInColumnsCache(ids) {
+            for (var i = 0; i < ids.length; i++) {
+                if (getColumnByIndex(ids[i]) !== -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         /*
         Row and column helpers
         */
+        function getRows() {
+            return rowsCache;
+        }
+        function getColumns() {
+            return columnsCache;
+        }
+
         function getRowByIndex(idx) {
             return rowsCache[idx];
         }
@@ -104,18 +181,25 @@
         /*
         Filter part
         */
+        function getFilterById(id) {
+            for (var i = 0; i < rowsFilters.length; i++) {
+                if (rowsFilters[i].getId() == id) {
+                    return rowsFilters[i];
+                }
+            }
+        }
+
         function getFilters() {
             return rowsFilters;
         }
 
         function setFilter(filterObj) {
-            if (filterObj instanceof settings.Filter.FilterQuery) {
+            if (filterObj instanceof SmallGrid.Filter.FilterQuery) {
                 clearFilter(filterObj);
                 rowsFilters.push(filterObj);
 
                 resetCacheRangeHeight();
                 self.onRowsChange.notify();
-                self.onDataChange.notify();
             }
         }
 
@@ -126,17 +210,15 @@
             }
             resetCacheRangeHeight();
             self.onRowsChange.notify();
-            self.onDataChange.notify();
         }
 
         function clearFilter(filterObj) {
-            if (filterObj instanceof settings.Filter.FilterQuery) {
+            if (filterObj instanceof SmallGrid.Filter.FilterQuery) {
                 for (var i = 0; i < rowsFilters.length; i++) {
                     if (rowsFilters[i].getId() == filterObj.getId()) {
                         rowsFilters.splice(i, 1);
                         resetCacheRangeHeight();
                         self.onRowsChange.notify();
-                        self.onDataChange.notify();
                         break;
                     }
                 }
@@ -147,45 +229,41 @@
             rowsFilters = [];
             resetCacheRangeHeight();
             self.onRowsChange.notify();
-            self.onDataChange.notify();
         }
 
         /*
         Data calculations
         */
         function getRowsHeight(cellOuterSize) {
-            return new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsHeight(cellOuterSize.height);
+            return new SmallGrid.Filter.FilterRequest(rowsFilters, rowsModel).getRowsHeight(cellOuterSize.height);
         }
 
         function getColumnsWidth(cellOuterSize) {
-            return new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsWidth(cellOuterSize.width);
+            return new SmallGrid.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsWidth(cellOuterSize.width);
         }
 
         function requestDataFromRange(point, size, outerSize, allowCache) {
+
             var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) & allowCache;
             var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) & allowCache;
 
             if (rowsCached === 0 || columnsCached === 0) {
-                self.onDataChangeStart.notify();
-
                 if (rowsCached === 0) {
-                    rowsCache = new settings.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
-
-                    self.onRowsChange.notify();
+                    rowsCache = new SmallGrid.Filter.FilterRequest(rowsFilters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
                 }
 
                 if (columnsCached === 0) {
-                    columnsCache = new settings.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
-                    self.onColumnsChange.notify();
+                    columnsCache = new SmallGrid.Filter.FilterRequest(columnsFilters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
                 }
 
                 updateCacheRange(size, outerSize);
-
-                self.onDataChangeStop.notify({
-                    rows: rowsCache,
-                    columns: columnsCache,
-                });
             }
+
+            return {
+                isCached: (rowsCached && columnsCached),
+                rows: rowsCache,
+                columns: columnsCache,
+            };
         }
 
         /*
@@ -194,18 +272,10 @@
         function updateCacheRange(size, outerSize) {
             if (columnsCache.length && rowsCache.length) {
                 cachedRange = {
-                    minTop: rowsCache[0].calcHeight < size.height
-                        ? rowsCache[0].calcHeight - rowsCache[0].height - outerSize.height
-                        : rowsCache[0].calcHeight + size.height,
-                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight < size.height
-                        ? size.height
-                        : rowsCache[(rowsCache.length - 1)].calcHeight - size.height + settings.scrollbarDimensions.height,
-                    minLeft: columnsCache[0].calcWidth < size.width
-                        ? columnsCache[0].calcWidth - columnsCache[0].width - outerSize.width
-                        : columnsCache[0].calcWidth + size.width,
-                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width
-                        ? size.width
-                        : columnsCache[(columnsCache.length - 1)].calcWidth - size.width + settings.scrollbarDimensions.width,
+                    minTop: rowsCache[0].calcHeight < size.height ? rowsCache[0].calcHeight - rowsCache[0].height - outerSize.height : rowsCache[0].calcHeight + size.height,
+                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight < size.height ? size.height : rowsCache[(rowsCache.length - 1)].calcHeight - size.height,
+                    minLeft: columnsCache[0].calcWidth < size.width ? columnsCache[0].calcWidth - columnsCache[0].width - outerSize.width : columnsCache[0].calcWidth + size.width,
+                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width ? size.width : columnsCache[(columnsCache.length - 1)].calcWidth - size.width,
                 };
             } else {
                 resetCacheRange();
@@ -227,38 +297,42 @@
             resetCacheRangeWidth();
         }
 
-        init();
+        init();//move to factory
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
+            "columns": columns,
+            "rows": rows,
+
             "resetCacheRange": resetCacheRange,
             "requestDataFromRange": requestDataFromRange,
 
-            "rows": rows,
-            "columns": columns,
-
-            "getRowsHeight": getRowsHeight,
-            "getColumnsWidth": getColumnsWidth,
-
-            "getRowByIndex": getRowByIndex,
-            "getColumnByIndex": getColumnByIndex,
-            "getRowById": getRowById,
-            "getColumnById": getColumnById,
-
-            "getRowIndexById": getRowIndexById,
-            "getColumnIndexById": getColumnIndexById,
-
-            "setFilter": setFilter,
             "clearFilter": clearFilter,
             "clearFilters": clearFilters,
+            "getColumnById": getColumnById,
+            "getColumnByIndex": getColumnByIndex,
+            "getColumnIndexById": getColumnIndexById,
+            "getColumns": getColumns,
+            "getColumnsWidth": getColumnsWidth,
+            "getFilterById": getFilterById,
+            "getFilters": getFilters,
+            "getRowById": getRowById,
+            "getRowByIndex": getRowByIndex,
+            "getRowIndexById": getRowIndexById,
+            "getRows": getRows,
+            "getRowsHeight": getRowsHeight,
+            "setFilter": setFilter,
+            "setFilters": setFilters,
 
-            "onRowsChange": new SmallGrid.Event.Handler(),//rename to onRowCountChange
-            "onColumnsChange": new SmallGrid.Event.Handler(),//rename to onColumnCountChange
-            "onDataChange": new SmallGrid.Event.Handler(),
-            "onDataChangeStart": new SmallGrid.Event.Handler(),
-            "onDataChangeStop": new SmallGrid.Event.Handler(),
+            "onColumnsChange": new SmallGrid.Event.Handler(),
+            "onRowsChange": new SmallGrid.Event.Handler(),
         });
     }
+
+    function CreateModel(rowsModel, columnsModel, settings) {
+        return new ViewModel(rowsModel, columnsModel, settings);
+    }
+
 })(jQuery);

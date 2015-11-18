@@ -1,6 +1,5 @@
-"use strict";
-
 (function ($) {
+    "use strict";
 
     $.extend(true, window, {
         "SmallGrid": {
@@ -9,96 +8,122 @@
             }
         }
     });
-    //todo: add shift and ctrl support
-    //todo: update css classes
-    //todo: keyboard navigation up and down
 
-    function RowSelectionPlugin(viewModel, view, settings) {
+    function RowSelectionPlugin(view, windowManager, settings) {
         var self = this;
         var selectedRowIds = [];
+        var lastFocusedRowId = null;
 
         function init() {
             view.onCellClick.subscribe(handleCellClick);
-            view.onCellKeyDown.subscribe(handeCellKeyDown);
         }
 
         function destroy() {
             view.onCellClick.unsubscribe(handleCellClick);
-            view.onCellKeyDown.unsubscribe(handeCellKeyDown);
         }
 
-        function handleCellClick(e) {
-            setSelectedRow(e.row.id);
+        function handleCellClick(event) {
+
+            if (event.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != event.row.id) {
+                clearSelectedRows(selectedRowIds);
+
+                var lastFocusedRow = view.getModel().rows.getRowById(lastFocusedRowId);
+                var currentRow = view.getModel().rows.getRowById(event.row.id);
+
+                if (lastFocusedRow && currentRow) {
+                    selectRowsRange(lastFocusedRowId, event.row.id);
+                }
+
+            } else if (event.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection) {
+                if (isRowSelected(event.row.id) === false) {
+                    selectRowById(event.row.id);
+                } else {
+                    clearSelectedRow(event.row.id);
+                }
+            } else {
+                var clearRowsIds = selectedRowIds.slice();
+                var selectedIndex = clearRowsIds.indexOf(event.row.id);
+
+                if (selectedIndex === -1) {
+                    selectRowById(event.row.id);
+                } else {
+                    clearRowsIds.splice(selectedIndex, 1);
+                }
+
+                clearSelectedRows(clearRowsIds);
+            }
+
+            if (event.event.shiftKey === false) lastFocusedRowId = event.row.id;
         }
 
+        function selectRowsRange(id1, id2) {
+            var lastFocusedIndex = view.getModel().rows.getRowIndexById(id1);
+            var currentRowIndex = view.getModel().rows.getRowIndexById(id2);
+            if (lastFocusedIndex !== -1 && currentRowIndex !== -1) {
+                var startIndex = Math.min(currentRowIndex, lastFocusedIndex);
+                var endIndex = Math.max(currentRowIndex, lastFocusedIndex);
 
-        function handeCellKeyDown(e) {
-            //console.log(e);//todo
+                for (var i = startIndex ; i <= endIndex; i++) {
+                    selectRowByIndex(i);
+                }
+            }
+            return self;
+        }
+
+        function selectRow(row) {
+            if (row) {
+                view.getModel().rows.setRowPropertyById(
+                    row.id,
+                    'rowCssClass',
+                    row.rowCssClass + ' ' + settings.cssClass.rowSelected
+                );
+                selectedRowIds.push(row.id);
+            }
+        }
+
+        function selectRowByIndex(idx) {
+            selectRow(
+                view.getModel().rows.getRowByIndex(idx)
+            );
+            return self;
         }
 
         function selectRowById(id) {
-
-            if (isRowSelected(id) === false) {
-                var row = viewModel.rows.getRowById(id);
-                if (row) {
-                    viewModel.rows.setRowPropertyById(
-                        id,
-                        'rowCssClass',
-                        row.rowCssClass + ' ' + settings.cssClass.rowSelected
-                    );
-                    selectedRowIds.push(id);
-                }
-            }
+            selectRow(
+                view.getModel().rows.getRowById(id)
+            );
+            return self;
         }
 
-        /*
-        Public api
-        */
-        function setSelectedRows(ids) {
-            if (settings.allowMultiRowSelection == true) {
-                for (var i = 0; i < ids.length; i++) {
-                    var row = viewModel.rows.getRowById(ids);
-                    if (row) {
-                        selectRowById(row.id);
-                    }
-                }
+        function clearSelectedRows(ids) {
+            for (var i = ids.length - 1; i >= 0; i--) {
+                clearSelectedRow(ids[i]);
             }
-            return this;
+            return self;
         }
 
-        function clearSelectedRows(skipId) {
-            if (selectedRowIds.length) {
-                for (var i = 0; i < selectedRowIds.length; i++) {
-                    if (selectedRowIds[i] == skipId) {
-                        continue;
-                    }
-
-                    var row = viewModel.rows.getRowById(selectedRowIds[i]);
-                    if (row) {
-                        viewModel.rows.setRowPropertyById(
-                            row.id,
-                            'rowCssClass',
-                            row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '')
-                        );
-                    }
-                    selectedRowIds.splice(i, 1);
-                }
+        function clearSelectedRow(id) {
+            var row = view.getModel().rows.getRowById(id);
+            if (row) {
+                view.getModel().rows.setRowPropertyById(
+                    row.id,
+                    'rowCssClass',
+                    row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '')
+                );
             }
-            return this;
+            var selectedIndex = selectedRowIds.indexOf(id);
+            if (selectedIndex !== -1) {
+                selectedRowIds.splice(selectedIndex, 1);
+            }
+
+            return self;
         }
 
         function isRowSelected(id) {
             return (selectedRowIds.indexOf(id) !== -1);
         }
 
-        function setSelectedRow(id) {
-            if (settings.allowMultiRowSelection == false) {
-                clearSelectedRows(id);
-            }
-            selectRowById(id);
-        }
-
-        function getSelectedRows() {
+        function getSelectedRowsIds() {
             return selectedRowIds;
         }
 
@@ -106,14 +131,16 @@
             "init": init,
             "destroy": destroy,
 
+            "clearSelectedRow": clearSelectedRow,
             "clearSelectedRows": clearSelectedRows,
-            "getSelectedRows": getSelectedRows,
+            "getSelectedRowsIds": getSelectedRowsIds,
             "isRowSelected": isRowSelected,
-            "setSelectedRow": setSelectedRow,
-            "setSelectedRows": setSelectedRows,
+            "selectRowByIndex": selectRowByIndex,
+            "selectRowById": selectRowById,
+            "selectRowsRange": selectRowsRange,
+
         });
 
-        init();
     }
 
 })(jQuery);

@@ -1,29 +1,21 @@
-"use strict";
-
 (function ($) {
+    "use strict";
+
     $.extend(true, window, {
         "SmallGrid": {
             "Handler": {
-                "Resize": ResizeHandler
+                "Resize": {
+                    "Create": Create,
+                    "Handler": ResizeHandler,
+                }
             }
         }
     });
 
-    var defaultSettings = {
-        "cellIdentifier": "TD",
-        "handleResize": undefined,
-        "handleResizeStart": undefined,
-        "handleResizeStop": undefined,
-        "handlerIdentifier": undefined,
-    };
-
     function ResizeHandler($container, settings) {
-        var settings = jQuery.extend({}, defaultSettings, settings);
-
         $container.on("mousedown", settings.handlerIdentifier, handleMouseDown);
 
-        function handleMouseDown(e) {
-
+        function handleMouseDown(event) {
             var $cellElement = $(this).closest(settings.cellIdentifier);
 
             if ($cellElement.length) {
@@ -32,20 +24,18 @@
                 settings.handleResizeStart({
                     cellElement: $cellElement,
                     cellIndex: cellIndex,
-                    event: e
+                    event: event
                 });
 
-                $("body")
+                $(document)
                     .bind("mousemove", function (event) {
                         var newWidth = event.pageX - $cellElement.offset().left;
-                        //TODO: remove condition?
                         if (newWidth > 0) {
-
                             settings.handleResize({
                                 cellElement: $cellElement,
                                 cellIndex: cellIndex,
                                 width: newWidth,
-                                event: e
+                                event: event
                             });
                         }
                     })
@@ -55,7 +45,7 @@
                         settings.handleResizeStop({
                             cellElement: $cellElement,
                             cellIndex: cellIndex,
-                            event: e
+                            event: event
                         });
                     });
             }
@@ -68,6 +58,20 @@
         $.extend(this, {
             "destroy": destroy
         });
-    };
+    }
+
+    function Create($container, settings) {
+        var defaultSettings = {
+            "cellIdentifier": "TD",
+            "handleResize": undefined,
+            "handleResizeStart": undefined,
+            "handleResizeStop": undefined,
+            "handlerIdentifier": undefined,
+        };
+
+        settings = $.extend({}, defaultSettings, settings);
+
+        return new ResizeHandler($container, settings);
+    }
 
 })(jQuery);

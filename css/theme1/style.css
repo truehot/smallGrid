@@ -1,0 +1,30 @@
+﻿/* Custom styles */
+
+.grid-viewport {
+    border: 1px solid #dddddd;
+}
+
+.grid-header-table {
+    background-color:#f5f5f5;
+    color:black;
+}
+
+.grid-content-table {
+    color:initial;
+}
+
+.grid-header-cell, .grid-cell {
+    border-color: white;
+}
+
+.grid-row-even {
+    background-color: #f9f9f9;
+}
+
+.grid-row-odd {
+    background-color: #FFFFFF;
+}
+
+.grid-row-selected {
+    background-color: #f5f5f5;
+}

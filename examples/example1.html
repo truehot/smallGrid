@@ -6,28 +6,29 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
 
 
-    <script src="../libs/jquery-2.1.3.min.js"></script>
+    <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
-    <div class="small-grid" style="width: 537px; height: 162px;"></div>
+    <div class="small-grid" style="width: 537px; height: 126px;"></div>
     <script>
-        var columns = [
-            { 'name': "Task 1", 'field': "task1", 'width': 100 },
-            { 'name': "Task 2", 'field': "task2", 'width': 100 },
-            { 'name': "Task 3", 'field': "task3", 'width': 100 },
-            { 'name': "Task 4", 'field': "task4", 'width': 100 },
-            { 'name': "Task 5", 'field': "task5", 'width': 100 },
-        ];
-        var items = [
-            { "task1": "Row 1", "task2": "Row 2", "task3": "Row 3", "task4": "Row 4", "task5": "Row 5" },
-            { "task1": "Row 6", "task2": "Row 7", "task3": "Row 8", "task4": "Row 9", "task5": "Row 10" },
-            { "task1": "Row 11", "task2": "Row 12", "task3": "Row 13", "task4": "Row 14", "task5": "Row 15" },
-            { "task1": "Row 16", "task2": "Row 17", "task3": "Row 18", "task4": "Row 19", "task5": "Row 20" },
-            { "task1": "Row 21", "task2": "Row 22", "task3": "Row 23", "task4": "Row 24", "task5": "Row 25" },
-        ];
         $(document).ready(function () {
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+			var columns = [
+				{ 'name': "Task 1", 'field': "task1", 'width': 100 },
+				{ 'name': "Task 2", 'field': "task2", 'width': 100 },
+				{ 'name': "Task 3", 'field': "task3", 'width': 100 },
+				{ 'name': "Task 4", 'field': "task4", 'width': 100 },
+				{ 'name': "Task 5", 'field': "task5", 'width': 100 },
+			];
+			var items = [
+				{ "task1": "Row 1", "task2": "Row 2", "task3": "Row 3", "task4": "Row 4", "task5": "Row 5" },
+				{ "task1": "Row 6", "task2": "Row 7", "task3": "Row 8", "task4": "Row 9", "task5": "Row 10" },
+				{ "task1": "Row 11", "task2": "Row 12", "task3": "Row 13", "task4": "Row 14", "task5": "Row 15" },
+				{ "task1": "Row 16", "task2": "Row 17", "task3": "Row 18", "task4": "Row 19", "task5": "Row 20" },
+				{ "task1": "Row 21", "task2": "Row 22", "task3": "Row 23", "task4": "Row 24", "task5": "Row 25" },
+			];
+			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad" : true});
+
         });
     </script>
 </body>

@@ -1,6 +1,5 @@
-"use strict";
-
 (function ($) {
+    "use strict";
 
     var guid = function () {
         var e = {};
@@ -59,9 +58,11 @@
     }
 
 
-    function measureCellDiff($element) {
-        var $row = $("<tr />").appendTo($element),
-            $cell = $("<td style='width:5px; height:5px;'>-</td>").appendTo($row);
+    function measureTableCellDiff(cssClass) {
+        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'></table>").appendTo('body'),
+            $tbody = $("<tbody></tbody>").appendTo($table),
+            $row = $("<tr/>").appendTo($tbody),
+            $cell = $("<td class='" + cssClass + "' style='width:5px; height:5px;'>-</td>").appendTo($row);
 
         var cellDiff = {
             width: $cell.outerWidth() - $cell.width(),
@@ -70,7 +71,8 @@
 
         $cell.remove();
         $row.remove();
-
+        $tbody.remove();
+        $table.remove();
         return cellDiff;
     }
 
@@ -82,10 +84,10 @@
         "SmallGrid": {
             "Utils": {
                 "changeSortOrder": changeSortOrder,
-                "getNewGuid": guid.newGuid,
+                "createGuid": guid.newGuid,
                 "isFunction": isFunction,
                 "isProperty": isProperty,
-                "measureCellDiff": measureCellDiff,
+                "measureCellDiff": measureTableCellDiff,
                 "measureMaxSupportedCssHeight": measureMaxSupportedCssHeight,
                 "measureScrollbar": measureScrollbar,
                 "parseBool": parseBool,

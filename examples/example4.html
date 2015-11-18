@@ -4,30 +4,31 @@
     <title>Column min and max width</title>
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
-    <script src="../libs/jquery-2.1.3.min.js"></script>
+    <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-        var columns = [
-            { 'name': "MaxWidth 300", 'field': "property1", 'width': 200, 'maxWidth': 300 },
-            { 'name': "MaxWidth 300, minWidth 100", 'field': "property2", 'width': 200, 'maxWidth': 300, 'minWidth': 100 },
-            { 'name': "MinWidth 100", 'field': "property3", 'width': 200, 'minWidth': 100 },
-            { 'name': "Column", 'field': "property4", 'width': 200, },
-            { 'name': "Column", 'field': "property5", 'width': 200, },
-        ];
-        var items = [];
-        for (var i = 1; i <= 600; i++) {
-            var item = {};
-            for (var ii = 1; ii < 6; ii++) {
-                item["property" + ii] = i + '' + ii;
-            }
 
-            items.push(item);
-        }
 
         $(document).ready(function () {
+			var columns = [
+				{ 'name': "MaxWidth 300", 'field': "property1", 'width': 200, 'maxWidth': 300 },
+				{ 'name': "MaxWidth 400, minWidth 100", 'field': "property2", 'width': 100, 'maxWidth': 400, 'minWidth': 100 },
+				{ 'name': "MinWidth 200", 'field': "property3", 'width': 200, 'minWidth': 200 },
+				{ 'name': "Column", 'field': "property4", 'width': 200, },
+				{ 'name': "Column", 'field': "property5", 'width': 200, },
+			];
+			var items = [];
+			for (var i = 1; i <= 600; i++) {
+				var item = {};
+				for (var ii = 1; ii < 6; ii++) {
+					item["property" + ii] = i + '' + ii;
+				}
+
+				items.push(item);
+			}
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
         });
     </script>
