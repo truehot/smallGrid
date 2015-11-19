@@ -3157,10 +3157,8 @@
         function handleColumnsChange(event) {
 
             if (bulkColumns.length == 0 && event.id) {
-                if (event.type == "add" || isInColumnsCache([event.id]) === true) {
-                    resetCacheRangeWidth();
-                    self.onColumnsChange.notify();
-                }
+                resetCacheRangeWidth();
+                self.onColumnsChange.notify();
             } else if (event.id) {
                 bulkColumns.push(event.id);
             }
@@ -3168,10 +3166,8 @@
 
         function handleRowsChange(event) {
             if (bulkRows.length == 0 && event.id) {
-                if (event.type == "add" || isInRowsCache([event.id]) === true) {
-                    resetCacheRangeHeight();
-                    self.onRowsChange.notify();
-                }
+                resetCacheRangeHeight();
+                self.onRowsChange.notify();
             } else if (event.id) {
                 bulkRows.push(event.id);
             }
@@ -3186,7 +3182,7 @@
         }
 
         function handleColumnsChangeStop(event) {
-            if ((event.mode && event.mode == "all") || (bulkColumns.length && isInColumnsCache(bulkRows))) {
+            if ((event.mode && event.mode == "all") || bulkColumns.length > 0) {
                 bulkColumns = [];
                 resetCacheRangeWidth();
                 self.onColumnsChange.notify();
@@ -3194,31 +3190,12 @@
         }
 
         function handleRowsChangeStop(event) {
-            if ((event.mode && event.mode == "all") || (bulkRows.length && isInRowsCache(bulkRows))) {
+            if ((event.mode && event.mode == "all") || bulkRows.length > 0) {
                 bulkRows = [];
                 resetCacheRangeHeight();
                 self.onRowsChange.notify();
             }
         }
-
-        function isInRowsCache(ids) {
-            for (var i = 0; i < ids.length; i++) {
-                if (getRowIndexById(ids[i]) !== -1) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function isInColumnsCache(ids) {
-            for (var i = 0; i < ids.length; i++) {
-                if (getColumnByIndex(ids[i]) !== -1) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
 
         /*
         Row and column helpers
@@ -3956,8 +3933,8 @@
         }
 
         function handleCellKeyDown(event) {
-            if (e && e.event) {
-                switch (e.event.keyCode) {
+            if (event && event.event) {
+                switch (event.event.keyCode) {
                     case 13:
                         applyEdit();
                         break;
@@ -4036,7 +4013,7 @@
                 if (row) {
                     row.item[editOptions.column.field] = editOptions.editor.getValue();
                     row.editMode = false;
-                    view.getModel().rows.updateItem(row);
+                    view.getModel().rows.updateRow(row);
                 }
 
                 //apply
