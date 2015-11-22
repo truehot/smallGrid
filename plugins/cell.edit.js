@@ -78,8 +78,8 @@
         }
 
         function handleCellKeyDown(event) {
-            if (e && e.event) {
-                switch (e.event.keyCode) {
+            if (event && event.event) {
+                switch (event.event.keyCode) {
                     case 13:
                         applyEdit();
                         break;
@@ -147,6 +147,7 @@
 
         function applyEdit() {
             if (editOptions.enabled === true) {
+                var request = view.suspendRender();
 
                 view.getModel().columns.setColumnPropertyById(
                     editOptions.column.id,
@@ -158,7 +159,7 @@
                 if (row) {
                     row.item[editOptions.column.field] = editOptions.editor.getValue();
                     row.editMode = false;
-                    view.getModel().rows.updateItem(row);
+                    view.getModel().rows.updateRow(row);
                 }
 
                 //apply
@@ -166,13 +167,15 @@
                 editOptions = {
                     enabled: false
                 }
+                view.resumeRender(request);
+                view.render();
             }
             return self;
         }
 
         function cancelEdit() {
             if (editOptions.enabled === true) {
-
+                var request = view.suspendRender();
                 view.getModel().columns.setColumnPropertyById(
                     editOptions.column.id,
                     'editMode',
@@ -182,7 +185,7 @@
                 var row = view.getModel().rows.getRowById(editOptions.row.id);
                 if (row) {
                     row.editMode = false;
-                    view.getModel().rows.updateItem(row);
+                    view.getModel().rows.updateRow(row);
                 }
 
                 //undo
@@ -190,6 +193,8 @@
                 editOptions = {
                     enabled: false
                 }
+                view.resumeRender(request);
+                view.render();
             }
             return self;
         }

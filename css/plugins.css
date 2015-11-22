@@ -35,12 +35,14 @@
         background-color: #4dc1aa;
         border: 1px;
         padding: 5px;
+        margin-bottom:0px;
     }
 
     .grid-header-menu .btn-clear {
         width: 40%;
         border: 1px;
         padding: 5px;
+        margin-bottom:0px;
     }
 
     .grid-header-menu .btn-submit + .btn-clear {
@@ -66,9 +68,17 @@
 
 .grid-columnpicker-menucontent {
     display: inline-block;
-    padding: 10px;
+    padding: 5px;
     vertical-align: middle;
     position: relative;
     border: 1px solid black;
     overflow: auto;
+}
+
+.grid-columnpicker-menucontent > div {
+    margin: 5px;
+}
+
+.grid-columnpicker-menucontent input {
+    vertical-align: text-bottom;
 }

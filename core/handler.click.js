@@ -55,7 +55,6 @@
             if (event && settings.handleContextMenu) {
                 settings.handleContextMenu(event);
             }
-            return false;
         }
 
         function handleDblClick(event) {

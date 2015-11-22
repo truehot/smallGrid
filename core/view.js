@@ -37,32 +37,32 @@
             var request = suspendRender();
 
             el = renderer.buildViewPortElements($container);
-            el['container'].empty().addClass(settings.uid);
+            el.container.empty().addClass(settings.uid);
 
             //viewport
-            el['viewport'].appendTo(el['container']);
+            el.viewport.appendTo(el.container);
 
 
             //bind events           
             handlers.push(
-                SmallGrid.Handler.Resize.Create(el['header'], {
+                SmallGrid.Handler.Resize.Create(el.header, {
                     "handleResize": handleHeaderResize,
                     "handleResizeStart": handleHeaderResizeStart,
                     "handleResizeStop": handleHeaderResizeStop,
                     "handlerIdentifier": "." + settings.cssClass.headerResizeHandle,
                 }),
-                SmallGrid.Handler.Click.Create(el['header'], {
+                SmallGrid.Handler.Click.Create(el.header, {
                     "handleClick": handleHeaderClick,
                     "handleDblClick": handleHeaderDblClick,
                     "handleContextMenu": handleHeaderContextMenu,
                 }),
-                SmallGrid.Handler.Click.Create(el['content'], {
+                SmallGrid.Handler.Click.Create(el.content, {
                     "handleClick": handleCellClick,
                     "handleDblClick": handleCellDblClick,
                     "handleContextMenu": handleCellContextMenu,
                     "handleKeyDown": handleCellKeyDown,
                 }),
-                SmallGrid.Handler.Scroll.Create(el['content'], {
+                SmallGrid.Handler.Scroll.Create(el.content, {
                     "handleScrollStart": handleScrollStart,
                     "handleScrollStop": handleScrollStop,
                     "handleScroll": handleScroll,
@@ -79,7 +79,7 @@
 
 
             //block invisible part in header ????
-            //el['header'].width(contentSize.width - settings.scrollbarDimensions.width);
+            //el.header.width(contentSize.width - settings.scrollbarDimensions.width);
 
             resize();
 
@@ -91,9 +91,9 @@
 
             resumeRender(request);
 
-
-
             self.onInitialize.notify({});
+
+            return self;
         }
 
         function destroy() {
@@ -104,11 +104,11 @@
             viewModel.onRowsChange.unsubscribe(handleRowsChange);
             viewModel.onColumnsChange.unsubscribe(handleColumnsChange);
 
-            if (el['container'].length) {
+            if (el.container.length) {
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].destroy();
                 }
-                el['container'].empty().removeClass(settings.uid);
+                el.container.empty().removeClass(settings.uid);
             }
             $(document.body).off("click", handleBodyClick);
             self.onDestroy.notify({});
@@ -138,14 +138,14 @@
         function isRowVisible(rowId) {
             var row = viewModel.getRowById(rowId);
             if (row) {
-                return (row.calcHeight - row.height - settings.cellOuterSize.height >= el['content'][0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el['content'][0].scrollTop);
+                return (row.calcHeight - row.height - settings.cellOuterSize.height >= el.content[0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el.content[0].scrollTop);
 
             }
             return false;
         }
 
         function getRowNodeByIndex(rowIndex) {
-            return el['contentTbody'][0].rows[rowIndex];
+            return el.contentTbody[0].rows[rowIndex];
         }
 
         function getRowNodeById(rowId) {
@@ -163,7 +163,7 @@
         }
 
         function getCellNodeByIndex(columnIndex, rowIndex) {
-            return el['contentTbody'][0].rows[rowIndex].cells[columnIndex];
+            return el.contentTbody[0].rows[rowIndex].cells[columnIndex];
         }
 
         function getCellNodeById(columnId, rowId) {
@@ -180,7 +180,7 @@
         function isColumnVisible(columnId) {
             var column = viewModel.getColumnById(columnId);
             if (column) {
-                return (column.calcWidth - column.width - settings.cellOuterSize.width >= el['content'][0].scrollLeft && column.calcWidth < contentSize.width + el['content'][0].scrollLeft);
+                return (column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft);
             }
             return false;
         }
@@ -219,28 +219,28 @@
         }
 
         function renderView() {
-            
+
             var request = suspendRender();
             suspendRenderRequests = 0;
             var result = viewModel.requestDataFromRange(
                 {
-                    top: el['content'][0].scrollTop * heightRatio,
-                    left: el['content'][0].scrollLeft
+                    top: el.content[0].scrollTop * heightRatio,
+                    left: el.content[0].scrollLeft
                 },
                 contentSize,
                 settings.cellOuterSize,
                 heightRatio == 1
             );
 
-            if (result.columns.length > 0 && result.isCached == 0) {
+            if (result.columns.length > 0 && result.isCached === 0) {
 
-                el['headerTable'].css({
+                el.headerTable.css({
                     'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
                 });
 
                 if (result.rows.length > 0) {
-                    el['contentTable'].css({
-                        'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el['content'][0].scrollTop * heightRatio) + el['content'][0].scrollTop,
+                    el.contentTable.css({
+                        'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el.content[0].scrollTop * heightRatio) + el.content[0].scrollTop,
                         'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
                     });
                 }
@@ -255,6 +255,8 @@
                 if (scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth) {
                     opts.hideColumnBorder = true;
                 }
+
+
                 if (settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth) {
                     opts.virtualColumnWidth = contentSize.width - lastColumn.calcWidth;
                 }
@@ -272,9 +274,9 @@
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
             self.onBeforeRowsRendered.notify({});
 
-            el['headerCol'][0].innerHTML = el['contentCol'][0].innerHTML = colsHtml;
-            el['headerTbody'][0].innerHTML = columnsHtml;
-            el['contentTbody'][0].innerHTML = rowsHtml;
+            el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
+            el.headerTbody[0].innerHTML = columnsHtml;
+            el.contentTbody[0].innerHTML = rowsHtml;
 
             self.onAfterRowsRendered.notify({});
         }
@@ -432,10 +434,10 @@
         }
 
         function resize() {
-            contentSize.width = el['container'].width();
-            contentSize.height = el['container'].height() - settings.header.height - settings.cellOuterSize.height;
-            el['content'].width(contentSize.width);
-            el['content'].height(contentSize.height);
+            contentSize.width = el.container.width();
+            contentSize.height = el.container.height() - settings.header.height - settings.cellOuterSize.height;
+            el.content.width(contentSize.width);
+            el.content.height(contentSize.height);
             return self;
         }
 
@@ -453,11 +455,11 @@
             }
 
             //fix?
-            el['header'].css({
+            el.header.css({
                 'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
             });
 
-            el['contentWrap'].css({
+            el.contentWrap.css({
                 'height': rowsHeight,
             });
 
@@ -474,11 +476,11 @@
                 scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
             );
 
-            el['headerWrap'].css({
+            el.headerWrap.css({
                 'width': width
             });
 
-            el['contentWrap'].css({
+            el.contentWrap.css({
                 'width': width,
             });
 
@@ -566,7 +568,7 @@
         function handleScroll(event) {
             if (suspendScrollEvent == false) {
                 notifyEvent(event, "onScroll", function () {
-                    el['header'][0].scrollLeft = el['content'][0].scrollLeft;
+                    el.header[0].scrollLeft = el.content[0].scrollLeft;
                     render();
                 });
             }
@@ -609,6 +611,7 @@
         }
 
         $.extend(this, {
+            "init": init,
             "destroy": destroy,
 
             "getCellNodeById": getCellNodeById,
@@ -659,8 +662,6 @@
             "onInitialize": new SmallGrid.Event.Handler(),
             "onDestroy": new SmallGrid.Event.Handler(),
         });
-
-        init();
     }
 
 
@@ -670,7 +671,7 @@
             throw new Error("Small grid requires a valid container, " + container + " does not exist in the DOM.");
         }
         var renderer = SmallGrid.View.Renderer.Create(settings);
-        return new ViewData($container, viewModel, renderer, settings);
+        return new ViewData($container, viewModel, renderer, settings).init();
     }
 
 })(jQuery);

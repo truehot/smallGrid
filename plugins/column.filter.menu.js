@@ -14,7 +14,7 @@
 
         function handleHeaderClick(event) {
             if (event && event.type && event.type == "filter") {
-                event.event.stopPropagation();
+                event.stopPropagation();
                 var isVisible = windowManager.isVisible(event.column.id);
                 windowManager.hideWindows();
 
@@ -22,7 +22,7 @@
 
                     windowManager.createWindow(
                         event.column.id,
-                        { filter: new SmallGrid.Filter.FilterQuery(event.column.field, settings) },
+                        { filter: new SmallGrid.Query.FilterQuery(event.column.field, settings) },
                         buildElements(event.column.id)
                     );
 

@@ -10,8 +10,10 @@
 .grid-viewport {
     position: relative;
     border: 1px solid black;
-    width: inherit;
     box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    display:inline-block;
 }
 
 .grid-header {
@@ -38,7 +40,7 @@
 
 .grid-content-table, .grid-header-table {
     /*border-collapse: collapse;*/
-    border-spacing: 0px;
+    border-spacing: 0;
     empty-cells: show;
     margin: 0;
     max-width: none;
@@ -46,13 +48,13 @@
     padding: 0;
     position: relative;
     table-layout: fixed;
-    width: 0px;
+    width: 0;
 }
 
 .grid-header-cell {
     border-color: black;
     border-style: solid;
-    border-width: 0px 1px 1px 0px;
+    border-width: 0 1px 1px 0;
     position: relative;
     padding: 2px;
     font-weight: bold;
@@ -71,22 +73,22 @@
 .grid-cell {
     border-color: black;
     border-style: solid;
-    border-width: 0px 1px 1px 0px;
+    border-width: 0 1px 1px 0;
     padding: 2px;
 }
 
 
 
 .grid-cell-hide-border {
-    border-right-width: 0px;
+    border-right-width: 0;
 }
 
 .grid-cell-last {
-    border-right-width: 0px;
+    border-right-width: 0;
 }
 .grid-cell-last-disabled {
-    border-right-width: 0px;
-    box-shadow: 1px 0px 0px black;
+    border-right-width: 0;
+    box-shadow: 1px 0 0 black;
 }
 .grid-cell-formatter {
     height: 100%;
@@ -95,9 +97,9 @@
 }
 
 .grid-scroll-vertical, .grid-scroll-horisontal {
-    height: 0px;
+    height: 0;
     position: relative;
-    width: 0px;
+    width: 0;
 }
 
 .disable-text-selection {
@@ -121,6 +123,8 @@
     overflow: hidden;
     position: relative;
     text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -270,12 +274,14 @@
         background-color: #4dc1aa;
         border: 1px;
         padding: 5px;
+        margin-bottom:0px;
     }
 
     .grid-header-menu .btn-clear {
         width: 40%;
         border: 1px;
         padding: 5px;
+        margin-bottom:0px;
     }
 
     .grid-header-menu .btn-submit + .btn-clear {
@@ -301,9 +307,17 @@
 
 .grid-columnpicker-menucontent {
     display: inline-block;
-    padding: 10px;
+    padding: 5px;
     vertical-align: middle;
     position: relative;
     border: 1px solid black;
     overflow: auto;
+}
+
+.grid-columnpicker-menucontent > div {
+    margin: 5px;
+}
+
+.grid-columnpicker-menucontent input {
+    vertical-align: text-bottom;
 }

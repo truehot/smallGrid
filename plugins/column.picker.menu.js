@@ -12,13 +12,15 @@
     function ColumnPickerMenu(view, windowManager, settings) {
         var self = this;
         var currentId = "column-picker";
+
         function handleHeaderContextMenu(event) {
 
             if (event) {
+                event.preventDefault();
+
                 windowManager.hideWindows();
-                if (windowManager.isWindow(currentId) === false) {
-                    windowManager.createWindow(currentId, {}, buildElements(currentId));
-                }
+                if (windowManager.isWindow(currentId) === false) windowManager.createWindow(currentId, {}, buildElements(currentId));
+
                 windowManager.showWindowNearPosition(
                     currentId,
                     { x: event.event.pageX, y: event.event.pageY }
@@ -49,6 +51,17 @@
             return html;
         }
 
+        function checkHiddenColumns(columns) {
+            var counter = 0;
+            for (var i = 0; i < columns.length; i++) {
+                if (columns[i].hidden === false) counter++;
+                if (counter > 1) return true;
+            }
+
+            return false;
+        }
+
+
         /*
         Handlers
         */
@@ -57,7 +70,7 @@
             if (event.target) {
                 var $checkbox = $(event.target).closest('input');
                 if ($checkbox.length) {
-                    if (view.getModel().getColumns().length == 1 && $checkbox[0].checked == false) {
+                    if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
                         return false;
                     }
 

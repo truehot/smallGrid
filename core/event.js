@@ -20,16 +20,28 @@
         var isPropagationStopped = false;
         var isImmediatePropagationStopped = false;
 
-        //Prevents any related handlers from being notified of the event.
+        this.preventDefault = function () {
+            if (data && "event" in data && typeof (data.event.preventDefault) === "function") {
+                data.event.preventDefault();
+            }
+        }
+
         this.stopPropagation = function () {
+            if (data && "event" in data && typeof (data.event.stopPropagation) === "function") {
+                data.event.stopPropagation();
+            }
             isPropagationStopped = true;
         };
 
         this.isPropagationStopped = function () {
             return isPropagationStopped;
         };
+
         //Keeps the rest of the handlers from being executed
         this.stopImmediatePropagation = function () {
+            if (data && "event" in data && typeof (data.event.stopImmediatePropagation) === "function") {
+                data.event.stopImmediatePropagation();
+            }
             isImmediatePropagationStopped = true;
         };
 
@@ -73,9 +85,9 @@
                 eventData = new EventData(eventData);
             }
 
-            for (var i = 0; i < handlers.length && !(eventData.isPropagationStopped() || eventData.isImmediatePropagationStopped()) ; i++) {
+            for (var i = 0; i < handlers.length && !eventData.isImmediatePropagationStopped() ; i++) {
                 if (handlers[i].call(this, eventData) === false) {
-                    eventData.stopImmediatePropagation();
+                    this.stopImmediatePropagation();
                     break;
                 }
             }

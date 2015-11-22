@@ -24,6 +24,7 @@
                 if ($contentElement && $contentElement.length) $contentElement.appendTo($container);
                 $container.appendTo(view.getNode('container')).hide();
             }
+            return self;
         }
 
         function isWindow(id) {
@@ -45,33 +46,42 @@
                     };
                 }
             }
+            return self;
         }
 
         function removeWindow(id) {
             for (var i = 0; i < cache.length; i++) {
                 if (cache[i].id == id) {
-                    return cache[i];
+                    cache.splice(i, 1);
+                    var window = view.getNode('container').children('.grid-window-' + id);
+                    if (window.length) {
+                        window.remove();
+                    }
                 }
             }
+            return self;
         }
 
         function showWindowNearPosition(id, position) {
             var data = getWindow(id);
             if (data != null) {
                 data.container.show();
-                var $container = view.getNode('container')
+
+                var $container = view.getNode('container');
+
                 var elementSizes = {
                     width: data.container.width(),
                     height: data.container.height()
                 };
 
-                var left = (elementSizes.width + position.x > $container.width() && elementSizes.width < x - $container.offset().left) ? x - elementSizes.width : position.x;
+                var left = (elementSizes.width + position.x > $container.width() && elementSizes.width < position.x - $container.offset().left) ? position.x - elementSizes.width : position.x;
 
                 data.container.offset({
                     top: position.y,
                     left: left
                 });
             }
+            return self;
         }
 
         function showWindowNearTarget(id, $target) {
@@ -109,14 +119,17 @@
 
         function showWindow(id) {
             view.getNode('container').children('.grid-window-' + id).show();
+            return self;
         }
 
         function hideWindow(id) {
             view.getNode('container').children('.grid-window-' + id).hide();
+            return self;
         }
 
         function hideWindows(event) {
             view.getNode('container').children('.grid-window').hide();
+            return self;
         }
 
         function init() {

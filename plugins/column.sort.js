@@ -26,13 +26,7 @@
                 var sortOrder = SmallGrid.Utils.changeSortOrder(column.sortOrder);
                 view.getModel().columns.setColumnsProperty("sortOrder", 0);//reset sorting
                 view.getModel().columns.setColumnPropertyById(column.id, "sortOrder", sortOrder);
-                view.getModel().rows.sort(
-                    SmallGrid.Column.Comparer[column.sortComparer]({
-                        "sortOrder": sortOrder,
-                        "field": column.field
-                    })
-                );
-
+                view.getModel().setSorter(new SmallGrid.Query.SorterQuery(column.field, sortOrder, column.sortComparer));
                 view.resumeRender(request);
                 view.render();
             }

@@ -126,7 +126,7 @@
                 cellCssClass += " " + settings.cssClass.cursorPointer;
             }
 
-            html = "<td style='width:" + (column.width + settings.cellOuterSize.width) + "px;height:" + settings.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
+            html = "<td style='height:" + settings.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
 
 
             if (column.sortable && column.sortOrder !== 0) {

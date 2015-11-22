@@ -56,7 +56,7 @@
     ColumnData.prototype.width = 50;
 
     //todo: fix events
-    function ColumnModel(items, settings) {
+    function ColumnModel(settings) {
         var self = this;
         var data = [];
 
@@ -96,12 +96,6 @@
         function total() {
             return data.length;
         }
-
-
-        function init() {
-            addItems(items);
-        }
-
 
         function addItem(item) {
             var column = addColumn(
@@ -351,7 +345,7 @@
             if (columns.length) {
                 self.onChangeStart.notify();
                 data = [];
-                for (i = 0; i < columns.length; i++) {
+                for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
                 self.onChangeStop.notify({ "mode": "all" });
@@ -370,8 +364,8 @@
         }
 
         function updateColumn(column) {
-            if (column instanceof ColumnData && SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) {
-                updateColumnById(column[settings.columns.idProperty], column);
+            if (column instanceof ColumnData) {
+                updateColumnById(column.id, column);
             }
             return self;
         }
@@ -503,8 +497,6 @@
             "updateColumnByIndex": updateColumnByIndex,
             "updateColumns": updateColumns,
         });
-
-        init();
     }
 
     function CreateModel(data, settings) {
@@ -512,9 +504,8 @@
             throw "Array expected";
         }
         return new ColumnModel(
-            data,
             settings
-        );
+        ).addItems(data);
     }
 
 })(jQuery);
