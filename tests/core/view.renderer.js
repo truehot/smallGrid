@@ -1,4 +1,5 @@
-QUnit.test("View.Renderer", function (assert) {
+QUnit.module("SmallGrid.View");
+QUnit.test("Renderer", function (assert) {
     var settings = SmallGrid.Settings.Create();
     var column = getColumn("test");
     var row = getRow();

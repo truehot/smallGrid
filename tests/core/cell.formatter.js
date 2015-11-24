@@ -1,4 +1,5 @@
-QUnit.test("Cell.Formatter", function (assert) {
+QUnit.module("SmallGrid.Cell");
+QUnit.test("Formatter", function (assert) {
 
     var settings = new SmallGrid.Settings.Create({});
 

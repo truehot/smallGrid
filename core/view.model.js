@@ -67,7 +67,7 @@
 
             if (bulkColumns.length === 0 && event.id) {
                 resetCacheRangeWidth();
-                self.onColumnsChange.notify();
+                self.onColumnsChange.notify({ ids: [event.id] });
             } else if (event.id) {
                 bulkColumns.push(event.id);
             }
@@ -76,7 +76,7 @@
         function handleRowsChange(event) {
             if (bulkRows.length === 0 && event.id) {
                 resetCacheRangeHeight();
-                self.onRowsChange.notify();
+                self.onRowsChange.notify({ ids: [event.id] });
             } else if (event.id) {
                 bulkRows.push(event.id);
             }
@@ -92,17 +92,17 @@
 
         function handleColumnsChangeStop(event) {
             if ((event.mode && event.mode == "all") || bulkColumns.length > 0) {
-                bulkColumns = [];
                 resetCacheRangeWidth();
-                self.onColumnsChange.notify();
+                self.onColumnsChange.notify({ ids: bulkColumns });
+                bulkColumns = [];
             }
         }
 
         function handleRowsChangeStop(event) {
             if ((event.mode && event.mode == "all") || bulkRows.length > 0) {
-                bulkRows = [];
                 resetCacheRangeHeight();
-                self.onRowsChange.notify();
+                self.onRowsChange.notify({ ids: bulkRows });
+                bulkRows = [];
             }
         }
 
@@ -167,8 +167,13 @@
 
         function setFilter(filterObj) {
             if (filterObj instanceof SmallGrid.Query.FilterQuery) {
-                clearFilter(filterObj);
-                rowsFilters.push(filterObj);
+                for (var i = 0; i < rowsFilters.length; i++) {
+                    if (rowsFilters[i].getId() == filterObj.getId()) {
+                        break;
+                    }
+                }
+
+                rowsFilters[i] = filterObj;
                 resetCacheRangeHeight();
                 self.onRowsChange.notify();
             }
@@ -202,9 +207,9 @@
 
         function setSorter(sorterObj) {
             if (sorterObj instanceof SmallGrid.Query.SorterQuery) {
-                clearSorters();
-                rowsSorters.push(sorterObj);
+                rowsSorters = [];
                 resetCacheRangeHeight();
+                rowsSorters.push(sorterObj);
                 self.onRowsChange.notify();
             }
         }
@@ -240,7 +245,6 @@
         }
 
         function requestDataFromRange(point, size, outerSize, allowCache) {
-
             var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) & allowCache;
             var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) & allowCache;
 

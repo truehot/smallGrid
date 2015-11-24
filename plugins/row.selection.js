@@ -23,7 +23,7 @@
         }
 
         function handleCellClick(event) {
-
+            var request = view.suspendRender();
             if (event.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != event.row.id) {
                 clearSelectedRows(selectedRowIds);
 
@@ -52,7 +52,8 @@
 
                 clearSelectedRows(clearRowsIds);
             }
-
+            view.resumeRender(request);
+            view.render();
             if (event.event.shiftKey === false) lastFocusedRowId = event.row.id;
         }
 

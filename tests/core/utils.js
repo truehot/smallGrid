@@ -1,3 +1,4 @@
+QUnit.module("SmallGrid");
 QUnit.test("Utils", function (assert) {
 
     assert.ok(

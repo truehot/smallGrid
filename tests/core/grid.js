@@ -1,3 +1,4 @@
+QUnit.module("SmallGrid");
 QUnit.test("Grid", function (assert) {
 
     var $div = $('<div/>');
@@ -7,15 +8,15 @@ QUnit.test("Grid", function (assert) {
     grid.unregisterPlugins();
     assert.ok(settings["explicitInitialization"] == true, "getSettings");
 
-    assert.deepEqual(grid.getView(), {}, "getView 1");
+    assert.deepEqual(grid.getView(), {}, "getView");
     grid.init();
-    assert.notDeepEqual(grid.getView(), {}, "getView 2");
+    assert.notDeepEqual(grid.getView(), {}, "getView");
 
-    assert.notDeepEqual(grid.getViewModel(), {}, "getViewModel 1");
-    assert.ok(grid.getViewModel() instanceof SmallGrid.View.Model.Model, "getViewModel 2");
+    assert.notDeepEqual(grid.getViewModel(), {}, "getViewModel");
+    assert.ok(grid.getViewModel() instanceof SmallGrid.View.Model.Model, "getViewModel");
 
-    assert.ok(grid.isRegisteredPlugin('ColumnSort'), "isRegisteredPlugin 1");
-    assert.ok(grid.isRegisteredPlugin('ColumnSort1') == false, "isRegisteredPlugin 2");
+    assert.ok(grid.isRegisteredPlugin('ColumnSort'), "isRegisteredPlugin");
+    assert.ok(grid.isRegisteredPlugin('ColumnSort1') == false, "isRegisteredPlugin");
 
     assert.ok(Object.keys(grid.getPlugins()).length > 0, "getPlugins");
     assert.ok(grid.getPlugin('ColumnSort') !== undefined, "getPlugin");

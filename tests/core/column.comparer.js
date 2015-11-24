@@ -1,4 +1,5 @@
-QUnit.test("Column.Comparer", function (assert) {
+QUnit.module("SmallGrid.Column");
+QUnit.test("Comparer", function (assert) {
     assert.ok(
         SmallGrid.Utils.changeSortOrder(-1) == 1 &&
         SmallGrid.Utils.changeSortOrder(1) == -1 &&

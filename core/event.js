@@ -19,12 +19,19 @@
 
         var isPropagationStopped = false;
         var isImmediatePropagationStopped = false;
+        var isDefaultPrevented = false;
 
         this.preventDefault = function () {
             if (data && "event" in data && typeof (data.event.preventDefault) === "function") {
                 data.event.preventDefault();
             }
+            isDefaultPrevented = true;
         }
+
+        this.isDefaultPrevented = function () {
+            return isDefaultPrevented;
+        }
+
 
         this.stopPropagation = function () {
             if (data && "event" in data && typeof (data.event.stopPropagation) === "function") {

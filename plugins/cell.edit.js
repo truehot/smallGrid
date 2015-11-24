@@ -12,6 +12,7 @@
 
     function CellEditPlugin(view, windowManager, settings) {
         var self = this;
+        var lastActive = null;
         var editOptions = {
             enabled: false
         };
@@ -37,6 +38,7 @@
         /*
          Handlers
          */
+
         function handleScrollStop(event) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
                 if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
@@ -57,8 +59,10 @@
                 if (cellNode) {
                     cellNode.className += " " + settings.cssClass.cellEdit;
                     editOptions.editor.append(cellNode);
-                    if (editOptions.addFocus === true) {
-                        editOptions.addFocus = false;
+                    if (editOptions.addFocusOnce === true) {
+                        editOptions.addFocusOnce = false;
+                        editOptions.editor.focus();
+                    } else if (lastActive != null && lastActive.columnId == editOptions.column.id && lastActive.rowId == editOptions.row.id) {
                         editOptions.editor.focus();
                     }
                 }
@@ -69,17 +73,31 @@
             if (settings.plugins.CellEdit.editOnClick === false) {
                 editCellById(event.column.id, event.row.id);
             }
+            lastActive = {
+                "columnId": event.column.id,
+                "rowId": event.row.id
+            }
         }
 
         function handleCellClick(event) {
             if (settings.plugins.CellEdit.editOnClick === true) {
                 editCellById(event.column.id, event.row.id);
             }
+            lastActive = {
+                "columnId": event.column.id,
+                "rowId": event.row.id
+            }
         }
 
         function handleCellKeyDown(event) {
             if (event && event.event) {
                 switch (event.event.keyCode) {
+                    //case 9:
+                    //    if (isEditMode() === true) {
+                    //        event.preventDefault();
+                    //        cancelEdit();
+                    //    }
+                    //    break;
                     case 13:
                         applyEdit();
                         break;
@@ -106,7 +124,7 @@
                 if (row && column && row.editable && column.editable && column.editor) {
                     editOptions = {
                         enabled: true,
-                        addFocus: true,
+                        addFocusOnce: true,
                         row: row,
                         column: column,
                         editor: new SmallGrid.Cell.Editor.Create(
@@ -117,7 +135,7 @@
                             settings
                         ),
                     }
-
+                    var request = view.suspendRender();
                     view.getModel().columns.setColumnPropertyById(
                         column.id,
                         'editMode',
@@ -129,14 +147,15 @@
                         'editMode',
                         true
                     );
-
+                    view.resumeRender(request);
+                    view.render();
                 }
             }
         }
 
 
         function getEditor() {
-            if (editOptions.enabled === true) {
+            if (isEditMode() === true) {
                 return editOptions.editor;
             }
         }
@@ -146,7 +165,7 @@
         }
 
         function applyEdit() {
-            if (editOptions.enabled === true) {
+            if (isEditMode() === true) {
                 var request = view.suspendRender();
 
                 view.getModel().columns.setColumnPropertyById(
@@ -174,7 +193,7 @@
         }
 
         function cancelEdit() {
-            if (editOptions.enabled === true) {
+            if (isEditMode() === true) {
                 var request = view.suspendRender();
                 view.getModel().columns.setColumnPropertyById(
                     editOptions.column.id,

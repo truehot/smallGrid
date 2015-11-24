@@ -1,4 +1,5 @@
-QUnit.test("Query.Sort", function (assert) {
+QUnit.module("SmallGrid.Query");
+QUnit.test("Sort", function (assert) {
 
     var test = {
         "test1": "test1",
@@ -13,5 +14,4 @@ QUnit.test("Query.Sort", function (assert) {
     assert.equal(sorter.getSortComparer(), test.test3, "getSortComparer");
 
 });
-
 

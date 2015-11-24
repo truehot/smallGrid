@@ -1,4 +1,5 @@
-QUnit.test("Handler.Scroll", function (assert) {
+QUnit.module("SmallGrid.Handler");
+QUnit.test("Scroll", function (assert) {
 
     var $wrapper = $('<div style="overflow: scroll;width:100px; height:100px; position:absolute; left:-1000px; top:-1000px;"/>');
     var $content = $('<div style="width:1000px; height:1000px">test</div>');

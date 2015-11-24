@@ -69,7 +69,7 @@
             event.preventDefault();
 
             var data = windowManager.getWindow(event.data.id);
-            if (data) {
+            if (data && data.opts) {
                 var filter = data.opts.filter;
                 var formValues = getFormValues(data.container);
 

@@ -272,6 +272,7 @@
         }
 
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
+
             self.onBeforeRowsRendered.notify({});
 
             el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
@@ -354,8 +355,8 @@
         /*
         Resize 
         */
-        function resizeColumnsWidth(updateColumns, scrollBarWidth, cellOuterWidth) {
-            var updateColumns = updateColumns.slice();
+        function resizeColumnsWidth(allColumns, scrollBarWidth, cellOuterWidth) {
+            var updateColumns = allColumns.slice();
             var total =
                 {
                     minWidth: 0,
@@ -365,15 +366,15 @@
                 contentWidth = contentSize.width - updateColumns.length * cellOuterWidth - scrollBarWidth;
 
             for (var i = updateColumns.length - 1; i >= 0; i--) {
-                var column = updateColumns[i];
-                if (column.resizeable === false) {
-                    contentWidth -= column.width;
+                var updateColumn = updateColumns[i];
+                if (updateColumn.resizeable === false) {
+                    contentWidth -= updateColumn.width;
                     updateColumns.splice(i, 1);
                     continue;
                 }
-                total.minWidth += column.minWidth;
-                total.maxWidth += column.maxWidth;
-                total.width += column.width;
+                total.minWidth += updateColumn.minWidth;
+                total.maxWidth += updateColumn.maxWidth;
+                total.width += updateColumn.width;
             }
 
             if (total.minWidth <= contentWidth && contentWidth <= total.maxWidth) {
@@ -493,6 +494,7 @@
         function handleCellClick(event) {
             var cellEvent = getCellEvent(event);
             if (cellEvent) {
+                //console.log(event);
                 notifyEvent(cellEvent, "onCellClick");
             }
         }
@@ -500,6 +502,7 @@
         function handleCellDblClick(event) {
             var cellEvent = getCellEvent(event);
             if (cellEvent) {
+                //console.log(event);
                 notifyEvent(cellEvent, "onCellDblClick");
             }
         }
@@ -554,23 +557,22 @@
         Handle scroll
         */
         function handleScrollStart(event) {
-            if (suspendScrollEvent == false) {
+            if (suspendScrollEvent === false) {
                 notifyEvent(event, "onScrollStart");
             }
         }
 
         function handleScrollStop(event) {
-            if (suspendScrollEvent == false) {
+            if (suspendScrollEvent === false) {
                 notifyEvent(event, "onScrollStop");
             }
         }
 
         function handleScroll(event) {
-            if (suspendScrollEvent == false) {
-                notifyEvent(event, "onScroll", function () {
-                    el.header[0].scrollLeft = el.content[0].scrollLeft;
-                    render();
-                });
+            if (suspendScrollEvent === false) {
+                el.header[0].scrollLeft = el.content[0].scrollLeft;
+                render();
+                notifyEvent(event, "onScroll");
             }
         }
 
@@ -605,8 +607,7 @@
             }
         }
 
-        function notifyEvent(event, handlerName, callback) {
-            if (callback != undefined) callback();
+        function notifyEvent(event, handlerName) {
             self[handlerName].notify(event);
         }
 

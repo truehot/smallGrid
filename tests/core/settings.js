@@ -1,3 +1,4 @@
+QUnit.module("SmallGrid");
 QUnit.test("Settings", function (assert) {
 
     var settings = new SmallGrid.Settings.Create({});

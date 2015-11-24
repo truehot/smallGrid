@@ -1,3 +1,4 @@
+QUnit.module("SmallGrid");
 QUnit.test("Row", function (assert) {
 
     var model = new SmallGrid.Row.Create([], SmallGrid.Settings.Create());

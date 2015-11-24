@@ -1,3 +1,4 @@
+QUnit.module("SmallGrid");
 QUnit.test("Plugins", function (assert) {
     var $container = $('<div/>');
     var settings = new SmallGrid.Settings.Create({});
@@ -9,10 +10,10 @@ QUnit.test("Plugins", function (assert) {
     var windowManager = new SmallGrid.View.Window.Create(view, settings);
 
     var plugin = SmallGrid.Plugins.Create("CellEdit", view, windowManager, settings, {});
-    assert.ok(plugin instanceof SmallGrid.Plugins.CellEdit, "Create 1");
+    assert.ok(plugin instanceof SmallGrid.Plugins.CellEdit, "Create");
 
     plugin = SmallGrid.Plugins.Create("CellEdit123", view, windowManager, settings, {})
-    assert.ok((plugin instanceof SmallGrid.Plugins.CellEdit) === false, "Create 2");
+    assert.ok((plugin instanceof SmallGrid.Plugins.CellEdit) === false, "Create");
 
 });
 

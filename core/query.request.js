@@ -102,13 +102,15 @@
 
                 if (convertedQuery.length) {
                     if (i !== 0) {
-                        resultQuery += " && ";
+                        resultQuery += ' && ';
                     }
                     resultQuery += '(' + convertedQuery + ')';
-                    resultQuery = new Function('item', 'return ' + resultQuery);
                 }
             }
-            return resultQuery;
+
+            if (resultQuery.length) {
+                return new Function('item', "return " + resultQuery);
+            }
         }
 
         function ColumnsFullWidth(outerWidth, filter) {

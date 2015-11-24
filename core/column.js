@@ -101,7 +101,7 @@
             var column = addColumn(
                 createColumn(item)
             );
-            self.onChange.notify({ "id": column.id, "type": "add" });
+            self.onChange.notify({ "id": column.id});
             return column;
         }
 
@@ -153,7 +153,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data[i].item = item;
-                    self.onChange.notify({ "id": id, "type": "update" });
+                    self.onChange.notify({ "id": id });
                     break;
                 }
             }
@@ -163,7 +163,7 @@
         function updateItemByIndex(idx, item) {
             if (data[idx]) {
                 data[idx].item = item;
-                self.onChange.notify({ "id": data[idx].id, "type": "update" });
+                self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
@@ -184,7 +184,7 @@
         function addColumn(column) {
             if (column instanceof ColumnData) {
                 data.push(column);
-                self.onChange.notify({ "id": column.id, "type": "add" });
+                self.onChange.notify({ "id": column.id });
             }
             return self;
         }
@@ -212,7 +212,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data.splice(i, 1);
-                    self.onChange.notify({ "id": id, "type": "delete" });
+                    self.onChange.notify({ "id": id });
                     break;
                 }
             }
@@ -223,7 +223,7 @@
             if (data[idx]) {
                 var id = data[idx].id;
                 data.splice(idx, 1);
-                self.onChange.notify({ "id": id, "type": "delete" });
+                self.onChange.notify({ "id": id });
             }
             return self;
         }
@@ -295,7 +295,7 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": column.id, "type": "add" });
+                self.onChange.notify({ "id": column.id });
             }
             return self;
         }
@@ -315,7 +315,7 @@
                     0,
                     column
                 );
-                self.onChange.notify({ "id": column.id, "type": "add" });
+                self.onChange.notify({ "id": column.id });
             }
             return self;
         }
@@ -325,7 +325,7 @@
                 if (data[i].id == id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
-                        self.onChange.notify({ "id": id, "type": "update" });
+                        self.onChange.notify({ "id": id });
                     }
                     break;
                 }
@@ -336,7 +336,7 @@
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
             if (propertyName && propertyName in data[idx]) {
                 data[idx][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[idx].id, "type": "update" });
+                self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
@@ -357,7 +357,7 @@
             self.onChangeStart.notify();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[i].id, "type": "update" });
+                self.onChange.notify({ "id": data[i].id });
             }
             self.onChangeStop.notify();
             return self;
@@ -375,7 +375,7 @@
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].id == id) {
                         data[i] = column;
-                        self.onChange.notify({ "id": id, "type": "update" });
+                        self.onChange.notify({ "id": id });
                         break;
                     }
                 }
@@ -387,7 +387,7 @@
             if (column instanceof ColumnData) {
                 if (data[idx]) {
                     data[idx] = column;
-                    self.onChange.notify({ "id": column.id, "type": "update" });
+                    self.onChange.notify({ "id": column.id });
                 }
             }
             return self;

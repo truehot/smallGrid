@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Resizeable columns</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
@@ -14,7 +15,7 @@
     <div style="width:100%">
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
     </div>
-    
+
     <script>
 
 
@@ -39,8 +40,6 @@
 
             $('.auto-chechbox').prop('checked', grid.getSettings().showLastColumn).change(function () {
                 grid.getSettings().showLastColumn = this.checked;
-
-                //TODO - change
                 grid.getView().render();
             });
 

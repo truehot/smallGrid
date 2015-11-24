@@ -8,7 +8,7 @@ if (typeof SmallGrid === "undefined") {
 (function ($) {
     "use strict";
     var defaultSettings = {
-        showLastColumn: true,//show last column
+        showLastColumn: false,//show last column
         explicitInitialization: false,
         uidPrefix: "smallgrid_",
         resizeColumnsOnLoad: false,//resize columns when view loaded to fit canvas

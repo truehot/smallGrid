@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Add/update/delete grid rows</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
@@ -12,9 +13,6 @@
         <button class="addNewFirst">Add new first</button>
         <button class="updateFirst">Update first</button>
         <button class="deleteFirst">Delete first</button>
-        <button class="addNewLast">Add new last</button>
-        <button class="updateLast">Update last</button>
-        <button class="deleteLast">Delete last</button>
     </div>
 
     <p class="small-grid" style="width: 600px; height: 300px;clear:both;float:left;margin-right:10px"></p>
@@ -23,62 +21,62 @@
 
 
         $(document).ready(function () {
-			var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200},
-				{ 'name': "Column 2", 'field': "property2", 'width': 200},
+            var columns = [
+				{ 'name': "Column 1", 'field': "property1", 'width': 200 },
+				{ 'name': "Column 2", 'field': "property2", 'width': 200 },
 				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
 				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
 				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
-			];
-			var items = [];
-			for (var i = 1; i <= 10; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + '' + ii;
-				}
+            ];
+            var items = [];
+            for (var i = 1; i <= 10; i++) {
+                var item = {};
+                for (var ii = 1; ii < 6; ii++) {
+                    item["property" + ii] = i + '' + ii;
+                }
 
-				items.push(item);
-			}
-			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+                items.push(item);
+            }
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+
+            var counter = 1;
+
+            $('.addNewFirst').on('click', function () {
+                var firstRow = grid.getViewModel().getRowByIndex(0);
+
+                var newRow = grid.getViewModel().rows.createRow(getItem(++counter));
+                if (firstRow) {
+                    grid.getViewModel().rows.insertRowBeforeId(firstRow.id, newRow);
+                } else {
+                    grid.getViewModel().rows.addRow(newRow);
+                }
+
+            });
+
+            $('.updateFirst').on('click', function () {
+                var firstRow = grid.getViewModel().getRowByIndex(0);
+                if (firstRow) {
+                    firstRow.item = getItem(++counter);
+                    grid.getViewModel().rows.updateRow(firstRow);
+                }
+
+            });
+
+            $('.deleteFirst').on('click', function () {
+                var firstRow = grid.getViewModel().getRowByIndex(0);
+                if (firstRow) {
+                    grid.getViewModel().rows.deleteRow(firstRow);
+                }
+            });
 
 
-
-			var counter = 1;
-
-			$('.addNewFirst').on('click', function () {
-			    var row = grid.getViewModel().rows.createRow(getItem(++counter));
-			    grid.getViewModel().rows.insertRowBeforeIndex(0, row);
-			});
-
-			$('.updateFirst').on('click', function () {
-			    grid.getViewModel().rows.updateItemByIndex(0, getItem(++counter));
-			});
-
-			$('.deleteFirst').on('click', function () {
-			    grid.getViewModel().rows.deleteRowByIndex(0);
-			});
-
-			$('.addNewLast').on('click', function () {
-			    grid.getViewModel().rows.addItem(getItem(++counter));
-			});
-
-			$('.updateLast').on('click', function () {
-			    var total = grid.getViewModel().rows.total() - 1 || 0;
-			    grid.getViewModel().rows.updateItemByIndex(total, getItem(++counter));
-			});
-
-			$('.deleteLast').on('click', function () {
-			    var total = grid.getViewModel().rows.total() - 1 || 0;
-			    grid.getViewModel().rows.deleteRowByIndex(total);
-			});
-
-			function getItem(value) {
-			    var item = {};
-			    for (var ii = 1; ii < 6; ii++) {
-			        item["property" + ii] = value + '' + ii;
-			    }
-			    return item;
-			}
+            function getItem(value) {
+                var item = {};
+                for (var ii = 1; ii < 6; ii++) {
+                    item["property" + ii] = value + '' + ii;
+                }
+                return item;
+            }
 
         });
     </script>

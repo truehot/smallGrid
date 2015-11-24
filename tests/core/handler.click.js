@@ -1,4 +1,5 @@
-QUnit.test("Handler.Click", function (assert) {
+QUnit.module("SmallGrid.Handler");
+QUnit.test("Click", function (assert) {
 
     var done1 = assert.async();
     var done2 = assert.async();
