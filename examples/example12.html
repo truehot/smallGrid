@@ -10,9 +10,12 @@
 </head>
 <body>
     <div style="float:left;">
-        <button class="addNewFirst">Add new first</button>
-        <button class="updateFirst">Update first</button>
-        <button class="deleteFirst">Delete first</button>
+        <button class="addFirstRow">Add first row</button>
+        <button class="updateFirstRow">Update first row</button>
+        <button class="deleteFirstRow">Delete first row</button>
+        <button class="addFirstColumn">Add first column</button>
+        <button class="updateFirstColumn">Update first column</button>
+        <button class="deleteFirstColumn">Delete first column</button>
     </div>
 
     <p class="small-grid" style="width: 600px; height: 300px;clear:both;float:left;margin-right:10px"></p>
@@ -41,41 +44,45 @@
 
             var counter = 1;
 
-            $('.addNewFirst').on('click', function () {
-                var firstRow = grid.getViewModel().getRowByIndex(0);
-
-                var newRow = grid.getViewModel().rows.createRow(getItem(++counter));
-                if (firstRow) {
-                    grid.getViewModel().rows.insertRowBeforeId(firstRow.id, newRow);
-                } else {
-                    grid.getViewModel().rows.addRow(newRow);
-                }
-
+            $('.addFirstColumn').on('click', function () {
+                var column = grid.getViewModel().columns.createColumn(getColumnItem(++counter));
+                grid.getViewModel().columns.insertColumnBeforeIndex(0, column);
             });
 
-            $('.updateFirst').on('click', function () {
-                var firstRow = grid.getViewModel().getRowByIndex(0);
-                if (firstRow) {
-                    firstRow.item = getItem(++counter);
-                    grid.getViewModel().rows.updateRow(firstRow);
-                }
-
+            $('.updateFirstColumn').on('click', function () {
+                var column = grid.getViewModel().columns.createColumn(getColumnItem(++counter));
+                grid.getViewModel().columns.updateColumnByIndex(0, column);
             });
 
-            $('.deleteFirst').on('click', function () {
-                var firstRow = grid.getViewModel().getRowByIndex(0);
-                if (firstRow) {
-                    grid.getViewModel().rows.deleteRow(firstRow);
-                }
+            $('.deleteFirstColumn').on('click', function () {
+                grid.getViewModel().columns.deleteColumnByIndex(0);
             });
 
 
-            function getItem(value) {
+            $('.addFirstRow').on('click', function () {
+                var row = grid.getViewModel().rows.createRow(getRowItem(++counter));
+                grid.getViewModel().rows.insertRowBeforeIndex(0, row);
+            });
+
+            $('.updateFirstRow').on('click', function () {
+                grid.getViewModel().rows.items.updateItemByIndex(0, getRowItem(++counter));
+            });
+
+            $('.deleteFirstRow').on('click', function () {
+                grid.getViewModel().rows.deleteRowByIndex(0);
+            });
+
+
+            function getRowItem(value) {
                 var item = {};
                 for (var ii = 1; ii < 6; ii++) {
                     item["property" + ii] = value + '' + ii;
                 }
                 return item;
+            }
+
+            function getColumnItem(value) {
+                return { 'name': "Column" + value, 'field': "property1", 'width': 100, 'sortable': false, filterable: true, editor: "Text" };
             }
 
         });
