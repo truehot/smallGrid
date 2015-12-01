@@ -15,7 +15,7 @@
     function ResizeHandler($container, settings) {
         $container.on("mousedown", settings.handlerIdentifier, handleMouseDown);
 
-        function handleMouseDown(event) {
+        function handleMouseDown(evt) {
             var $cellElement = $(this).closest(settings.cellIdentifier);
 
             if ($cellElement.length) {
@@ -24,28 +24,28 @@
                 settings.handleResizeStart({
                     cellElement: $cellElement,
                     cellIndex: cellIndex,
-                    event: event
+                    event: evt
                 });
 
                 $(document)
-                    .bind("mousemove", function (event) {
-                        var newWidth = event.pageX - $cellElement.offset().left;
+                    .bind("mousemove", function (evt) {
+                        var newWidth = evt.pageX - $cellElement.offset().left;
                         if (newWidth > 0) {
                             settings.handleResize({
                                 cellElement: $cellElement,
                                 cellIndex: cellIndex,
                                 width: newWidth,
-                                event: event
+                                event: evt
                             });
                         }
                     })
-                    .bind("mouseup", function (event) {
+                    .bind("mouseup", function (evt) {
                         $(this).unbind("mousemove mouseup");
 
                         settings.handleResizeStop({
                             cellElement: $cellElement,
                             cellIndex: cellIndex,
-                            event: event
+                            event: evt
                         });
                     });
             }

@@ -44,12 +44,37 @@
             return dataModel.filter(new ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
         }
 
-        function getColumnsWidth(width) {
-            return dataModel.reduce(new ColumnsFullWidth(width, getColumnFilter()), 0);
+        function getColumnsTotal(width) {
+            var total = {
+                width: 0,
+                count: 0,
+            };
+            var columns = dataModel.getColumns();
+            var filter = getColumnFilter();
+
+            for (var i = 0; i < columns.length; i++) {
+                if ((filter && (filter(columns[i]) === false)) || (columns[i].hidden === true)) continue;
+                total.width += columns[i].width + width;
+                total.count++;
+            }
+
+            return total;
         }
 
-        function getRowsHeight(height) {
-            return dataModel.reduce(new RowsFullHeight(height, getRowFilter()), 0);
+        function getRowsTotal(height) {
+            var total = {
+                height: 0,
+                count: 0,
+            };
+            var rows = dataModel.getRows();
+            var filter = getRowFilter();
+
+            for (var i = 0; i < rows.length; i++) {
+                if ((filter && (filter(rows[i]) === false)) || (rows[i].hidden === true)) continue;
+                total.height += rows[i].height + height;
+                total.count++;
+            }
+            return total;
         }
 
         function getColumnFilter() {
@@ -113,22 +138,8 @@
             }
         }
 
-        function ColumnsFullWidth(outerWidth, filter) {
-            return function (prev, item) {
-                if ((filter && (filter(item) === false)) || (item.hidden === true)) return prev;
-                return prev + item.width + outerWidth;
-            };
-        }
-
-        function RowsFullHeight(outerHeight, filter) {
-            return function (prev, item) {
-                if (filter && (filter(item) === false)) return prev;
-                return prev + item.height + outerHeight;
-            };
-        }
-
         function ColumnsRangeByWidth(center, width, outerWidth, filter) {
-            var calcWidth = 0, min = center - width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
+            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
             return function (item, index, array) {
                 if ((filter && (filter(item) === false)) || (item.hidden === true)) return false;
                 filterIndex++;
@@ -148,9 +159,9 @@
         }
 
         function RowsRangeByHeight(center, height, outerHeight, filter) {
-            var calcHeight = 0, min = center - height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
+            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
             return function (item, index, array) {
-                if (filter && (filter(item) === false)) return false;
+                if (filter && (filter(item) === false) || (item.hidden === true)) return false;
                 filterIndex++;
 
                 var inRange = min <= calcHeight && calcHeight <= max;
@@ -169,8 +180,8 @@
 
         $.extend(this, {
             "getColumnsInRange": getColumnsInRange,
-            "getColumnsWidth": getColumnsWidth,
-            "getRowsHeight": getRowsHeight,
+            "getColumnsTotal": getColumnsTotal,
+            "getRowsTotal": getRowsTotal,
             "getRowsInRange": getRowsInRange
         });
     }

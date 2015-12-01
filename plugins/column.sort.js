@@ -19,10 +19,10 @@
             view.onHeaderClick.unsubscribe(handleHeaderClick);
         }
 
-        function handleHeaderClick(event) {
-            if (event && event.type && event.type == "sort") {
+        function handleHeaderClick(evt) {
+            if (evt && evt.type && evt.type == "sort") {
                 var request = view.suspendRender();
-                var column = event.column;
+                var column = evt.column;
                 var sortOrder = SmallGrid.Utils.changeSortOrder(column.sortOrder);
                 view.getModel().columns.setColumnsProperty("sortOrder", 0);//reset sorting
                 view.getModel().columns.setColumnPropertyById(column.id, "sortOrder", sortOrder);

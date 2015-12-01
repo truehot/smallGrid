@@ -5,7 +5,7 @@ QUnit.test("Plugins", function (assert) {
     var columnModel = new SmallGrid.Column.Create([], settings);
     var rowsModel = new SmallGrid.Row.Create([], settings);
 
-    var viewModel = new SmallGrid.View.Model.Create(columnModel, rowsModel, settings);
+    var viewModel = new SmallGrid.View.Model.Create(rowsModel, columnModel, settings);
     var view = new SmallGrid.View.Create($container, viewModel, settings);
     var windowManager = new SmallGrid.View.Window.Create(view, settings);
 

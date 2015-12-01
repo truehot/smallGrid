@@ -22,30 +22,30 @@
             view.onCellClick.unsubscribe(handleCellClick);
         }
 
-        function handleCellClick(event) {
+        function handleCellClick(evt) {
             var request = view.suspendRender();
-            if (event.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != event.row.id) {
+            if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != evt.row.id) {
                 clearSelectedRows(selectedRowIds);
 
                 var lastFocusedRow = view.getModel().rows.getRowById(lastFocusedRowId);
-                var currentRow = view.getModel().rows.getRowById(event.row.id);
+                var currentRow = view.getModel().rows.getRowById(evt.row.id);
 
                 if (lastFocusedRow && currentRow) {
-                    selectRowsRange(lastFocusedRowId, event.row.id);
+                    selectRowsRange(lastFocusedRowId, evt.row.id);
                 }
 
-            } else if (event.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection) {
-                if (isRowSelected(event.row.id) === false) {
-                    selectRowById(event.row.id);
+            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection) {
+                if (isRowSelected(evt.row.id) === false) {
+                    selectRowById(evt.row.id);
                 } else {
-                    clearSelectedRow(event.row.id);
+                    clearSelectedRow(evt.row.id);
                 }
             } else {
                 var clearRowsIds = selectedRowIds.slice();
-                var selectedIndex = clearRowsIds.indexOf(event.row.id);
+                var selectedIndex = clearRowsIds.indexOf(evt.row.id);
 
                 if (selectedIndex === -1) {
-                    selectRowById(event.row.id);
+                    selectRowById(evt.row.id);
                 } else {
                     clearRowsIds.splice(selectedIndex, 1);
                 }
@@ -54,7 +54,7 @@
             }
             view.resumeRender(request);
             view.render();
-            if (event.event.shiftKey === false) lastFocusedRowId = event.row.id;
+            if (evt.event.shiftKey === false) lastFocusedRowId = evt.row.id;
         }
 
         function selectRowsRange(id1, id2) {

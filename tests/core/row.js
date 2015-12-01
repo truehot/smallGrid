@@ -3,79 +3,79 @@ QUnit.test("Row", function (assert) {
 
     var model = new SmallGrid.Row.Create([], SmallGrid.Settings.Create());
 
-    assert.ok(model.getItems().length == 0, "Row.Create");
+    assert.ok(model.items.getItems().length == 0, "Row.Create");
     assert.ok(model.isEmpty() == true, "isEmpty");
     assert.ok(model.total() == 0, "total");
 
-    assert.ok(model.getItems().length == 0, "init");
+    assert.ok(model.items.getItems().length == 0, "init");
 
-    model.addItems([]);
-    assert.ok(model.getItems().length == 0, "addItems");
+    model.items.addItems([]);
+    assert.ok(model.items.getItems().length == 0, "items.addItems");
 
     model.addRows([]);
-    assert.ok(model.getItems().length == 0, "addRows");
+    assert.ok(model.items.getItems().length == 0, "items.addRows");
 
     model.updateRows([]);
-    assert.ok(model.getItems().length == 0, "updateItems");
+    assert.ok(model.items.getItems().length == 0, "items.updateItems");
 
     model.deleteRows();
-    assert.ok(model.getItems().length == 0, "deleteItems");
+    assert.ok(model.items.getItems().length == 0, "items.deleteItems");
 
-    model.setItems([]);
-    assert.ok(model.getItems().length == 0, "setItems");
+    model.items.setItems([]);
+    assert.ok(model.items.getItems().length == 0, "items.setItems");
 
     model.setRows([]);
-    assert.ok(model.getItems().length == 0, "setRows");
+    assert.ok(model.items.getItems().length == 0, "setRows");
 
-    assert.ok(model.getItems().length == 0, "getItems");
+    assert.ok(model.items.getItems().length == 0, "items.getItems");
     assert.ok(model.getRows().length == 0, "getRows");
 
     var item = getItem();
     var model = new SmallGrid.Row.Create([item], SmallGrid.Settings.Create());
-    assert.ok(model.getItems().length == 1, "Data.Create");
+    assert.ok(model.items.getItems().length == 1, "Data.Create");
     assert.ok(model.getRows().length == 1, "Data.Create");
     assert.deepEqual(model.getRows()[0].item, item, "Data.Create");
 
-    model.updateItems([item]);
-    assert.ok(model.getRows().length == 1, "updateItems");
-    assert.deepEqual(model.getRows()[0].item, item, "updateItems");
+    model.items.updateItems([item]);
+    assert.ok(model.getRows().length == 1, "items.updateItems");
+    assert.deepEqual(model.getRows()[0].item, item, "items.updateItems");
 
-    model.deleteItems([item]);
-    assert.ok(model.getRows().length == 0, "deleteItems");
+    model.items.deleteItems();
+    assert.ok(model.getRows().length == 0, "items.deleteItems");
 
-    model.setItems([item]);
-    assert.ok(model.getRows().length == 1, "setItems");
-    assert.deepEqual(model.getRows()[0].item, item, "setItems");
-
-    assert.deepEqual(model.getRowById(model.getRows()[0].id), model.getRowByIndex(0), "getRowById && getRowByIndex");
-    assert.deepEqual(model.getRowByIndex(0).item, item, "getRowByIndex");
-    assert.deepEqual(model.getRowById(model.getRows()[0].id).item, item, "getRowById");
+    model.items.setItems([item]);
+    assert.ok(model.getRows().length == 1, "items.setItems");
+    assert.deepEqual(model.getRows()[0].item, item, "items.setItems");
 
     assert.deepEqual(model.getRowById(model.getRows()[0].id), model.getRowByIndex(0), "getRowById && getRowByIndex");
     assert.deepEqual(model.getRowByIndex(0).item, item, "getRowByIndex");
     assert.deepEqual(model.getRowById(model.getRows()[0].id).item, item, "getRowById");
 
-    model.deleteItemById(model.getRows()[0].id);
-    assert.ok(model.getRows().length == 0, "deleteItemById");
+    assert.deepEqual(model.getRowById(model.getRows()[0].id), model.getRowByIndex(0), "getRowById && getRowByIndex");
+    assert.deepEqual(model.getRowByIndex(0).item, item, "getRowByIndex");
+    assert.deepEqual(model.getRowById(model.getRows()[0].id).item, item, "getRowById");
 
-    model.setItems([item]);
-    assert.ok(model.getRows().length == 1, "setItems");
+    model.items.deleteItemById(model.getRows()[0].id);
+    assert.ok(model.getRows().length == 0, "items.deleteItemById");
+
+    model.items.setItems([item]);
+    assert.ok(model.getRows().length == 1, "items.setItems");
 
     var newItem = model.getRows()[0];
-    model.updateItem(newItem);
-    assert.deepEqual(model.getRows()[0], newItem, "updateItem");
+    model.items.updateItem(newItem);
+    assert.deepEqual(model.getRows()[0], newItem, "items.updateItem");
 
-    model.updateItemById(newItem.id, newItem.item);
-    assert.deepEqual(model.getRows()[0], newItem, "updateItemById");
+    model.items.updateItemById(newItem.id, newItem.item);
+    assert.deepEqual(model.getRows()[0], newItem, "items.updateItemById");
 
-    model.updateItemByIndex(0, newItem.item);
-    assert.deepEqual(model.getRows()[0], newItem, "updateItemByIndex");
+    model.items.updateItemByIndex(0, newItem.item);
+    assert.deepEqual(model.getRows()[0], newItem, "items.updateItemByIndex");
 
     model.updateRowByIndex(0, newItem);
     assert.deepEqual(model.getRows()[0], newItem, "updateRowByIndex");
 
-    model.updateItems([newItem]);
-    assert.deepEqual(model.getRows()[0], newItem, "updateItems");
+    model.items.updateItems([newItem]);
+    assert.deepEqual(model.getRows()[0], newItem, "items.updateItems");
 
 
     assert.ok(model.getRowIdByIndex(0) == newItem.id, "getRowIdByIndex");
@@ -94,14 +94,14 @@ QUnit.test("Row", function (assert) {
     model.deleteRowByIndex(0);
     assert.ok(model.getRows().length == 0, "deleteRowByIndex");
 
-    model.addItem(item);
-    assert.ok(model.getRows().length == 1, "addItem");
-    assert.deepEqual(model.getRows()[0].item, item, "addItem");
+    model.items.addItem(item);
+    assert.ok(model.getRows().length == 1, "items.addItem");
+    assert.deepEqual(model.getRows()[0].item, item, "items.addItem");
 
     model.deleteRow(model.getRows()[0]);
     assert.ok(model.getRows().length == 0, "deleteRow");
 
-    model.setItems([item, item]);
+    model.items.setItems([item, item]);
     var dataItem = model.getRows()[0];
     var newItem = getItem();
 
@@ -112,7 +112,7 @@ QUnit.test("Row", function (assert) {
 
     model.insertRowBeforeIndex(0, model.createRow(newItem));
     assert.ok(model.getRows().length == 4, "insertItemBeforeIndex");
-    assert.deepEqual(model.getRows()[0].item, newItem, "insertItemBeforeIndex");
+    assert.deepEqual(model.getRows()[0].item, newItem, "items.insertItemBeforeIndex");
 
     var newItem = getItem();
     model.insertRowAfterId(dataItem.id, model.createRow(newItem));
@@ -125,8 +125,8 @@ QUnit.test("Row", function (assert) {
     assert.deepEqual(model.getRows()[1].item, newItem, "insertRowAfterIndex");
 
 
-    model.setItems([getItem(), getItem()]);
-    assert.ok(model.getRows().length == 2, "setItems");
+    model.items.setItems([getItem(), getItem()]);
+    assert.ok(model.getRows().length == 2, "items.setItems");
 
     model.setRowsProperty("editMode", true);
     assert.ok(model.getRows()[0].editMode == true, "setRowsProperty");

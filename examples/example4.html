@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Column min and max width</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -9,27 +9,30 @@
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
+
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
 
 
+
+
         $(document).ready(function () {
-			var columns = [
+            var columns = [
 				{ 'name': "MaxWidth 300", 'field': "property1", 'width': 200, 'maxWidth': 300 },
 				{ 'name': "MaxWidth 400, minWidth 100", 'field': "property2", 'width': 100, 'maxWidth': 400, 'minWidth': 100 },
 				{ 'name': "MinWidth 200", 'field': "property3", 'width': 200, 'minWidth': 200 },
 				{ 'name': "Column", 'field': "property4", 'width': 200, },
 				{ 'name': "Column", 'field': "property5", 'width': 200, },
-			];
-			var items = [];
-			for (var i = 1; i <= 600; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + '' + ii;
-				}
+            ];
+            var items = [];
+            for (var i = 1; i <= 600; i++) {
+                var item = {};
+                for (var ii = 1; ii < 6; ii++) {
+                    item["property" + ii] = i + '' + ii;
+                }
 
-				items.push(item);
-			}
+                items.push(item);
+            }
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
         });
     </script>

@@ -57,6 +57,7 @@
                     if (window.length) {
                         window.remove();
                     }
+                    break;
                 }
             }
             return self;
@@ -127,7 +128,7 @@
             return self;
         }
 
-        function hideWindows(event) {
+        function hideWindows() {
             view.getNode('container').children('.grid-window').hide();
             return self;
         }
@@ -166,6 +167,10 @@
 
 
     function Create(view, settings) {
+        if (view instanceof SmallGrid.View.View === false) {
+            throw new TypeError("View expected.");
+        }
+
         return new SmallGrid.View.Window.Manager(view, settings).init();
     }
 

@@ -238,3 +238,9 @@
 .grid-window {
     display:inline-block;
 }
+
+.grid-preload-font {
+    visibility:hidden;
+    width:1px; height:1px;
+    font-family: FontAwesome;
+}

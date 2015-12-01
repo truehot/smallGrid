@@ -39,7 +39,7 @@
          Handlers
          */
 
-        function handleScrollStop(event) {
+        function handleScrollStop(evt) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
                 if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
                     editOptions.editor.focus();
@@ -47,13 +47,13 @@
             }
         }
 
-        function handleBeforeRowsRendered(event) {
+        function handleBeforeRowsRendered(evt) {
             if (isEditMode() === true) {
                 editOptions.editor.remove();
             }
         }
 
-        function handleAfterRowsRendered(event) {
+        function handleAfterRowsRendered(evt) {
             if (isEditMode() === true) {
                 var cellNode = view.getCellNodeById(editOptions.column.id, editOptions.row.id);
                 if (cellNode) {
@@ -69,29 +69,29 @@
             }
         }
 
-        function handleCellDblClick(event) {
+        function handleCellDblClick(evt) {
             if (settings.plugins.CellEdit.editOnClick === false) {
-                editCellById(event.column.id, event.row.id);
+                editCellById(evt.column.id, evt.row.id);
             }
             lastActive = {
-                "columnId": event.column.id,
-                "rowId": event.row.id
+                "columnId": evt.column.id,
+                "rowId": evt.row.id
             }
         }
 
-        function handleCellClick(event) {
+        function handleCellClick(evt) {
             if (settings.plugins.CellEdit.editOnClick === true) {
-                editCellById(event.column.id, event.row.id);
+                editCellById(evt.column.id, evt.row.id);
             }
             lastActive = {
-                "columnId": event.column.id,
-                "rowId": event.row.id
+                "columnId": evt.column.id,
+                "rowId": evt.row.id
             }
         }
 
-        function handleCellKeyDown(event) {
-            if (event && event.event) {
-                switch (event.event.keyCode) {
+        function handleCellKeyDown(evt) {
+            if (evt && evt.event) {
+                switch (evt.event.keyCode) {
                     //case 9:
                     //    if (isEditMode() === true) {
                     //        event.preventDefault();

@@ -1,7 +1,6 @@
 QUnit.module("SmallGrid.Query");
 QUnit.test("Request", function (assert) {
 
-
     var columns = [];
     for (var i = 1; i <= 60; i++) {
         var column = { 'name': "Column", 'field': "property" + i };
@@ -28,18 +27,25 @@ QUnit.test("Request", function (assert) {
     var columnsRequest = new SmallGrid.Query.Request([], [], columnsModel);
 
 
-    assert.ok(rowsRequest.getRowsHeight(2) == 1320, "getRowsHeight");
-    assert.ok(rowsRequest.getRowsHeight(20) == 2400, "getRowsHeight");
+    var filter1 = new SmallGrid.Query.FilterQuery('property1', settings).contains("6");
+    var filter2 = new SmallGrid.Query.FilterQuery('field', settings).contains("property6");
+    var sorter = new SmallGrid.Query.SorterQuery('property1', 1, "Default", settings);
+    var rowsRequestFS = new SmallGrid.Query.Request([filter1], [sorter], rowsModel);
+    var columnsRequestFS = new SmallGrid.Query.Request([filter2], [sorter], columnsModel);
 
-    assert.ok(rowsRequest.getRowsInRange(1, 5, 2)[0].item.property1 == "11", "getRowsInRange");
-    assert.ok(rowsRequest.getRowsInRange(2000, 500, 20)[0].item.property1 == "371", "getRowsInRange");
+    assert.ok(rowsRequest.getRowsTotal(2).height == 1320, "getRowsTotal");
+    assert.deepEqual(rowsRequest.getRowsTotal(20), { count: 60, height: 2400 }, "getRowsTotal");
 
+    assert.ok(rowsRequest.getRowsInRange(1, 5, 2)[0].item.property1 == 11, "getRowsInRange");
+    assert.ok(rowsRequestFS.getRowsInRange(1, 5, 2)[0].item.property1 == 61, "getRowsInRange");
+    assert.ok(rowsRequest.getRowsInRange(2000, 500, 20)[0].item.property1 == 251, "getRowsInRange");
 
-    assert.ok(columnsRequest.getColumnsWidth(5) == 3300, "getColumnsWidth");
-    assert.ok(columnsRequest.getColumnsWidth(100) == 9000, "getColumnsWidth");
+    assert.ok(columnsRequest.getColumnsTotal(5).width == 3300, "getColumnsTotal");
+    assert.deepEqual(columnsRequest.getColumnsTotal(100), { count: 60, width: 9000 }, "getColumnsTotal");
 
-    assert.ok(columnsRequest.getColumnsInRange(0, 200, 4)[0].item.property1 == "11", "getColumnsInRange");
-    assert.ok(columnsRequest.getColumnsInRange(1000, 250, 10)[0].item.property1 == "131", "getColumnsInRange");
+    assert.ok(columnsRequest.getColumnsInRange(0, 200, 4)[0].item.property1 == 11, "getColumnsInRange");
+    assert.ok(columnsRequestFS.getColumnsInRange(0, 200, 4)[0].item.property1 == 11, "getColumnsInRange");//only rows filters supported
+    assert.ok(columnsRequest.getColumnsInRange(1000, 250, 10)[0].item.property1 == 91, "getColumnsInRange");
 });
 
 

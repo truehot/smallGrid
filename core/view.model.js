@@ -17,6 +17,9 @@
         var columns = columnsModel;
         var rows = rowsModel;
 
+        var rowsTotal = { count: 0, height: 0 };
+        var columnsTotal = { count: 0, width: 0 };
+
         var rowsCache = [];
         var columnsCache = [];
 
@@ -30,10 +33,10 @@
         var bulkRows = [];
 
         var cachedRange = {
-            minTop: -1,
-            maxTop: -1,
-            minLeft: -1,
-            maxLeft: -1,
+            minTop: undefined,
+            maxTop: undefined,
+            minLeft: undefined,
+            maxLeft: undefined,
         };
 
         /*
@@ -63,22 +66,22 @@
         /*
         Handlers
         */
-        function handleColumnsChange(event) {
+        function handleColumnsChange(evt) {
 
-            if (bulkColumns.length === 0 && event.id) {
-                resetCacheRangeWidth();
-                self.onColumnsChange.notify({ ids: [event.id] });
-            } else if (event.id) {
-                bulkColumns.push(event.id);
+            if (bulkColumns.length === 0 && evt.id) {
+                updateCacheWidth();
+                self.onColumnsChange.notify({ ids: [evt.id] });
+            } else if (evt.id) {
+                bulkColumns.push(evt.id);
             }
         }
 
-        function handleRowsChange(event) {
-            if (bulkRows.length === 0 && event.id) {
-                resetCacheRangeHeight();
-                self.onRowsChange.notify({ ids: [event.id] });
-            } else if (event.id) {
-                bulkRows.push(event.id);
+        function handleRowsChange(evt) {
+            if (bulkRows.length === 0 && evt.id) {
+                updateCacheHeight();
+                self.onRowsChange.notify({ ids: [evt.id] });
+            } else if (evt.id) {
+                bulkRows.push(evt.id);
             }
         }
 
@@ -90,17 +93,17 @@
             bulkRows = [];
         }
 
-        function handleColumnsChangeStop(event) {
-            if ((event.mode && event.mode == "all") || bulkColumns.length > 0) {
-                resetCacheRangeWidth();
+        function handleColumnsChangeStop(evt) {
+            if ((evt.mode && evt.mode == "all") || bulkColumns.length > 0) {
+                updateCacheWidth();
                 self.onColumnsChange.notify({ ids: bulkColumns });
                 bulkColumns = [];
             }
         }
 
-        function handleRowsChangeStop(event) {
-            if ((event.mode && event.mode == "all") || bulkRows.length > 0) {
-                resetCacheRangeHeight();
+        function handleRowsChangeStop(evt) {
+            if ((evt.mode && evt.mode == "all") || bulkRows.length > 0) {
+                updateCacheHeight();
                 self.onRowsChange.notify({ ids: bulkRows });
                 bulkRows = [];
             }
@@ -158,6 +161,14 @@
             }
         }
 
+        function getRowsTotal() {
+            return rowsTotal;
+        }
+
+        function getColumnsTotal() {
+            return columnsTotal;
+        }
+
         /*
         Filter part
         */
@@ -174,7 +185,7 @@
                 }
 
                 rowsFilters[i] = filterObj;
-                resetCacheRangeHeight();
+                updateCacheHeight();
                 self.onRowsChange.notify();
             }
         }
@@ -184,7 +195,7 @@
                 for (var i = 0; i < rowsFilters.length; i++) {
                     if (rowsFilters[i].getId() == filterObj.getId()) {
                         rowsFilters.splice(i, 1);
-                        resetCacheRangeHeight();
+                        updateCacheHeight();
                         self.onRowsChange.notify();
                         break;
                     }
@@ -194,7 +205,7 @@
 
         function clearFilters() {
             rowsFilters = [];
-            resetCacheRangeHeight();
+            updateCacheHeight();
             self.onRowsChange.notify();
         }
 
@@ -208,7 +219,7 @@
         function setSorter(sorterObj) {
             if (sorterObj instanceof SmallGrid.Query.SorterQuery) {
                 rowsSorters = [];
-                resetCacheRangeHeight();
+                updateCacheHeight();
                 rowsSorters.push(sorterObj);
                 self.onRowsChange.notify();
             }
@@ -219,7 +230,7 @@
                 for (var i = 0; i < rowsSorters.length; i++) {
                     if (rowsSorters[i].getField() == sorterObj.getField()) {
                         rowsSorters.splice(i, 1);
-                        resetCacheRangeHeight();
+                        updateCacheHeight();
                         self.onRowsChange.notify();
                         break;
                     }
@@ -229,7 +240,7 @@
 
         function clearSorters() {
             rowsSorters = [];
-            resetCacheRangeHeight();
+            updateCacheHeight();
             self.onRowsChange.notify();
         }
 
@@ -237,27 +248,27 @@
         Data calculations
         */
         function getRowsHeight(cellOuterSize) {
-            return new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsHeight(cellOuterSize.height);
+            rowsTotal = new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsTotal(cellOuterSize.height);
+            return rowsTotal.height;
         }
 
         function getColumnsWidth(cellOuterSize) {
-            return new SmallGrid.Query.Request(columnsFilters, columnsSorters, columnsModel).getColumnsWidth(cellOuterSize.width);
+            columnsTotal = new SmallGrid.Query.Request(columnsFilters, columnsSorters, columnsModel).getColumnsTotal(cellOuterSize.width);
+            return columnsTotal.width;
         }
 
-        function requestDataFromRange(point, size, outerSize, allowCache) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop) & allowCache;
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft) & allowCache;
+        function requestDataFromRange(point, size, outerSize, scrollSize, allowCache) {
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop + scrollSize.width) & allowCache;
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft + scrollSize.height) & allowCache;
 
-            if (rowsCached === 0 || columnsCached === 0) {
-                if (rowsCached === 0) {
-                    rowsCache = new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
-                }
+            if (rowsCached === 0) {
+                rowsCache = new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
+                updateCacheHeight(rowsCache, size, outerSize);
+            }
 
-                if (columnsCached === 0) {
-                    columnsCache = new SmallGrid.Query.Request(columnsFilters, columnsSorters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
-                }
-
-                updateCacheRange(size, outerSize);
+            if (columnsCached === 0) {
+                columnsCache = new SmallGrid.Query.Request(columnsFilters, columnsSorters, columnsModel).getColumnsInRange(point.left, size.width, outerSize.width);
+                updateCacheWidth(columnsCache, size, outerSize);
             }
 
             return {
@@ -270,44 +281,36 @@
         /*
         Cache range
         */
-        function updateCacheRange(size, outerSize) {
-            if (columnsCache.length && rowsCache.length) {
-                cachedRange = {
-                    minTop: rowsCache[0].calcHeight < size.height ? rowsCache[0].calcHeight - rowsCache[0].height - outerSize.height : rowsCache[0].calcHeight + size.height,
-                    maxTop: rowsCache[(rowsCache.length - 1)].calcHeight < size.height ? size.height : rowsCache[(rowsCache.length - 1)].calcHeight - size.height,
-                    minLeft: columnsCache[0].calcWidth < size.width ? columnsCache[0].calcWidth - columnsCache[0].width - outerSize.width : columnsCache[0].calcWidth + size.width,
-                    maxLeft: columnsCache[(columnsCache.length - 1)].calcWidth < size.width ? size.width : columnsCache[(columnsCache.length - 1)].calcWidth - size.width,
-                };
+        function updateCacheWidth(columns, size, outerSize) {
+            if (columns && columns.length) {
+                cachedRange.minLeft = columns[0].calcWidth < size.width ? columns[0].calcWidth - columns[0].width - outerSize.width : columns[0].calcWidth + size.width;
+                cachedRange.maxLeft = columns[(columns.length - 1)].calcWidth < size.width ? size.width : columns[(columns.length - 1)].calcWidth - size.width;
             } else {
-                resetCacheRange();
+                cachedRange.minLeft = undefined;
+                cachedRange.maxLeft = undefined;
             }
         }
 
-        function resetCacheRangeHeight() {
-            cachedRange.minTop = -1;
-            cachedRange.maxTop = -1;
+        function updateCacheHeight(rows, size, outerSize) {
+            if (rows && rows.length) {
+                cachedRange.minTop = rows[0].calcHeight < size.height ? rows[0].calcHeight - rows[0].height - outerSize.height : rows[0].calcHeight + size.height;
+                cachedRange.maxTop = rows[(rows.length - 1)].calcHeight < size.height ? size.height : rows[(rows.length - 1)].calcHeight - size.height;
+            } else {
+                cachedRange.minTop = undefined;
+                cachedRange.maxTop = undefined;
+            }
         }
-
-        function resetCacheRangeWidth() {
-            cachedRange.minLeft = -1;
-            cachedRange.maxLeft = -1;
-        }
-
-        function resetCacheRange() {
-            resetCacheRangeHeight();
-            resetCacheRangeWidth();
-        }
-
-
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
+            "getRowsTotal": getRowsTotal,
+            "getColumnsTotal": getColumnsTotal,
+
             "columns": columns,
             "rows": rows,
 
-            "resetCacheRange": resetCacheRange,
             "requestDataFromRange": requestDataFromRange,
 
             "clearSorter": clearSorter,
@@ -336,6 +339,14 @@
     }
 
     function CreateModel(rowsModel, columnsModel, settings) {
+        if (rowsModel instanceof SmallGrid.Row.Model === false) {
+            throw new TypeError("Rows model is not defined.");
+        }
+
+        if (columnsModel instanceof SmallGrid.Column.Model === false) {
+            throw new TypeError("Column model is not defined.");
+        }
+
         return new ViewModel(rowsModel, columnsModel, settings).init();
     }
 

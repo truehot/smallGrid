@@ -1,6 +1,8 @@
 QUnit.module("SmallGrid.Query");
 QUnit.test("Sort", function (assert) {
 
+    var settings = SmallGrid.Settings.Create();
+
     var test = {
         "test1": "test1",
         "test2": "test2",

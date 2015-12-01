@@ -36,7 +36,7 @@
             if (type in self) {
                 return self[type](str || "");
             }
-            throw "Type " + type + " not found";
+            throw new TypeError("Type " + type + " not found.");
         }
 
         function and() {

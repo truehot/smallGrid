@@ -13,10 +13,11 @@
 
     function RowData(data) {
         if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
-        if ("disabled" in data) this.disabled = data.disabled;//todo: wtf is that? row css class?
+        if ("disabled" in data) this.disabled = data.disabled;
         if ("editable" in data) this.editable = data.editable;
         if ("editMode" in data) this.editMode = data.editMode;
         if ("height" in data) this.height = data.height;
+        if ("hidden" in data) this.hidden = data.hidden;
         if ("id" in data) this.id = data.id;
         if ("item" in data) this.item = data.item;
         if ("maxHeight" in data) this.maxHeight = data.maxHeight;
@@ -25,10 +26,11 @@
     }
 
     RowData.prototype.cellCssClass = "";// row based cell class
-    RowData.prototype.disabled = false; // is row disabled for ????????????
+    RowData.prototype.disabled = false; // is row disabled
     RowData.prototype.editable = true; // are row cells editable?
     RowData.prototype.editMode = false; // are row cells in edit mode
     RowData.prototype.height = 20;// row height
+    RowData.prototype.hidden = false;//row visibility
     RowData.prototype.id = undefined;// unique indicator
     RowData.prototype.item = null;//
     RowData.prototype.maxHeight = 200;// max row height
@@ -39,12 +41,99 @@
         var self = this;
         var data = [];
 
-        function forEach(callback) {
-            if (data.length) {
-                data.forEach(callback);
+        var items = {
+
+            addItem: function (item) {
+                var row = addRow(
+                    createRow(item)
+                );
+                self.onChange.notify({ "id": row.id });
+                return row;
+            },
+
+            addItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.addItem(items[i]);
+                    }
+                    self.onChangeStop.notify();
+                }
+                return self;
+            },
+
+            deleteItems: function () {
+                return deleteRows();
+            },
+
+            deleteItemById: function (id) {
+                return deleteRowById(id);
+            },
+
+            deleteItem: function (item) {
+                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
+                    deleteRowById(item[settings.rows.idProperty]);
+                }
+                return self;
+            },
+
+            getItems: function () {
+                var result = [];
+                for (var i = 0; i < data.length; i++) {
+                    result.push(data[i].item);
+                }
+                return result;
+            },
+
+            setItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    data = [];
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.addItem(items[i]);
+                    }
+                    self.onChangeStop.notify({ "mode": "all" });
+                }
+                return self;
+            },
+
+            updateItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.updateItem(items[i]);
+                    }
+                    self.onChangeStop.notify();
+                }
+                return self;
+            },
+
+            updateItem: function (item) {
+                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
+                    self.items.updateItemById(item[settings.rows.idProperty], item);
+                }
+            },
+
+            updateItemById: function (id, item) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == id) {
+                        data[i].item = item;
+                        self.onChange.notify({ "id": id });
+                        break;
+                    }
+                }
+                return self;
+            },
+
+            updateItemByIndex: function (idx, item) {
+                if (data[idx]) {
+                    data[idx].item = item;
+                    self.onChange.notify({ "id": data[idx].id });
+                }
+                return self;
             }
-            return self;
         }
+
 
         function filter(callback) {
             if (data.length) {
@@ -146,39 +235,6 @@
             return self;
         }
 
-        function addItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                for (var i = 0; i < items.length; i++) {
-                    addItem(items[i]);
-                }
-                self.onChangeStop.notify();
-            }
-            return self;
-        }
-
-        function setItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                data = [];
-                for (var i = 0; i < items.length; i++) {
-                    addItem(items[i]);
-                }
-                self.onChangeStop.notify({ "mode": "all" });
-            }
-            return self;
-        }
-
-        function updateItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                for (var i = 0; i < items.length; i++) {
-                    updateItem(items[i]);
-                }
-                self.onChangeStop.notify();
-            }
-            return self;
-        }
 
         function updateRows(rows) {
             if (rows.length) {
@@ -207,22 +263,12 @@
             self.onChangeStart.notify();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[i].id});
+                self.onChange.notify({ "id": data[i].id });
             }
             self.onChangeStop.notify();
             return self;
         }
 
-        function deleteItems(items) {
-            if (data.length) {
-                self.onChangeStart.notify();
-                for (var i = 0; i < items.length; i++) {
-                    deleteItem(items[i]);
-                }
-                self.onChangeStop.notify({ "mode": "all" });
-            }
-            return self;
-        }
 
         function deleteRows() {
             if (data.length) {
@@ -236,62 +282,14 @@
         /*
         Single updates
         */
-
         function addRow(row) {
             if (row instanceof RowData) {
                 data.push(row);
-                self.onChange.notify({ "id": row.id});
+                self.onChange.notify({ "id": row.id });
             }
             return self;
         }
 
-        function addItem(item) {
-            var row = addRow(
-                createRow(item)
-            );
-            self.onChange.notify({ "id": row.id});
-            return row;
-        }
-
-        function deleteItem(item) {
-            if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                deleteRowById(item[settings.rows.idProperty]);
-            }
-            return self;
-        }
-
-        function getItems() {
-            var result = [];
-            for (var i = 0; i < data.length; i++) {
-                result.push(data[i].item);
-            }
-            return result;
-        }
-
-        function updateItem(item) {
-            if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                updateItemById(item[settings.rows.idProperty], item);
-            }
-        }
-
-        function updateItemById(id, item) {
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
-                    data[i].item = item;
-                    self.onChange.notify({ "id": id});
-                    break;
-                }
-            }
-            return self;
-        }
-
-        function updateItemByIndex(idx, item) {
-            if (data[idx]) {
-                data[idx].item = item;
-                self.onChange.notify({ "id": data[idx].id});
-            }
-            return self;
-        }
 
         function deleteRow(row) {
             if (row instanceof RowData) {
@@ -304,7 +302,7 @@
             for (var i = 0; i < data.length; i++) {
                 if (data[i].id == id) {
                     data.splice(i, 1);
-                    self.onChange.notify({ "id": id});
+                    self.onChange.notify({ "id": id });
                     break;
                 }
             }
@@ -315,7 +313,7 @@
             if (data[idx]) {
                 var id = data[idx].id;
                 data.splice(idx, 1);
-                self.onChange.notify({ "id": id});
+                self.onChange.notify({ "id": id });
             }
             return self;
         }
@@ -378,7 +376,7 @@
                     0,
                     row
                 );
-                self.onChange.notify({ "id": row.id});
+                self.onChange.notify({ "id": row.id });
             }
             return self;
         }
@@ -398,7 +396,7 @@
                     0,
                     row
                 );
-                self.onChange.notify({ "id": row.id});
+                self.onChange.notify({ "id": row.id });
             }
             return self;
         }
@@ -408,7 +406,7 @@
                 if (data[i].id == id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
-                        self.onChange.notify({ "id": id});
+                        self.onChange.notify({ "id": id });
                     }
                     break;
                 }
@@ -419,7 +417,7 @@
         function setRowPropertyByIndex(idx, propertyName, propertyValue) {
             if (propertyName && propertyName in data[idx]) {
                 data[idx][propertyName] = propertyValue;
-                self.onChange.notify({ "id": data[idx].id});
+                self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
@@ -438,7 +436,7 @@
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].id == id) {
                         data[i] = row;
-                        self.onChange.notify({ "id": id});
+                        self.onChange.notify({ "id": id });
                         break;
                     }
                 }
@@ -450,7 +448,7 @@
             if (row instanceof RowData) {
                 if (data[idx]) {
                     data[idx] = row;
-                    self.onChange.notify({ "id": row.id});
+                    self.onChange.notify({ "id": row.id });
                 }
             }
             return self;
@@ -483,6 +481,7 @@
         }
 
         $.extend(this, {
+            "items": items,
             "onChange": new SmallGrid.Event.Handler(),
             "onChangeStart": new SmallGrid.Event.Handler(),
             "onChangeStop": new SmallGrid.Event.Handler(),
@@ -493,22 +492,10 @@
             //"remove": remove,
 
             "filter": filter,
-            "forEach": forEach,
+
             "reduce": reduce,
             "sort": sort,
             "total": total,
-
-            "addItem": addItem,
-            "addItems": addItems,
-            "deleteItem": deleteItem,
-            "deleteItems": deleteRows,
-            "deleteItemById": deleteRowById,
-            "getItems": getItems,
-            "setItems": setItems,
-            "updateItem": updateItem,
-            "updateItemById": updateItemById,
-            "updateItems": updateItems,
-            "updateItemByIndex": updateItemByIndex,
 
             "addRow": addRow,
             "addRows": addRows,
@@ -542,10 +529,10 @@
 
     function CreateModel(data, settings) {
         if (!Array.isArray(data)) {
-            throw "Array expected";
+            throw new TypeError("Array expected.");
         }
         return new RowModel(
             settings
-        ).addItems(data);
+        ).items.addItems(data);
     }
 })(jQuery);

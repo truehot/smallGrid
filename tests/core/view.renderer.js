@@ -16,7 +16,7 @@ QUnit.test("Renderer", function (assert) {
     var colsHtml = renderer.buildColsHtml(columns.getColumns(), opts);
     var rowsHtml = renderer.buildRowsHtml(columns.getColumns(), rows.getRows(), opts);
 
-    assert.equal(el['viewport'].html(), "<div class=\"grid-header disable-text-selection\"><div class=\"grid-header-wrap\"><table class=\"grid-header-table\"><colgroup></colgroup><tbody></tbody></table></div></div><div class=\"grid-content\"><div class=\"grid-content-wrap\"><table class=\"grid-content-table\"><colgroup></colgroup><tbody></tbody></table></div></div><div class=\"grid-footer\"></div>", "buildViewPortElements");
+    assert.equal(el['viewport'].html(), "<div class=\"grid-header disable-text-selection\"><div class=\"grid-header-wrap\"><table class=\"grid-header-table\"><colgroup></colgroup><tbody></tbody></table></div></div><div class=\"grid-content\"><div class=\"grid-content-wrap\"><table class=\"grid-content-table\"><colgroup></colgroup><tbody></tbody></table></div></div><div class=\"grid-footer\"></div><div class=\"grid-preload-font\"></div>", "buildViewPortElements");
     
 
     assert.equal(headerHtml, "<tr class='grid-header-row'><td style='height:20px' class='grid-header-cell grid-cursor-pointer'><div class='grid-header-cell-div'><span class='grid-column-name'>" + column.name + "</span></div><span class='grid-resizable-handle'></span></td></tr>", "buldHeaderColumnsHtml");

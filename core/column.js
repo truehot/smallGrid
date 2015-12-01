@@ -43,7 +43,7 @@
     ColumnData.prototype.filterable = false;//bool
     ColumnData.prototype.formatter = "Default";//default cell content formatter
     ColumnData.prototype.headerCssClass = "";//css class for column header cell  
-    ColumnData.prototype.hidden = false;//is column hidden?
+    ColumnData.prototype.hidden = false;//column visibility
     ColumnData.prototype.id = undefined;//unique indicator
     ColumnData.prototype.item = null;
     ColumnData.prototype.maxWidth = 9999;
@@ -55,17 +55,102 @@
     ColumnData.prototype.sortOrder = 0;//0, 1, -1
     ColumnData.prototype.width = 50;
 
-    //todo: fix events
     function ColumnModel(settings) {
         var self = this;
         var data = [];
+        var items = {
+            addItem: function (item) {
+                var column = addColumn(
+                    createColumn(item)
+                );
+                self.onChange.notify({ "id": column.id });
+                return column;
+            },
 
-        function forEach(callback) {
-            if (data.length) {
-                data.forEach(callback);
+            addItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.addItem(items[i]);
+                    }
+                    self.onChangeStop.notify();
+                }
+                return self;
+            },
+
+
+            deleteItem: function (item) {
+                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
+                    deleteColumnById(item[settings.columns.idProperty]);
+                }
+                return self;
+            },
+
+            deleteItems: function () {
+                return deleteColumns();
+            },
+
+            deleteItemById: function (id) {
+                return deleteColumnById(id);
+            },
+
+            getItems: function () {
+                var result = [];
+                for (var i = 0; i < data.length; i++) {
+                    result.push(data[i].item);
+                }
+                return result;
+            },
+
+            setItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    data = [];
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.addItem(items[i]);
+                    }
+                    self.onChangeStop.notify({ "mode": "all" });
+                }
+                return self;
+            },
+
+            updateItem: function (item) {
+                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
+                    self.items.updateItemById(item[settings.columns.idProperty], item);
+                }
+            },
+
+            updateItemById: function (id, item) {
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].id == id) {
+                        data[i].item = item;
+                        self.onChange.notify({ "id": id });
+                        break;
+                    }
+                }
+                return self;
+            },
+
+            updateItemByIndex: function (idx, item) {
+                if (data[idx]) {
+                    data[idx].item = item;
+                    self.onChange.notify({ "id": data[idx].id });
+                }
+                return self;
+            },
+
+
+            updateItems: function (items) {
+                if (items.length) {
+                    self.onChangeStart.notify();
+                    for (var i = 0; i < items.length; i++) {
+                        self.items.updateItem(items[i]);
+                    }
+                    self.onChangeStop.notify();
+                }
+                return self;
             }
-            return self;
-        }
+        };
 
         function filter(callback) {
             if (data.length) {
@@ -96,90 +181,6 @@
         function total() {
             return data.length;
         }
-
-        function addItem(item) {
-            var column = addColumn(
-                createColumn(item)
-            );
-            self.onChange.notify({ "id": column.id});
-            return column;
-        }
-
-        function addItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                for (var i = 0; i < items.length; i++) {
-                    addItem(items[i]);
-                }
-                self.onChangeStop.notify();
-            }
-            return self;
-        }
-
-        function deleteItem(item) {
-            if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                deleteColumnById(item[settings.columns.idProperty]);
-            }
-            return self;
-        }
-
-        function getItems() {
-            var result = [];
-            for (var i = 0; i < data.length; i++) {
-                result.push(data[i].item);
-            }
-            return result;
-        }
-
-        function setItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                data = [];
-                for (var i = 0; i < items.length; i++) {
-                    addItem(items[i]);
-                }
-                self.onChangeStop.notify({ "mode": "all" });
-            }
-            return self;
-        }
-
-        function updateItem(item) {
-            if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                updateItemById(item[settings.columns.idProperty], item);
-            }
-        }
-
-        function updateItemById(id, item) {
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
-                    data[i].item = item;
-                    self.onChange.notify({ "id": id });
-                    break;
-                }
-            }
-            return self;
-        }
-
-        function updateItemByIndex(idx, item) {
-            if (data[idx]) {
-                data[idx].item = item;
-                self.onChange.notify({ "id": data[idx].id });
-            }
-            return self;
-        }
-
-
-        function updateItems(items) {
-            if (items.length) {
-                self.onChangeStart.notify();
-                for (var i = 0; i < items.length; i++) {
-                    updateItem(items[i]);
-                }
-                self.onChangeStop.notify();
-            }
-            return self;
-        }
-
 
         function addColumn(column) {
             if (column instanceof ColumnData) {
@@ -447,27 +448,27 @@
         }
 
         $.extend(this, {
+            "items": items,
+
             "onChange": new SmallGrid.Event.Handler(),
             "onChangeStart": new SmallGrid.Event.Handler(),
             "onChangeStop": new SmallGrid.Event.Handler(),
 
             "filter": filter,
-            "forEach": forEach,
             "reduce": reduce,
             "sort": sort,
             "total": total,
 
-            "addItem": addItem,
-            "addItems": addItems,
-            "deleteItem": deleteItem,
-            "deleteItems": deleteColumns,
-            "deleteItemById": deleteColumnById,
-            "getItems": getItems,
-            "setItems": setItems,
-            "updateItem": updateItem,
-            "updateItemById": updateItemById,
-            "updateItemByIndex": updateItemByIndex,
-            "updateItems": updateItems,
+
+            //"deleteItem": deleteItem,
+            //"deleteItems": deleteColumns,
+            //"deleteItemById": deleteColumnById,
+            //"getItems": getItems,
+            //"setItems": setItems,
+            //"updateItem": updateItem,
+            //"updateItemById": updateItemById,
+            //"updateItemByIndex": updateItemByIndex,
+            //"updateItems": updateItems,
 
             "addColumn": addColumn,
             "addColumns": addColumns,
@@ -500,12 +501,11 @@
     }
 
     function CreateModel(data, settings) {
-        if (!Array.isArray(data)) {
-            throw "Array expected";
-        }
+        if (!Array.isArray(data)) throw new TypeError("Array expected.");
+
         return new ColumnModel(
             settings
-        ).addItems(data);
+        ).items.addItems(data);
     }
 
 })(jQuery);

@@ -38,12 +38,9 @@
 
             el = renderer.buildViewPortElements($container);
             el.container.empty().addClass(settings.uid);
-
-            //viewport
             el.viewport.appendTo(el.container);
 
-
-            //bind events           
+            //bind events
             handlers.push(
                 SmallGrid.Handler.Resize.Create(el.header, {
                     "handleResize": handleHeaderResize,
@@ -73,20 +70,13 @@
             );
 
             $(document).on("click", handleBodyClick);
-
             viewModel.onRowsChange.subscribe(handleRowsChange);
             viewModel.onColumnsChange.subscribe(handleColumnsChange);
 
-
-            //block invisible part in header ????
-            //el.header.width(contentSize.width - settings.scrollbarDimensions.width);
-
             resize();
-
             handleRowsChange();
             if (settings.resizeColumnsOnLoad === true) resizeColumns();
             handleColumnsChange();
-
             renderView();
 
             resumeRender(request);
@@ -195,7 +185,6 @@
         /*
         Render
         */
-
         function render() {
             suspendRenderRequests++;
             renderRequests();
@@ -209,10 +198,10 @@
                     requestDataTimer = setTimeout(function () {
                         renderView();
                         requestDataTimer = requestRenderTimer = null;
-                    }, 30);
+                    }, 17);
 
                 } else if (requestRenderTimer == null) {
-                    requestRenderTimer = setTimeout(render, 200);
+                    requestRenderTimer = setTimeout(render, 187);
                 }
             }
             return self;
@@ -222,6 +211,7 @@
 
             var request = suspendRender();
             suspendRenderRequests = 0;
+
             var result = viewModel.requestDataFromRange(
                 {
                     top: el.content[0].scrollTop * heightRatio,
@@ -229,43 +219,42 @@
                 },
                 contentSize,
                 settings.cellOuterSize,
+                {
+                    width: scrollVisibility.vertical ? settings.scrollbarDimensions.width : 0,
+                    height: scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0,
+                },
                 heightRatio == 1
             );
 
-            if (result.columns.length > 0 && result.isCached === 0) {
-
-                el.headerTable.css({
-                    'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
-                });
-
-                if (result.rows.length > 0) {
-                    el.contentTable.css({
-                        'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el.content[0].scrollTop * heightRatio) + el.content[0].scrollTop,
+            if (result.isCached === 0) {
+                if (result.columns.length > 0) {
+                    el.headerTable.css({
                         'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
                     });
+
+                    if (result.rows.length > 0) {
+                        el.contentTable.css({
+                            'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el.content[0].scrollTop * heightRatio) + el.content[0].scrollTop,
+                            'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
+                        });
+                    }
+
+                    var lastColumn = result.columns[result.columns.length - 1];
+
+                    var opts = {
+                        hideColumnBorder: (scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth),
+                        virtualColumnWidth: (settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth) ? contentSize.width - lastColumn.calcWidth : 0,
+                    };
+
+                    renderViewHtml(
+                        renderer.buildHeaderColumnsHtml(result.columns, opts),
+                        renderer.buildColsHtml(result.columns, opts),
+                        renderer.buildRowsHtml(result.columns, result.rows, opts)
+                    );
+
+                } else {
+                    renderViewHtml("", "", "");
                 }
-
-                var opts =
-                    {
-                        hideColumnBorder: false,
-                        virtualColumnWidth: 0,
-                    },
-                    lastColumn = result.columns[result.columns.length - 1];
-
-                if (scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth) {
-                    opts.hideColumnBorder = true;
-                }
-
-
-                if (settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth) {
-                    opts.virtualColumnWidth = contentSize.width - lastColumn.calcWidth;
-                }
-
-                renderViewHtml(
-                    renderer.buildHeaderColumnsHtml(result.columns, opts),
-                    renderer.buildColsHtml(result.columns, opts),
-                    renderer.buildRowsHtml(result.columns, result.rows, opts)
-                );
             }
 
             resumeRender(request);
@@ -328,27 +317,26 @@
             return type;
         }
 
-        function getColumnEvent(event) {
-            var column = viewModel.getColumnByIndex(event.cellIndex);
+        function getColumnEvent(evt) {
+            var column = viewModel.getColumnByIndex(evt.cellIndex);
             if (column) {
-                event.type = getColumnEventType($(event.event.target).attr("class"), column);
-                event.targetClass = $(event.event.target).attr("class");
-                event.column = column;
-                return event;
+                evt.type = getColumnEventType($(evt.event.target).attr("class"), column);
+                evt.targetClass = $(evt.event.target).attr("class");
+                evt.column = column;
+                return evt;
             }
         }
 
-        function getCellEvent(event) {
-            var column = viewModel.getColumnByIndex(event.cellIndex);
-            var row = viewModel.getRowByIndex(event.rowIndex);
+        function getCellEvent(evt) {
+            var column = viewModel.getColumnByIndex(evt.cellIndex);
+            var row = viewModel.getRowByIndex(evt.rowIndex);
 
             if (column && column.field.length > 0 && row && column.field in row.item) {
-                //replace with extend
-                event.type = getCellEventType($(event.event.target).attr("class"), column, row);
-                event.row = row;
-                event.column = column;
+                evt.type = getCellEventType($(evt.event.target).attr("class"), column, row);
+                evt.row = row;
+                evt.column = column;
 
-                return event;
+                return evt;
             }
         }
 
@@ -448,14 +436,13 @@
         function handleRowsChange() {
             var rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
-            scrollVisibility.vertical = (rowsHeight > contentSize.height);
+            scrollVisibility.vertical = scrollVisibility.horisontal ? (rowsHeight > (contentSize.height - settings.scrollbarDimensions.height)) : (rowsHeight > contentSize.height);
 
             if (rowsHeight > settings.maxSupportedCssHeight) {
                 heightRatio = (rowsHeight - contentSize.height + settings.scrollbarDimensions.height) / (settings.maxSupportedCssHeight - contentSize.height + settings.scrollbarDimensions.height);
                 rowsHeight = settings.maxSupportedCssHeight;
             }
 
-            //fix?
             el.header.css({
                 'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
             });
@@ -470,7 +457,7 @@
         function handleColumnsChange() {
             var columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
-            scrollVisibility.horisontal = (columnsWidth > contentSize.width);
+            scrollVisibility.horisontal = scrollVisibility.vertical ? (columnsWidth > (contentSize.width - settings.scrollbarDimensions.width)) : (columnsWidth > contentSize.width);
 
             var width = Math.max(
                 columnsWidth,
@@ -491,31 +478,29 @@
         /*
         Handle cell events
         */
-        function handleCellClick(event) {
-            var cellEvent = getCellEvent(event);
+        function handleCellClick(evt) {
+            var cellEvent = getCellEvent(evt);
             if (cellEvent) {
-                //console.log(event);
                 notifyEvent(cellEvent, "onCellClick");
             }
         }
 
-        function handleCellDblClick(event) {
-            var cellEvent = getCellEvent(event);
+        function handleCellDblClick(evt) {
+            var cellEvent = getCellEvent(evt);
             if (cellEvent) {
-                //console.log(event);
                 notifyEvent(cellEvent, "onCellDblClick");
             }
         }
 
-        function handleCellContextMenu(event) {
-            var cellEvent = getCellEvent(event);
+        function handleCellContextMenu(evt) {
+            var cellEvent = getCellEvent(evt);
             if (cellEvent) {
                 notifyEvent(cellEvent, "onCellContextMenu");
             }
         }
 
-        function handleCellKeyDown(event) {
-            var cellEvent = getCellEvent(event);
+        function handleCellKeyDown(evt) {
+            var cellEvent = getCellEvent(evt);
             if (cellEvent) {
                 notifyEvent(cellEvent, "onCellKeyDown");
             }
@@ -524,91 +509,91 @@
         /*
         Handle resize events
         */
-        function handleHeaderResize(event) {
-            notifyEvent(event, "onColumnResize");
+        function handleHeaderResize(evt) {
+            notifyEvent(evt, "onColumnResize");
         }
 
-        function handleHeaderResizeStart(event) {
+        function handleHeaderResizeStart(evt) {
             suspendScrollEvent = true;
-            notifyEvent(event, "onColumnResizeStart");
+            notifyEvent(evt, "onColumnResizeStart");
         }
 
-        function handleHeaderResizeStop(event) {
+        function handleHeaderResizeStop(evt) {
             suspendScrollEvent = false;
-            notifyEvent(event, "onColumnResizeStop");
+            notifyEvent(evt, "onColumnResizeStop");
         }
 
         /*
         Handle mouse wheel
         */
-        function handleMouseWheelStart(event) {
-            notifyEvent(event, "onMouseWheelStart");
+        function handleMouseWheelStart(evt) {
+            notifyEvent(evt, "onMouseWheelStart");
         }
 
-        function handleMouseWheelStop(event) {
-            notifyEvent(event, "onMouseWheelStop");
+        function handleMouseWheelStop(evt) {
+            notifyEvent(evt, "onMouseWheelStop");
         }
 
-        function handleMouseWheel(event) {
-            notifyEvent(event, "onMouseWheel");
+        function handleMouseWheel(evt) {
+            notifyEvent(evt, "onMouseWheel");
         }
 
         /*
         Handle scroll
         */
-        function handleScrollStart(event) {
+        function handleScrollStart(evt) {
             if (suspendScrollEvent === false) {
-                notifyEvent(event, "onScrollStart");
+                notifyEvent(evt, "onScrollStart");
             }
         }
 
-        function handleScrollStop(event) {
+        function handleScrollStop(evt) {
             if (suspendScrollEvent === false) {
-                notifyEvent(event, "onScrollStop");
+                notifyEvent(evt, "onScrollStop");
             }
         }
 
-        function handleScroll(event) {
+        function handleScroll(evt) {
             if (suspendScrollEvent === false) {
                 el.header[0].scrollLeft = el.content[0].scrollLeft;
                 render();
-                notifyEvent(event, "onScroll");
+                notifyEvent(evt, "onScroll");
             }
         }
 
         /*
         Handle body events
         */
-        function handleBodyClick(event) {
-            notifyEvent(event, "onBodyClick");
+        function handleBodyClick(evt) {
+            notifyEvent(evt, "onBodyClick");
         }
 
         /*
         Handle header events
         */
-        function handleHeaderClick(event) {
-            var columnEvent = getColumnEvent(event);
+        function handleHeaderClick(evt) {
+            var columnEvent = getColumnEvent(evt);
             if (columnEvent) {
                 notifyEvent(columnEvent, "onHeaderClick");
             }
         }
 
-        function handleHeaderContextMenu(event) {
-            var columnEvent = getColumnEvent(event);
+        function handleHeaderContextMenu(evt) {
+            var columnEvent = getColumnEvent(evt);
             if (columnEvent) {
                 notifyEvent(columnEvent, "onHeaderContextMenu");
             }
         }
 
-        function handleHeaderDblClick(event) {
-            var columnEvent = getColumnEvent(event);
+        function handleHeaderDblClick(evt) {
+            var columnEvent = getColumnEvent(evt);
             if (columnEvent) {
                 notifyEvent(columnEvent, "onHeaderDblClick");
             }
         }
 
-        function notifyEvent(event, handlerName) {
-            self[handlerName].notify(event);
+        function notifyEvent(evt, handlerName) {
+            self[handlerName].notify(evt);
         }
 
         $.extend(this, {
@@ -633,7 +618,6 @@
             "resumeRender": resumeRender,
             "suspendRender": suspendRender,
 
-            //Events
             "onScroll": new SmallGrid.Event.Handler(),
             "onScrollStart": new SmallGrid.Event.Handler(),
             "onScrollStop": new SmallGrid.Event.Handler(),
@@ -651,7 +635,7 @@
             "onCellClick": new SmallGrid.Event.Handler(),
             "onCellContextMenu": new SmallGrid.Event.Handler(),
             "onCellDblClick": new SmallGrid.Event.Handler(),
-            "onCellKeyDown": new SmallGrid.Event.Handler(), // not working?
+            "onCellKeyDown": new SmallGrid.Event.Handler(),
 
             "onColumnResize": new SmallGrid.Event.Handler(),
             "onColumnResizeStart": new SmallGrid.Event.Handler(),
@@ -671,6 +655,11 @@
         if (!$container.length) {
             throw new Error("Small grid requires a valid container, " + container + " does not exist in the DOM.");
         }
+
+        if (viewModel instanceof SmallGrid.View.Model.Model === false) {
+            throw new TypeError("View model is not defined.");
+        }
+
         var renderer = SmallGrid.View.Renderer.Create(settings);
         return new ViewData($container, viewModel, renderer, settings).init();
     }

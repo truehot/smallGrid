@@ -237,7 +237,14 @@
 
 .grid-window {
     display:inline-block;
-}/* Plugins styles */
+}
+
+.grid-preload-font {
+    visibility:hidden;
+    width:1px; height:1px;
+    font-family: FontAwesome;
+}
+/* Plugins styles */
 
 
 

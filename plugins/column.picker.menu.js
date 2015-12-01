@@ -13,17 +13,17 @@
         var self = this;
         var currentId = "column-picker";
 
-        function handleHeaderContextMenu(event) {
+        function handleHeaderContextMenu(evt) {
 
-            if (event) {
-                event.preventDefault();
+            if (evt) {
+                evt.preventDefault();
 
                 windowManager.hideWindows();
                 if (windowManager.isWindow(currentId) === false) windowManager.createWindow(currentId, {}, buildElements(currentId));
 
                 windowManager.showWindowNearPosition(
                     currentId,
-                    { x: event.event.pageX, y: event.event.pageY }
+                    { x: evt.event.pageX, y: evt.event.pageY }
                 );
             }
         }
@@ -65,10 +65,10 @@
         /*
         Handlers
         */
-        function handleMenuClick(event) {
-            event.stopPropagation();
-            if (event.target) {
-                var $checkbox = $(event.target).closest('input');
+        function handleMenuClick(evt) {
+            evt.stopPropagation();
+            if (evt.target) {
+                var $checkbox = $(evt.target).closest('input');
                 if ($checkbox.length) {
                     if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
                         return false;

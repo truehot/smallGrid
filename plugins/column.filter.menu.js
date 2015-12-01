@@ -12,23 +12,23 @@
     function ColumnFilterMenu(view, windowManager, settings) {
         var self = this;
 
-        function handleHeaderClick(event) {
-            if (event && event.type && event.type == "filter") {
-                event.stopPropagation();
-                var isVisible = windowManager.isVisible(event.column.id);
+        function handleHeaderClick(evt) {
+            if (evt && evt.type && evt.type == "filter") {
+                evt.stopPropagation();
+                var isVisible = windowManager.isVisible(evt.column.id);
                 windowManager.hideWindows();
 
-                if (windowManager.isWindow(event.column.id) === false) {
+                if (windowManager.isWindow(evt.column.id) === false) {
 
                     windowManager.createWindow(
-                        event.column.id,
-                        { filter: new SmallGrid.Query.FilterQuery(event.column.field, settings) },
-                        buildElements(event.column.id)
+                        evt.column.id,
+                        { filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings) },
+                        buildElements(evt.column.id)
                     );
 
-                    windowManager.showWindowNearTarget(event.column.id, $(event.event.target));
+                    windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
                 } else if (isVisible === false) {
-                    windowManager.showWindow(event.column.id);
+                    windowManager.showWindow(evt.column.id);
                 }
             }
         }
@@ -65,10 +65,10 @@
         /*
         Handlers
         */
-        function handleMenuSubmit(event) {
-            event.preventDefault();
+        function handleMenuSubmit(evt) {
+            evt.preventDefault();
 
-            var data = windowManager.getWindow(event.data.id);
+            var data = windowManager.getWindow(evt.data.id);
             if (data && data.opts) {
                 var filter = data.opts.filter;
                 var formValues = getFormValues(data.container);
@@ -81,20 +81,20 @@
                 }
                 view.getModel().setFilter(filter);
 
-                windowManager.hideWindow(event.data.id);
+                windowManager.hideWindow(evt.data.id);
             }
         }
 
-        function handleMenuClear(event) {
-            var data = windowManager.getWindow(event.data.id);
+        function handleMenuClear(evt) {
+            var data = windowManager.getWindow(evt.data.id);
             if (data) {
                 view.getModel().clearFilter(data.opts.filter);
-                windowManager.hideWindow(event.data.id);
+                windowManager.hideWindow(evt.data.id);
             }
         }
 
-        function handleMenuClick(event) {
-            event.stopPropagation();
+        function handleMenuClick(evt) {
+            evt.stopPropagation();
         }
 
         /*

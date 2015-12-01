@@ -20,54 +20,54 @@
             .on("dblclick", handleDblClick)
             .on("keydown", handleKeyDown);
 
-        function getCellEvent(event) {
-            if (event && event.target) {
-                var $cellElement = $(event.target).closest(settings.cellIdentifier);
+        function getCellEvent(evt) {
+            if (evt && evt.target) {
+                var $cellElement = $(evt.target).closest(settings.cellIdentifier);
                 if ($cellElement.length) {
                     var $rowElement = $cellElement.closest(settings.rowIdentifier);
                     if ($rowElement.length) {
                         return {
                             cellIndex: $cellElement.index(),
                             rowIndex: $rowElement.index(),
-                            event: event,
+                            event: evt,
                         };
                     }
                 }
             }
         }
 
-        function handleMouseDown(event) {
-            if (event.ctrlKey || event.shiftKey) {
+        function handleMouseDown(evt) {
+            if (evt.ctrlKey || evt.shiftKey) {
                 document.getSelection().removeAllRanges();
-                event.preventDefault();
+                evt.preventDefault();
             }
         }
 
-        function handleClick(event) {
-            event = getCellEvent(event);
-            if (event && settings.handleClick) {
-                settings.handleClick(event);
+        function handleClick(evt) {
+            evt = getCellEvent(evt);
+            if (evt && settings.handleClick) {
+                settings.handleClick(evt);
             }
         }
 
-        function handleContextMenu(event) {
-            event = getCellEvent(event);
-            if (event && settings.handleContextMenu) {
-                settings.handleContextMenu(event);
+        function handleContextMenu(evt) {
+            evt = getCellEvent(evt);
+            if (evt && settings.handleContextMenu) {
+                settings.handleContextMenu(evt);
             }
         }
 
-        function handleDblClick(event) {
-            event = getCellEvent(event);
-            if (event && settings.handleDblClick) {
-                settings.handleDblClick(event);
+        function handleDblClick(evt) {
+            evt = getCellEvent(evt);
+            if (evt && settings.handleDblClick) {
+                settings.handleDblClick(evt);
             }
         }
 
-        function handleKeyDown(event) {
-            event = getCellEvent(event);
-            if (event && settings.handleKeyDown) {
-                settings.handleKeyDown(event);
+        function handleKeyDown(evt) {
+            evt = getCellEvent(evt);
+            if (evt && settings.handleKeyDown) {
+                settings.handleKeyDown(evt);
             }
         }
 

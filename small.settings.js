@@ -1,14 +1,14 @@
 if (typeof jQuery === "undefined") {
-    throw "Small grid requires jquery module to be loaded";
+    throw new Error("Small grid requires jquery module to be loaded.");
 }
 if (typeof SmallGrid === "undefined") {
-    throw "Small grid required to be loaded";
+    throw new Error("Small grid required to be loaded.");
 }
 
 (function ($) {
     "use strict";
     var defaultSettings = {
-        showLastColumn: false,//show last column
+        showLastColumn: true,//show last column
         explicitInitialization: false,
         uidPrefix: "smallgrid_",
         resizeColumnsOnLoad: false,//resize columns when view loaded to fit canvas

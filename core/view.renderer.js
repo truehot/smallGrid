@@ -40,6 +40,7 @@
             el['header'] = $("<div class='grid-header'/>");
             el['content'] = $("<div class='grid-content'/>");
             el['footer'] = $("<div class='grid-footer'/>");
+            el['preload'] = $("<div class='grid-preload-font'/>");
 
             el['headerCol'] = $("<colgroup></colgroup>");
             el['headerTable'] = $("<table class='grid-header-table'></table>");
@@ -50,6 +51,7 @@
             el['contentTable'] = $("<table class='grid-content-table'></table>");
             el['contentTbody'] = $("<tbody></tbody>");
             el['contentWrap'] = $("<div class='grid-content-wrap'/>");
+
 
             //header part
             el['headerCol'].appendTo(el['headerTable']);
@@ -67,6 +69,7 @@
             el['header'].appendTo(el['viewport']);
             el['content'].appendTo(el['viewport']);
             el['footer'].appendTo(el['viewport']);
+            el['preload'].appendTo(el['viewport']);
 
             if (settings.header.disableTextSelection) {
                 el['header'].addClass(settings.cssClass.disableTextSelection);

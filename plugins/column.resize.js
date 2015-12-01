@@ -36,11 +36,11 @@
             view.onColumnResizeStop.subscribe(handleColumnResizeStop);
         }
 
-        function handleColumnResize(event) {
+        function handleColumnResize(evt) {
             if (column && $lastHeaderCol.length) {
                 width = Math.max(
                     Math.min(
-                        parseInt(event.width, 10),
+                        parseInt(evt.width, 10),
                         column.maxWidth
                     ),
                     column.minWidth
@@ -55,12 +55,12 @@
             }
         }
 
-        function handleColumnResizeStart(event) {
+        function handleColumnResizeStart(evt) {
             headerWidth = view.getNode('header').width();
-            column = view.getModel().getColumnByIndex(event.cellIndex);
+            column = view.getModel().getColumnByIndex(evt.cellIndex);
             $headerCursorCells = view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer);
-            $headerCol = view.getNode('headerTable').find("colgroup > col:nth-child(" + (event.cellIndex + 1) + ")");
-            $contentCol = view.getNode('contentTable').find("colgroup > col:nth-child(" + (event.cellIndex + 1) + ")");
+            $headerCol = view.getNode('headerTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
+            $contentCol = view.getNode('contentTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
             $lastHeaderCol = view.getNode('headerTable').find("colgroup > col:last");
             $lastContentCol = view.getNode('contentTable').find("colgroup > col:last");
 

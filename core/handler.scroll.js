@@ -35,31 +35,31 @@
         $element.on('scroll', handleScroll);
         $element.on('wheel', handleMouseWheel);
 
-        function handleMouseWheel(event) {
+        function handleMouseWheel(evt) {
             clearTimeout(wheelStopTimer);
 
             if (isWheelMoved === false) {
                 isWheelMoved = true;
-                settings.handleMouseWheelStart({ event: event });
+                settings.handleMouseWheelStart({ event: evt });
             }
 
-            settings.handleMouseWheel({ event: event });
+            settings.handleMouseWheel({ event: evt });
 
             wheelStopTimer = setTimeout(function () {
-                settings.handleMouseWheelStop({ event: event });
+                settings.handleMouseWheelStop({ event: evt });
                 isWheelMoved = false;
             }, settings.latency);
 
         }
 
-        function handleScroll(event) {
+        function handleScroll(evt) {
 
             var scroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
                 topDelta: $element[0].scrollTop - lastScroll.scrollTop,
                 leftDelta: $element[0].scrollLeft - lastScroll.scrollLeft,
-                event: event,
+                event: evt,
             };
 
             clearTimeout(scrollStopTimer);
