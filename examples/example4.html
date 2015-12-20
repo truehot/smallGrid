@@ -1,15 +1,34 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Column min and max width</title>
+    <title>Background of columns/rows/cells</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+
+    <style>
+        .darkslategray {
+            background-color: darkslategray;
+        }
+
+        .gray {
+            background-color: gray;
+        }
+
+        .dimgray {
+            background-color: dimgray;
+        }
+    </style>
+
 </head>
 <body>
-
+    <div style="float:left;">
+        <button class="changeColumnBackground">First column background</button>
+        <button class="changeRowBackground">First row background</button>
+        <button class="changeCellBackground">Random cell in row</button>
+    </div>
     <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
 
@@ -18,14 +37,14 @@
 
         $(document).ready(function () {
             var columns = [
-				{ 'name': "MaxWidth 300", 'field': "property1", 'width': 200, 'maxWidth': 300 },
-				{ 'name': "MaxWidth 400, minWidth 100", 'field': "property2", 'width': 100, 'maxWidth': 400, 'minWidth': 100 },
-				{ 'name': "MinWidth 200", 'field': "property3", 'width': 200, 'minWidth': 200 },
-				{ 'name': "Column", 'field': "property4", 'width': 200, },
-				{ 'name': "Column", 'field': "property5", 'width': 200, },
+				{ 'name': "Column 1", 'field': "property1", 'width': 100 },
+				{ 'name': "Column 2", 'field': "property2", 'width': 100 },
+				{ 'name': "Column 3", 'field': "property3", 'width': 100 },
+				{ 'name': "Column 4", 'field': "property4", 'width': 100 },
+				{ 'name': "Column 5", 'field': "property5", 'width': 100 },
             ];
             var items = [];
-            for (var i = 1; i <= 600; i++) {
+            for (var i = 1; i < 20; i++) {
                 var item = {};
                 for (var ii = 1; ii < 6; ii++) {
                     item["property" + ii] = i + '' + ii;
@@ -34,6 +53,34 @@
                 items.push(item);
             }
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+
+            $('.changeColumnBackground').on('click', function () {
+                var column = grid.getViewModel().getColumnByIndex(0);
+                if (column) {
+                    column.cellCssClass = 'darkslategray';
+                    grid.getViewModel().columns.updateColumn(column);
+                }
+            });
+
+            $('.changeRowBackground').on('click', function () {
+                var row = grid.getViewModel().getRowByIndex(0);
+                if (row) {
+                    row.rowCssClass = 'gray';
+                    grid.getViewModel().rows.updateRow(row);
+                }
+            });
+
+            $('.changeCellBackground').on('click', function () {
+                var row = grid.getViewModel().getRows()[Math.floor(Math.random() * 20)];
+                if (row) {
+                    var propertyNumber = Math.floor(Math.random() * 6);
+                    row.cellCssClass = {}
+                    row.cellCssClass['property' + propertyNumber] = 'dimgray';
+                    grid.getViewModel().rows.updateRow(row);
+                }
+            });
+
+
         });
     </script>
 </body>

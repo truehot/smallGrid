@@ -13,7 +13,7 @@
     <button class="resizeColumnsClass">Resize columns</button>
     <!--<button class="resizeClass">Resize</button>-->
     <div style="width:100%">
-        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="small-grid" style="width: 50%; height: 500px;"></div>
     </div>
 
     <script>
@@ -21,11 +21,11 @@
 
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Resizeable", 'field': "property2", 'width': 100, },
-				{ 'name': "Column", 'field': "property1", 'width': 100, 'resizeable': false },
-				{ 'name': "Resizeable", 'field': "property3", 'width': 100, },
-				{ 'name': "Column", 'field': "property4", 'width': 100, 'resizeable': false },
-				{ 'name': "Resizeable", 'field': "property5", 'width': 100, },
+				{ 'name': "Column 1 (max width 200)", 'field': "property2", 'width': 100, 'resizeable': true, 'maxWidth': 200 },
+				{ 'name': "Column 2", 'field': "property1", 'width': 100, 'resizeable': true },
+				{ 'name': "Column 3", 'field': "property3", 'width': 100, 'resizeable': true },
+				{ 'name': "Column 4", 'field': "property4", 'width': 100, 'resizeable': true },
+				{ 'name': "Column 5", 'field': "property5", 'width': 100, 'resizeable': true },
             ];
             var items = [];
             for (var i = 1; i <= 600; i++) {
