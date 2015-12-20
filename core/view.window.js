@@ -136,14 +136,12 @@
         function init() {
             view.onBodyClick.subscribe(hideWindows);
             view.onColumnResizeStart.subscribe(hideWindows);
-            view.onScrollStart.subscribe(hideWindows);
             return self;
         }
 
         function destroy() {
             view.onBodyClick.unsubscribe(hideWindows);
             view.onColumnResizeStart.unsubscribe(hideWindows);
-            view.onScrollStart.unsubscribe(hideWindows);
 
             cache = [];
         }

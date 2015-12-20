@@ -9,25 +9,24 @@
     <script src="../small.grid.all.min.js"></script>
 </head>
 <body>
-    <div class="small-grid" style="width: 537px; height: 126px;"></div>
+    <div class="small-grid" style="width: 537px; height: 124px;"></div>
     <script>
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Task 1", 'field': "task1", 'width': 100 },
-				{ 'name': "Task 2", 'field': "task2", 'width': 100 },
-				{ 'name': "Task 3", 'field': "task3", 'width': 100 },
-				{ 'name': "Task 4", 'field': "task4", 'width': 100 },
-				{ 'name': "Task 5", 'field': "task5", 'width': 100 },
+				{ 'name': "Name", 'field': "task1", 'width': 100 },
+				{ 'name': "Surname", 'field': "task2", 'width': 100 },
+				{ 'name': "City", 'field': "task3", 'width': 100 },
+				{ 'name': "Index", 'field': "task4", 'width': 100 },
+				{ 'name': "Phone", 'field': "task5", 'width': 100 },
             ];
             var items = [
-				{ "task1": "Row 1", "task2": "Row 2", "task3": "Row 3", "task4": "Row 4", "task5": "Row 5" },
-				{ "task1": "Row 6", "task2": "Row 7", "task3": "Row 8", "task4": "Row 9", "task5": "Row 10" },
-				{ "task1": "Row 11", "task2": "Row 12", "task3": "Row 13", "task4": "Row 14", "task5": "Row 15" },
-				{ "task1": "Row 16", "task2": "Row 17", "task3": "Row 18", "task4": "Row 19", "task5": "Row 20" },
-				{ "task1": "Row 21", "task2": "Row 22", "task3": "Row 23", "task4": "Row 24", "task5": "Row 25" },
+				{ "task1": "Eric", "task2": "Ball", "task3": "Tallinn", "task4": "1232", "task5": "1111111" },
+				{ "task1": "Nathan", "task2": "MacLeod", "task3": "Tartu", "task4": "5543", "task5": "2222222" },
+				{ "task1": "Melanie", "task2": "Black", "task3": "Narva", "task4": "7768", "task5": "3333333" },
+				{ "task1": "Karen", "task2": "Hodges", "task3": "Parnu", "task4": "6567", "task5": "4444444" },
+				{ "task1": "Keith", "task2": "Short", "task3": "Riga", "task4": "2342", "task5": "5555555" },
             ];
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
-
         });
     </script>
 </body>

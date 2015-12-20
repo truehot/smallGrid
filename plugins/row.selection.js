@@ -139,9 +139,7 @@
             "selectRowByIndex": selectRowByIndex,
             "selectRowById": selectRowById,
             "selectRowsRange": selectRowsRange,
-
         });
-
     }
 
 })(jQuery);

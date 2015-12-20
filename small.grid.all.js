@@ -472,21 +472,21 @@
 
     ColumnData.prototype.align = "";//column cells align - "" / center / right
     ColumnData.prototype.cellCssClass = "";//css class for column cells
-    ColumnData.prototype.editable = true; // are column cells editable
+    ColumnData.prototype.editable = true; //true when column cells editable
     ColumnData.prototype.editor = undefined; // name of editor
-    ColumnData.prototype.editMode = false; // are column cells in editMode
-    ColumnData.prototype.field = ""; // cell content will be taken from value of this property in row
-    ColumnData.prototype.filterable = false;//bool
+    ColumnData.prototype.editMode = false; //true when column cell in editMode
+    ColumnData.prototype.field = ""; //cell content will be taken from value of this property in row
+    ColumnData.prototype.filterable = false;//true when column is filterable
     ColumnData.prototype.formatter = "Default";//default cell content formatter
-    ColumnData.prototype.headerCssClass = "";//css class for column header cell  
-    ColumnData.prototype.hidden = false;//column visibility
-    ColumnData.prototype.id = undefined;//unique indicator
+    ColumnData.prototype.headerCssClass = "";//css class for column header cell
+    ColumnData.prototype.hidden = false;//true when column is visible
+    ColumnData.prototype.id = undefined;//column unique indicator
     ColumnData.prototype.item = null;
     ColumnData.prototype.maxWidth = 9999;
     ColumnData.prototype.minWidth = 25;
-    ColumnData.prototype.name = "";
-    ColumnData.prototype.resizeable = true;//is column resizeable
-    ColumnData.prototype.sortable = true;//is column sortable
+    ColumnData.prototype.name = "";//column title in grid header
+    ColumnData.prototype.resizeable = true;//true when column resizeable
+    ColumnData.prototype.sortable = true;//true when column sortable
     ColumnData.prototype.sortComparer = "Default";
     ColumnData.prototype.sortOrder = 0;//0, 1, -1
     ColumnData.prototype.width = 50;
@@ -1445,7 +1445,6 @@
         }
 
         function handleScroll(evt) {
-
             var scroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,
@@ -1779,7 +1778,7 @@
         }
 
         function ColumnsRangeByWidth(center, width, outerWidth, filter) {
-            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
+            var calcWidth = 0, min = center - width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
             return function (item, index, array) {
                 if ((filter && (filter(item) === false)) || (item.hidden === true)) return false;
                 filterIndex++;
@@ -1799,7 +1798,7 @@
         }
 
         function RowsRangeByHeight(center, height, outerHeight, filter) {
-            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
+            var calcHeight = 0, min = center - height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
             return function (item, index, array) {
                 if (filter && (filter(item) === false) || (item.hidden === true)) return false;
                 filterIndex++;
@@ -1887,15 +1886,15 @@
 
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled
-    RowData.prototype.editable = true; // are row cells editable?
-    RowData.prototype.editMode = false; // are row cells in edit mode
+    RowData.prototype.editable = true; // true when row cells are editable
+    RowData.prototype.editMode = false; // true when row cell in edit mode
     RowData.prototype.height = 20;// row height
     RowData.prototype.hidden = false;//row visibility
     RowData.prototype.id = undefined;// unique indicator
-    RowData.prototype.item = null;//
+    RowData.prototype.item = null;//item data
     RowData.prototype.maxHeight = 200;// max row height
     RowData.prototype.minHeight = 20; // min row height
-    RowData.prototype.rowCssClass = ""; // whole row css class
+    RowData.prototype.rowCssClass = "";// whole row css class
 
     function RowModel(settings) {
         var self = this;
@@ -2686,15 +2685,22 @@
         }
 
         function renderRequests() {
+
             if (isSuspended() === false && suspendRenderRequests > 0) {
-
                 if (requestDataTimer == null) {
-                    requestDataTimer = setTimeout(function () {
-                        renderView();
-                        requestDataTimer = requestRenderTimer = null;
-                    }, 17);
+                    requestDataTimer++;
 
-                } else if (requestRenderTimer == null) {
+                    clearTimeout(requestRenderTimer);
+                    renderView();
+                    if (settings.renderDelay) {
+                        setTimeout(function () {
+                            requestDataTimer = null;
+                        }, 0)
+                    } else {
+                        requestDataTimer = null;
+                    }
+                } else {
+                    clearTimeout(requestRenderTimer);
                     requestRenderTimer = setTimeout(render, 187);
                 }
             }
@@ -2755,7 +2761,6 @@
         }
 
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
-
             self.onBeforeRowsRendered.notify({});
 
             el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
@@ -2928,9 +2933,20 @@
         Data handlers
         */
         function handleRowsChange() {
+
             var rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
             scrollVisibility.vertical = scrollVisibility.horisontal ? (rowsHeight > (contentSize.height - settings.scrollbarDimensions.height)) : (rowsHeight > contentSize.height);
+
+            if (settings.showLastColumn == true) {
+                el.headerWrap.css({
+                    'width': Math.max(el.headerWrap.width(), contentSize.width)
+                });
+
+                el.contentWrap.css({
+                    'width': Math.max(el.contentWrap.width(), contentSize.width),
+                });
+            }
 
             if (rowsHeight > settings.maxSupportedCssHeight) {
                 heightRatio = (rowsHeight - contentSize.height + settings.scrollbarDimensions.height) / (settings.maxSupportedCssHeight - contentSize.height + settings.scrollbarDimensions.height);
@@ -2949,6 +2965,7 @@
         }
 
         function handleColumnsChange() {
+
             var columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
             scrollVisibility.horisontal = scrollVisibility.vertical ? (columnsWidth > (contentSize.width - settings.scrollbarDimensions.width)) : (columnsWidth > contentSize.width);
@@ -3418,8 +3435,8 @@
         }
 
         function requestDataFromRange(point, size, outerSize, scrollSize, allowCache) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop + scrollSize.width) & allowCache;
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft + scrollSize.height) & allowCache;
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop + scrollSize.height) & allowCache;
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft + scrollSize.width) & allowCache;
 
             if (rowsCached === 0) {
                 rowsCache = new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
@@ -3443,8 +3460,9 @@
         */
         function updateCacheWidth(columns, size, outerSize) {
             if (columns && columns.length) {
-                cachedRange.minLeft = columns[0].calcWidth < size.width ? columns[0].calcWidth - columns[0].width - outerSize.width : columns[0].calcWidth + size.width;
-                cachedRange.maxLeft = columns[(columns.length - 1)].calcWidth < size.width ? size.width : columns[(columns.length - 1)].calcWidth - size.width;
+                cachedRange.minLeft = columns[0].calcWidth - columns[0].width - outerSize.width;
+                cachedRange.maxLeft = columns[(columns.length - 1)].calcWidth > size.width ? columns[(columns.length - 1)].calcWidth - size.width : size.width;
+
             } else {
                 cachedRange.minLeft = undefined;
                 cachedRange.maxLeft = undefined;
@@ -3453,8 +3471,8 @@
 
         function updateCacheHeight(rows, size, outerSize) {
             if (rows && rows.length) {
-                cachedRange.minTop = rows[0].calcHeight < size.height ? rows[0].calcHeight - rows[0].height - outerSize.height : rows[0].calcHeight + size.height;
-                cachedRange.maxTop = rows[(rows.length - 1)].calcHeight < size.height ? size.height : rows[(rows.length - 1)].calcHeight - size.height;
+                cachedRange.minTop = rows[0].calcHeight - rows[0].height - outerSize.height;
+                cachedRange.maxTop = rows[(rows.length - 1)].calcHeight > size.height ? rows[(rows.length - 1)].calcHeight - size.height : size.height;
             } else {
                 cachedRange.minTop = undefined;
                 cachedRange.maxTop = undefined;
@@ -3758,7 +3776,7 @@
                 cellCssClass += " " + settings.cssClass.cellAlignRight;
             }
 
-            if (row.cellCssClass && column.field in row.cellCssClass) {
+            if (row.cellCssClass && (column.field in row.cellCssClass)) {
                 cellCssClass += " " + row.cellCssClass[column.field];
             }
 
@@ -3940,14 +3958,12 @@
         function init() {
             view.onBodyClick.subscribe(hideWindows);
             view.onColumnResizeStart.subscribe(hideWindows);
-            view.onScrollStart.subscribe(hideWindows);
             return self;
         }
 
         function destroy() {
             view.onBodyClick.unsubscribe(hideWindows);
             view.onColumnResizeStart.unsubscribe(hideWindows);
-            view.onScrollStart.unsubscribe(hideWindows);
 
             cache = [];
         }
@@ -3992,7 +4008,6 @@
 
     function CellEditPlugin(view, windowManager, settings) {
         var self = this;
-        var lastActive = null;
         var editOptions = {
             enabled: false
         };
@@ -4018,7 +4033,6 @@
         /*
          Handlers
          */
-
         function handleScrollStop(evt) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
                 if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
@@ -4042,30 +4056,30 @@
                     if (editOptions.addFocusOnce === true) {
                         editOptions.addFocusOnce = false;
                         editOptions.editor.focus();
-                    } else if (lastActive != null && lastActive.columnId == editOptions.column.id && lastActive.rowId == editOptions.row.id) {
-                        editOptions.editor.focus();
                     }
                 }
             }
         }
 
         function handleCellDblClick(evt) {
+
+            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+                editOptions.editor.focus();
+            }
+
             if (settings.plugins.CellEdit.editOnClick === false) {
                 editCellById(evt.column.id, evt.row.id);
-            }
-            lastActive = {
-                "columnId": evt.column.id,
-                "rowId": evt.row.id
             }
         }
 
         function handleCellClick(evt) {
+
+            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+                editOptions.editor.focus();
+            }
+
             if (settings.plugins.CellEdit.editOnClick === true) {
                 editCellById(evt.column.id, evt.row.id);
-            }
-            lastActive = {
-                "columnId": evt.column.id,
-                "rowId": evt.row.id
             }
         }
 
@@ -4133,7 +4147,6 @@
             }
         }
 
-
         function getEditor() {
             if (isEditMode() === true) {
                 return editOptions.editor;
@@ -4161,7 +4174,6 @@
                     view.getModel().rows.updateRow(row);
                 }
 
-                //apply
                 editOptions.editor.destroy();
                 editOptions = {
                     enabled: false
@@ -4224,10 +4236,13 @@
 
     function ColumnFilterMenu(view, windowManager, settings) {
         var self = this;
+        var lastActiveColumnId = null;
 
         function handleHeaderClick(evt) {
             if (evt && evt.type && evt.type == "filter") {
                 evt.stopPropagation();
+                lastActiveColumnId = evt.column.id;
+
                 var isVisible = windowManager.isVisible(evt.column.id);
                 windowManager.hideWindows();
 
@@ -4235,7 +4250,9 @@
 
                     windowManager.createWindow(
                         evt.column.id,
-                        { filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings) },
+                        {
+                            filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings)
+                        },
                         buildElements(evt.column.id)
                     );
 
@@ -4283,26 +4300,38 @@
 
             var data = windowManager.getWindow(evt.data.id);
             if (data && data.opts) {
-                var filter = data.opts.filter;
-                var formValues = getFormValues(data.container);
+                var column = view.getModel().columns.getColumnById(evt.data.id);
+                if (column) {
+                    var filter = data.opts.filter;
+                    var formValues = getFormValues(data.container);
 
-                data.opts.filter.clear();
-                data.opts.filter.add(formValues.type[0], formValues.value[0]);
-                if (formValues.value[1]) {
-                    data.opts.filter.add(formValues.operator);
-                    data.opts.filter.add(formValues.type[1], formValues.value[1]);
+                    data.opts.filter.clear();
+                    data.opts.filter.add(formValues.type[0], formValues.value[0]);
+                    if (formValues.value[1]) {
+                        data.opts.filter.add(formValues.operator);
+                        data.opts.filter.add(formValues.type[1], formValues.value[1]);
+                    }
+
+                    column.headerCssClass += ' ' + settings.cssClass.headerFilterActive;
+                    view.getModel().columns.updateColumn(column);
+                    view.getModel().setFilter(filter);
+                    windowManager.hideWindow(evt.data.id);
                 }
-                view.getModel().setFilter(filter);
-
-                windowManager.hideWindow(evt.data.id);
             }
         }
 
         function handleMenuClear(evt) {
             var data = windowManager.getWindow(evt.data.id);
             if (data) {
-                view.getModel().clearFilter(data.opts.filter);
-                windowManager.hideWindow(evt.data.id);
+                var column = view.getModel().columns.getColumnById(evt.data.id);
+                if (column) {
+                    column.headerCssClass = column.headerCssClass.replace(' ' + settings.cssClass.headerFilterActive, '');
+                    view.getModel().columns.updateColumn(column);
+
+                    view.getModel().clearFilter(data.opts.filter);
+                    windowManager.hideWindow(evt.data.id);
+                }
+
             }
         }
 
@@ -4310,16 +4339,25 @@
             evt.stopPropagation();
         }
 
+        function hideWindow() {
+            if (lastActiveColumnId != null) {
+                windowManager.hideWindow(lastActiveColumnId);
+                lastActiveColumnId = null;
+            }
+        }
+
         /*
         Init && destroy
         */
         function init() {
             view.onHeaderClick.subscribe(handleHeaderClick);
+            view.onScrollStart.subscribe(hideWindow);
             return self;
         }
 
         function destroy() {
             view.onHeaderClick.unsubscribe(handleHeaderClick);
+            view.onScrollStart.unsubscribe(hideWindow);
         }
 
 
@@ -4352,26 +4390,33 @@
                 evt.preventDefault();
 
                 windowManager.hideWindows();
-                if (windowManager.isWindow(currentId) === false) windowManager.createWindow(currentId, {}, buildElements(currentId));
+                if (windowManager.isWindow(currentId) === false) {
+                    windowManager.createWindow(currentId, {}, buildElements(currentId));
+                } else {
+                    var data = windowManager.getWindow(currentId);
+                    if (data) {
+                        data.container.empty().append(buildElements(currentId));
+                    }
+                }
 
                 windowManager.showWindowNearPosition(
                     currentId,
-                    { x: evt.event.pageX, y: evt.event.pageY }
+                    {
+                        x: evt.event.pageX,
+                        y: evt.event.pageY
+                    }
                 );
             }
         }
 
         function buildElements(id) {
             var $element = $("<div class='grid-columnpicker-menu'></div>");
-            var $form = $('<form>');
-            var $content = $('<div class="grid-columnpicker-menucontent"></div>')
-                .appendTo($form);
+            var $content = $('<div class="grid-columnpicker-menucontent"></div>').appendTo($element);
 
-            $form.on("click", { id: id }, handleMenuClick);
-            $form.appendTo($element);
+            $element.on("click", { id: id }, handleMenuClick);
+            $element.on("mouseenter", { id: id }, handleMenuMouseEnter);
 
             $(buildContent()).appendTo($content);
-
             return $element;
         }
 
@@ -4390,14 +4435,18 @@
                 if (columns[i].hidden === false) counter++;
                 if (counter > 1) return true;
             }
-
             return false;
         }
-
 
         /*
         Handlers
         */
+        function handleMenuMouseEnter(evt) {
+            $(this).off("mouseleave").on("mouseleave", function () {
+                windowManager.hideWindow(evt.data.id);
+            });
+
+        }
         function handleMenuClick(evt) {
             evt.stopPropagation();
             if (evt.target) {
@@ -4406,7 +4455,6 @@
                     if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
                         return false;
                     }
-
                     view.getModel().columns.setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
                 }
             }
@@ -4732,9 +4780,7 @@
             "selectRowByIndex": selectRowByIndex,
             "selectRowById": selectRowById,
             "selectRowsRange": selectRowsRange,
-
         });
-
     }
 
 })(jQuery);if (typeof jQuery === "undefined") {
@@ -4747,6 +4793,7 @@ if (typeof SmallGrid === "undefined") {
 (function ($) {
     "use strict";
     var defaultSettings = {
+        renderDelay: 0,
         showLastColumn: true,//show last column
         explicitInitialization: false,
         uidPrefix: "smallgrid_",
@@ -4768,6 +4815,7 @@ if (typeof SmallGrid === "undefined") {
             headerCellDiv: "grid-header-cell-div",
             headerColumnName: "grid-column-name",
             headerFilter: "grid-header-filter",
+            headerFilterActive: "grid-header-filter-active",
             headerResizeHandle: "grid-resizable-handle",
             headerRow: "grid-header-row",
             headerSortable: "grid-sortable",
@@ -4822,11 +4870,11 @@ if (typeof SmallGrid === "undefined") {
             ColumnSort: {},
             ColumnResize: {},
             RowSelection: {
-                multipleRowSelection: false//allow multirow selection
+                multipleRowSelection: false//allow multiplerow selection
             },
             CellEdit: {
                 editOnClick: false,//when true, editor loaded after click
-                autoFocus: true//autofocus editor when scrolling
+                autoFocus: true//autofocus edited cell when scrolling
             },
             ColumnFilterMenu: {},
             ColumnPickerMenu: {},

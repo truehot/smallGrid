@@ -10,10 +10,10 @@
 .grid-viewport {
     position: relative;
     border: 1px solid black;
-    box-sizing: content-box;
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
-    display:inline-block;
+    box-sizing: content-box;
+    display: inline-block;
 }
 
 .grid-header {
@@ -69,15 +69,12 @@
     white-space: nowrap;
 }
 
-
 .grid-cell {
     border-color: black;
     border-style: solid;
     border-width: 0 1px 1px 0;
     padding: 2px;
 }
-
-
 
 .grid-cell-hide-border {
     border-right-width: 0;
@@ -86,10 +83,12 @@
 .grid-cell-last {
     border-right-width: 0;
 }
+
 .grid-cell-last-disabled {
     border-right-width: 0;
     box-shadow: 1px 0 0 black;
 }
+
 .grid-cell-formatter {
     height: 100%;
     overflow: hidden;
@@ -122,9 +121,9 @@
     display: inline;
     overflow: hidden;
     position: relative;
-    text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -171,21 +170,26 @@
     right: 0;
     text-align: center;
     width: 20px;
+    height: 14px;
 }
 
-    .grid-header-filter:before {
-        color: #000;
-        font-family: FontAwesome;
-        font-size: 1em;
-        content: "\f0d7";
-    }
+.grid-header-filter-active .grid-header-filter {
+    font-size:1.3em;
+}
+
+.grid-header-filter:before {
+    color: #000;
+    font-family: FontAwesome;
+    font-size: 1em;
+    content: "\f0d7";
+}
 
 .grid-cell-edit {
     padding: 0;
 }
 
     .grid-cell-edit > label {
-        display:block;
+        display: block;
     }
 
 .grid-row-valign-top {
@@ -231,16 +235,17 @@
     margin: 0;
     padding: 2px;
     width: 100%;
-    background-color:#dedebe;
-    font-size:15px;
+    background-color: #dedebe;
+    font-size: 15px;
 }
 
 .grid-window {
-    display:inline-block;
+    display: inline-block;
 }
 
 .grid-preload-font {
-    visibility:hidden;
-    width:1px; height:1px;
+    visibility: hidden;
+    width: 1px;
+    height: 1px;
     font-family: FontAwesome;
 }

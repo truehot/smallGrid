@@ -246,7 +246,7 @@
                 cellCssClass += " " + settings.cssClass.cellAlignRight;
             }
 
-            if (row.cellCssClass && column.field in row.cellCssClass) {
+            if (row.cellCssClass && (column.field in row.cellCssClass)) {
                 cellCssClass += " " + row.cellCssClass[column.field];
             }
 

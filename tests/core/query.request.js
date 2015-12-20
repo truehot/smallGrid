@@ -36,16 +36,16 @@ QUnit.test("Request", function (assert) {
     assert.ok(rowsRequest.getRowsTotal(2).height == 1320, "getRowsTotal");
     assert.deepEqual(rowsRequest.getRowsTotal(20), { count: 60, height: 2400 }, "getRowsTotal");
 
-    assert.ok(rowsRequest.getRowsInRange(1, 5, 2)[0].item.property1 == 11, "getRowsInRange");
-    assert.ok(rowsRequestFS.getRowsInRange(1, 5, 2)[0].item.property1 == 61, "getRowsInRange");
-    assert.ok(rowsRequest.getRowsInRange(2000, 500, 20)[0].item.property1 == 251, "getRowsInRange");
+    assert.equal(rowsRequest.getRowsInRange(1, 5, 2)[0].item.property1, 11, "getRowsInRange");
+    assert.equal(rowsRequestFS.getRowsInRange(1, 5, 2)[0].item.property1, 61, "getRowsInRange");
+    assert.equal(rowsRequest.getRowsInRange(2000, 500, 20)[0].item.property1, 371, "getRowsInRange");
 
-    assert.ok(columnsRequest.getColumnsTotal(5).width == 3300, "getColumnsTotal");
+    assert.equal(columnsRequest.getColumnsTotal(5).width, 3300, "getColumnsTotal");
     assert.deepEqual(columnsRequest.getColumnsTotal(100), { count: 60, width: 9000 }, "getColumnsTotal");
 
-    assert.ok(columnsRequest.getColumnsInRange(0, 200, 4)[0].item.property1 == 11, "getColumnsInRange");
-    assert.ok(columnsRequestFS.getColumnsInRange(0, 200, 4)[0].item.property1 == 11, "getColumnsInRange");//only rows filters supported
-    assert.ok(columnsRequest.getColumnsInRange(1000, 250, 10)[0].item.property1 == 91, "getColumnsInRange");
+    assert.equal(columnsRequest.getColumnsInRange(0, 200, 4)[0].item.property1, 11, "getColumnsInRange");
+    assert.equal(columnsRequestFS.getColumnsInRange(0, 200, 4)[0].item.property1, 11, "getColumnsInRange");//only rows filters supported
+    assert.equal(columnsRequest.getColumnsInRange(1000, 250, 10)[0].item.property1, 131, "getColumnsInRange");
 });
 
 

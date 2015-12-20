@@ -19,12 +19,16 @@
 }
 
     .grid-header-menu input {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         width: 100%;
         margin-bottom: 5px;
     }
 
     .grid-header-menu select {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
         box-sizing: border-box;
         width: 100%;
         margin-bottom: 5px;
@@ -35,14 +39,16 @@
         background-color: #4dc1aa;
         border: 1px;
         padding: 5px;
-        margin-bottom:0px;
+        margin-bottom: 0;
+        cursor:pointer;
     }
 
     .grid-header-menu .btn-clear {
         width: 40%;
         border: 1px;
         padding: 5px;
-        margin-bottom:0px;
+        margin-bottom: 0;
+        cursor:pointer;
     }
 
     .grid-header-menu .btn-submit + .btn-clear {
@@ -52,33 +58,36 @@
 /*Column picker*/
 .grid-columnpicker-menu {
     display: inline-block;
-
     -moz-user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
-
     cursor: default;
     text-align: left;
     background-color: #fdfdfd;
+}
 
+
+.grid-columnpicker-menucontent div {
+    white-space: nowrap;
 }
 
 
 .grid-columnpicker-menucontent {
+    overflow-y: scroll;
+    max-height: 200px;
     display: inline-block;
     padding: 5px;
     vertical-align: middle;
     position: relative;
     border: 1px solid black;
-    overflow: auto;
 }
 
-.grid-columnpicker-menucontent > div {
-    margin: 5px;
-}
+    .grid-columnpicker-menucontent > div {
+        margin: 5px;
+    }
 
-.grid-columnpicker-menucontent input {
-    vertical-align: text-bottom;
-}
+    .grid-columnpicker-menucontent input {
+        vertical-align: text-bottom;
+    }

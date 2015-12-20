@@ -8,6 +8,7 @@ if (typeof SmallGrid === "undefined") {
 (function ($) {
     "use strict";
     var defaultSettings = {
+        renderDelay: 0,
         showLastColumn: true,//show last column
         explicitInitialization: false,
         uidPrefix: "smallgrid_",
@@ -29,6 +30,7 @@ if (typeof SmallGrid === "undefined") {
             headerCellDiv: "grid-header-cell-div",
             headerColumnName: "grid-column-name",
             headerFilter: "grid-header-filter",
+            headerFilterActive: "grid-header-filter-active",
             headerResizeHandle: "grid-resizable-handle",
             headerRow: "grid-header-row",
             headerSortable: "grid-sortable",
@@ -83,11 +85,11 @@ if (typeof SmallGrid === "undefined") {
             ColumnSort: {},
             ColumnResize: {},
             RowSelection: {
-                multipleRowSelection: false//allow multirow selection
+                multipleRowSelection: false//allow multiplerow selection
             },
             CellEdit: {
                 editOnClick: false,//when true, editor loaded after click
-                autoFocus: true//autofocus editor when scrolling
+                autoFocus: true//autofocus edited cell when scrolling
             },
             ColumnFilterMenu: {},
             ColumnPickerMenu: {},

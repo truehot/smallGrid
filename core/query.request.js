@@ -139,7 +139,7 @@
         }
 
         function ColumnsRangeByWidth(center, width, outerWidth, filter) {
-            var calcWidth = 0, min = center - 2 * width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
+            var calcWidth = 0, min = center - width - outerWidth, max = center + 2 * width + outerWidth, filterIndex = 0;
             return function (item, index, array) {
                 if ((filter && (filter(item) === false)) || (item.hidden === true)) return false;
                 filterIndex++;
@@ -159,7 +159,7 @@
         }
 
         function RowsRangeByHeight(center, height, outerHeight, filter) {
-            var calcHeight = 0, min = center - 2 * height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
+            var calcHeight = 0, min = center - height - outerHeight, max = center + 2 * height + outerHeight, filterIndex = 0;
             return function (item, index, array) {
                 if (filter && (filter(item) === false) || (item.hidden === true)) return false;
                 filterIndex++;

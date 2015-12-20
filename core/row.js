@@ -27,15 +27,15 @@
 
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled
-    RowData.prototype.editable = true; // are row cells editable?
-    RowData.prototype.editMode = false; // are row cells in edit mode
+    RowData.prototype.editable = true; // true when row cells are editable
+    RowData.prototype.editMode = false; // true when row cell in edit mode
     RowData.prototype.height = 20;// row height
     RowData.prototype.hidden = false;//row visibility
     RowData.prototype.id = undefined;// unique indicator
-    RowData.prototype.item = null;//
+    RowData.prototype.item = null;//item data
     RowData.prototype.maxHeight = 200;// max row height
     RowData.prototype.minHeight = 20; // min row height
-    RowData.prototype.rowCssClass = ""; // whole row css class
+    RowData.prototype.rowCssClass = "";// whole row css class
 
     function RowModel(settings) {
         var self = this;

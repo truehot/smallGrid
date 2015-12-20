@@ -192,15 +192,22 @@
         }
 
         function renderRequests() {
+
             if (isSuspended() === false && suspendRenderRequests > 0) {
-
                 if (requestDataTimer == null) {
-                    requestDataTimer = setTimeout(function () {
-                        renderView();
-                        requestDataTimer = requestRenderTimer = null;
-                    }, 17);
+                    requestDataTimer++;
 
-                } else if (requestRenderTimer == null) {
+                    clearTimeout(requestRenderTimer);
+                    renderView();
+                    if (settings.renderDelay) {
+                        setTimeout(function () {
+                            requestDataTimer = null;
+                        }, 0)
+                    } else {
+                        requestDataTimer = null;
+                    }
+                } else {
+                    clearTimeout(requestRenderTimer);
                     requestRenderTimer = setTimeout(render, 187);
                 }
             }
@@ -261,7 +268,6 @@
         }
 
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
-
             self.onBeforeRowsRendered.notify({});
 
             el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
@@ -434,9 +440,20 @@
         Data handlers
         */
         function handleRowsChange() {
+
             var rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
             scrollVisibility.vertical = scrollVisibility.horisontal ? (rowsHeight > (contentSize.height - settings.scrollbarDimensions.height)) : (rowsHeight > contentSize.height);
+
+            if (settings.showLastColumn == true) {
+                el.headerWrap.css({
+                    'width': Math.max(el.headerWrap.width(), contentSize.width)
+                });
+
+                el.contentWrap.css({
+                    'width': Math.max(el.contentWrap.width(), contentSize.width),
+                });
+            }
 
             if (rowsHeight > settings.maxSupportedCssHeight) {
                 heightRatio = (rowsHeight - contentSize.height + settings.scrollbarDimensions.height) / (settings.maxSupportedCssHeight - contentSize.height + settings.scrollbarDimensions.height);
@@ -455,6 +472,7 @@
         }
 
         function handleColumnsChange() {
+
             var columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
             scrollVisibility.horisontal = scrollVisibility.vertical ? (columnsWidth > (contentSize.width - settings.scrollbarDimensions.width)) : (columnsWidth > contentSize.width);

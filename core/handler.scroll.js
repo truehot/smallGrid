@@ -53,7 +53,6 @@
         }
 
         function handleScroll(evt) {
-
             var scroll = {
                 scrollTop: $element[0].scrollTop,
                 scrollLeft: $element[0].scrollLeft,

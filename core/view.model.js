@@ -258,8 +258,8 @@
         }
 
         function requestDataFromRange(point, size, outerSize, scrollSize, allowCache) {
-            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop + scrollSize.width) & allowCache;
-            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft + scrollSize.height) & allowCache;
+            var rowsCached = (cachedRange.minTop <= point.top && point.top <= cachedRange.maxTop + scrollSize.height) & allowCache;
+            var columnsCached = (cachedRange.minLeft <= point.left && point.left <= cachedRange.maxLeft + scrollSize.width) & allowCache;
 
             if (rowsCached === 0) {
                 rowsCache = new SmallGrid.Query.Request(rowsFilters, rowsSorters, rowsModel).getRowsInRange(point.top, size.height, outerSize.height);
@@ -283,8 +283,9 @@
         */
         function updateCacheWidth(columns, size, outerSize) {
             if (columns && columns.length) {
-                cachedRange.minLeft = columns[0].calcWidth < size.width ? columns[0].calcWidth - columns[0].width - outerSize.width : columns[0].calcWidth + size.width;
-                cachedRange.maxLeft = columns[(columns.length - 1)].calcWidth < size.width ? size.width : columns[(columns.length - 1)].calcWidth - size.width;
+                cachedRange.minLeft = columns[0].calcWidth - columns[0].width - outerSize.width;
+                cachedRange.maxLeft = columns[(columns.length - 1)].calcWidth > size.width ? columns[(columns.length - 1)].calcWidth - size.width : size.width;
+
             } else {
                 cachedRange.minLeft = undefined;
                 cachedRange.maxLeft = undefined;
@@ -293,8 +294,8 @@
 
         function updateCacheHeight(rows, size, outerSize) {
             if (rows && rows.length) {
-                cachedRange.minTop = rows[0].calcHeight < size.height ? rows[0].calcHeight - rows[0].height - outerSize.height : rows[0].calcHeight + size.height;
-                cachedRange.maxTop = rows[(rows.length - 1)].calcHeight < size.height ? size.height : rows[(rows.length - 1)].calcHeight - size.height;
+                cachedRange.minTop = rows[0].calcHeight - rows[0].height - outerSize.height;
+                cachedRange.maxTop = rows[(rows.length - 1)].calcHeight > size.height ? rows[(rows.length - 1)].calcHeight - size.height : size.height;
             } else {
                 cachedRange.minTop = undefined;
                 cachedRange.maxTop = undefined;

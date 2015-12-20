@@ -12,7 +12,6 @@
 
     function CellEditPlugin(view, windowManager, settings) {
         var self = this;
-        var lastActive = null;
         var editOptions = {
             enabled: false
         };
@@ -38,7 +37,6 @@
         /*
          Handlers
          */
-
         function handleScrollStop(evt) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
                 if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
@@ -62,30 +60,30 @@
                     if (editOptions.addFocusOnce === true) {
                         editOptions.addFocusOnce = false;
                         editOptions.editor.focus();
-                    } else if (lastActive != null && lastActive.columnId == editOptions.column.id && lastActive.rowId == editOptions.row.id) {
-                        editOptions.editor.focus();
                     }
                 }
             }
         }
 
         function handleCellDblClick(evt) {
+
+            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+                editOptions.editor.focus();
+            }
+
             if (settings.plugins.CellEdit.editOnClick === false) {
                 editCellById(evt.column.id, evt.row.id);
-            }
-            lastActive = {
-                "columnId": evt.column.id,
-                "rowId": evt.row.id
             }
         }
 
         function handleCellClick(evt) {
+
+            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+                editOptions.editor.focus();
+            }
+
             if (settings.plugins.CellEdit.editOnClick === true) {
                 editCellById(evt.column.id, evt.row.id);
-            }
-            lastActive = {
-                "columnId": evt.column.id,
-                "rowId": evt.row.id
             }
         }
 
@@ -153,7 +151,6 @@
             }
         }
 
-
         function getEditor() {
             if (isEditMode() === true) {
                 return editOptions.editor;
@@ -181,7 +178,6 @@
                     view.getModel().rows.updateRow(row);
                 }
 
-                //apply
                 editOptions.editor.destroy();
                 editOptions = {
                     enabled: false
