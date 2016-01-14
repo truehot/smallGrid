@@ -1,5 +1,5 @@
 # SmallGrid
-SmallGrid (beta) is simple javascript component for displaying tabular data.
+SmallGrid(beta) is simple javascript component for displaying tabular data.
 
 ## Demo
 
@@ -12,11 +12,13 @@ SmallGrid (beta) is simple javascript component for displaying tabular data.
 
 ## Browser Support
 
-IE 12+ ✔ | Chrome 47.0+ ✔ | Firefox 43.0+ ✔|
+Microsoft Edge ✔ 
+Chrome 47.0+   ✔ 
+Firefox 43.0+  ✔
 
 ## Installation
 
-Include necessary JS and Css files
+Include necessary JS and CSS files
 
 <!-- -->
 
@@ -36,7 +38,7 @@ Example code:
             var items = [
 		{ "task1": "Eric", "task2": "Ball", "task3": "Tallinn", "task4": "1232", "task5": "1111111" },
             ];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
         });
 
 ## Tests
