@@ -1,5 +1,5 @@
 # SmallGrid
-SmallGrid(beta) is simple javascript component for displaying tabular data.
+SmallGrid(beta) is javascript component for displaying tabular data.
 
 ## Demo
 
