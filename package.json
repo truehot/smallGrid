@@ -8,7 +8,6 @@
       "url": "https://github.com/truehot/smallGrid/blob/master/LICENSE.txt"
     }
   ],
-  "main": "./src/MyLib.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/truehot/smallGrid.git"
