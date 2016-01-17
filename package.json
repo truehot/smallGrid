@@ -2,12 +2,7 @@
   "name": "smallgrid",
   "version": "0.4.0",
   "description": "Javascript component for displaying tabular data.",
-  "license": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/truehot/smallGrid/blob/master/LICENSE.txt"
-    }
-  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/truehot/smallGrid.git"
@@ -32,7 +27,6 @@
   "scripts": {
     "test": "grunt travis --verbose"
   },
-
   "dependencies": {
      "jquery": "~2.1.3"
   },

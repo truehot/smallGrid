@@ -42,7 +42,7 @@ Example code:
         });
 
 ## Tests
-[![Build Status][travis-badge]][travis]
+[![Build Status](https://travis-ci.org/truehot/smallGrid.svg?branch=master)](https://travis-ci.org/truehot/smallGrid)
 From the project directory, in folder tests can be ran using index.html
 
 ## Contributing
