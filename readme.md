@@ -42,8 +42,7 @@ Example code:
         });
 
 ## Tests
-
-Qunit used.
+[![Build Status][travis-badge]][travis]
 From the project directory, in folder tests can be ran using index.html
 
 ## Contributing

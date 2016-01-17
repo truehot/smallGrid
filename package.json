@@ -2,7 +2,7 @@
   "name": "smallgrid",
   "version": "0.4.0",
   "description": "Javascript component for displaying tabular data.",
-  "licenses": [
+  "license": [
     {
       "type": "MIT",
       "url": "https://github.com/truehot/smallGrid/blob/master/LICENSE.txt"
