@@ -24,22 +24,25 @@ QUnit.test("Formatter", function (assert) {
     assert.ok(SmallGrid.Cell.Formatter.Radio(true, {}, {}, settings) == "<i class='fa fa-dot-circle-o'></i>", "Radio");
     assert.ok(SmallGrid.Cell.Formatter.Radio(false, {}, {}, settings) == "<i class='fa fa-circle-o'></i>", "Radio");
 
-    settings.formatter.moneyFormatter = {
-        locales: 'en-US',
-        options: {
-            currency: 'USD',
-            style: 'currency'
-        }
-    }
-    assert.ok(SmallGrid.Cell.Formatter.Money("12345.12345", {}, {}, settings) == "$12,345.12", "Money");
-    assert.ok(SmallGrid.Cell.Formatter.Money(-123, {}, {}, settings) == "-$123.00", "Money");
+    if(Intl != undefined){
 
-    settings.formatter.dateFormatter = {
-        locales: 'en-US',
-        options: {}
+        settings.formatter.moneyFormatter = {
+            locales: 'en-US',
+            options: {
+                currency: 'USD',
+                style: 'currency'
+            }
+        }
+        assert.ok(SmallGrid.Cell.Formatter.Money("12345.12345", {}, {}, settings) == "$12,345.12", "Money");
+        assert.ok(SmallGrid.Cell.Formatter.Money(-123, {}, {}, settings) == "-$123.00", "Money");
+
+        settings.formatter.dateFormatter = {
+            locales: 'en-US',
+            options: {}
+        }
+        assert.ok(SmallGrid.Cell.Formatter.Date("Wed, 09 Aug 1995 00:00:00", {}, {}, settings) == "8/9/1995", "Date");
+        assert.ok(SmallGrid.Cell.Formatter.Date("2015-01-17T16:42:24.598Z", {}, {}, settings) == "1/17/2015", "Date");
     }
-    assert.ok(SmallGrid.Cell.Formatter.Date("Wed, 09 Aug 1995 00:00:00", {}, {}, settings) == "8/9/1995", "Date");
-    assert.ok(SmallGrid.Cell.Formatter.Date("2015-01-17T16:42:24.598Z", {}, {}, settings) == "1/17/2015", "Date");
 });
 
 
