@@ -6,8 +6,9 @@
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
-    <script src="../small.grid.all.min.js"></script>
-
+    <script src="../small.grid.all.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
     <style>
         .darkslategray {
             background-color: darkslategray;
@@ -24,59 +25,61 @@
 
 </head>
 <body>
-    <div style="float:left;">
-        <button class="changeColumnBackground">First column background</button>
-        <button class="changeRowBackground">First row background</button>
-        <button class="changeCellBackground">Random cell in row</button>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <button class="changeColumnBackground">First column background</button>
+            <button class="changeRowBackground">First row background</button>
+            <button class="changeCellBackground">Random cell in row</button>
+        </div>
     </div>
-    <div class="small-grid" style="width: 600px; height: 500px;"></div>
+
     <script>
-
-
-
-
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 100 },
-				{ 'name': "Column 2", 'field': "property2", 'width': 100 },
-				{ 'name': "Column 3", 'field': "property3", 'width': 100 },
-				{ 'name': "Column 4", 'field': "property4", 'width': 100 },
-				{ 'name': "Column 5", 'field': "property5", 'width': 100 },
+                { 'name': "Name", 'field': "name", 'width': 100, 'filterable': true },
+                { 'name': "Surname", 'field': "surname", 'width': 100, 'filterable': true },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center', 'filterable': true },
+                { 'name': "Phone", 'field': "phone", 'width': 150, 'filterable': true },
+                { 'name': "Address", 'field': "address", 'width': 200, 'filterable': true },
             ];
-            var items = [];
-            for (var i = 1; i < 20; i++) {
-                var item = {};
-                for (var ii = 1; ii < 6; ii++) {
-                    item["property" + ii] = i + '' + ii;
-                }
 
-                items.push(item);
-            }
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
 
             $('.changeColumnBackground').on('click', function () {
-                var column = grid.getViewModel().getColumnByIndex(0);
+                var column = grid.getColumnsModel().getColumnByIndex(0);
                 if (column) {
                     column.cellCssClass = 'darkslategray';
-                    grid.getViewModel().columns.updateColumn(column);
+                    grid.getColumnsModel().updateColumn(column);
                 }
             });
 
             $('.changeRowBackground').on('click', function () {
-                var row = grid.getViewModel().getRowByIndex(0);
+                var row = grid.getRowsModel().getRowByIndex(0);
                 if (row) {
                     row.rowCssClass = 'gray';
-                    grid.getViewModel().rows.updateRow(row);
+                    grid.getRowsModel().updateRow(row);
                 }
             });
 
             $('.changeCellBackground').on('click', function () {
-                var row = grid.getViewModel().getRows()[Math.floor(Math.random() * 20)];
+                var row = grid.getRowsModel().getRowByIndex(Math.floor(Math.random() * 18));
                 if (row) {
-                    var propertyNumber = Math.floor(Math.random() * 6);
-                    row.cellCssClass = {}
-                    row.cellCssClass['property' + propertyNumber] = 'dimgray';
-                    grid.getViewModel().rows.updateRow(row);
+                    var column = columns[Math.floor(Math.random() * 5)];
+                    if (row.cellCssClass[column.field]) {
+                        row.cellCssClass[column.field] = {};
+                    } else {
+                        row.cellCssClass = {};
+                        row.cellCssClass[column.field] = 'dimgray';
+                       
+                    }
+                    grid.getRowsModel().updateRow(row);
                 }
             });
 

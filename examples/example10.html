@@ -7,39 +7,48 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
-	<form><label><input type="checkbox" class="multiselect" />Enable multiple row selection</label></form>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <label><input type="checkbox" class="multiselect" /> Enable multiple row selection</label>
+            <button class="selectFirstRow">Select first row</button>
+        </div>
+    </div>
 
-
-    <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-
-
         $(document).ready(function () {
-			var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200},
-				{ 'name': "Column 2", 'field': "property2", 'width': 200},
-				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
-				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
-				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
-			];
-			var items = [];
-			for (var i = 1; i <= 100; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + '' + ii;
-				}
+            var columns = [
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
+                { 'name': "Phone", 'field': "phone", 'width': 100 },
+                { 'name': "Email", 'field': "email", 'width': 100 },
+            ];
 
-				items.push(item);
-			}
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
 
             $('.multiselect').change(function () {
                 var settings = grid.getSettings();
                 settings.plugins.RowSelection.multipleRowSelection = this.checked;
             });
+
+            $('.selectFirstRow').on('click', function () {
+                var plugin = grid.getPlugin("RowSelection");
+                plugin.selectRowByIndex(0);
+            });
+
         });
     </script>
+
 </body>
 </html>

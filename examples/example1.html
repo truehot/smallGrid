@@ -7,27 +7,33 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
-    <div class="small-grid" style="width: 537px; height: 124px;"></div>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Name", 'field': "task1", 'width': 100 },
-				{ 'name': "Surname", 'field': "task2", 'width': 100 },
-				{ 'name': "City", 'field': "task3", 'width': 100 },
-				{ 'name': "Index", 'field': "task4", 'width': 100 },
-				{ 'name': "Phone", 'field': "task5", 'width': 100 },
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, align:'center' },
+                { 'name': "Phone", 'field': "phone", 'width': 150 },
+                { 'name': "Email", 'field': "email", 'width': 200 },
             ];
-            var items = [
-				{ "task1": "Eric", "task2": "Ball", "task3": "Tallinn", "task4": "1232", "task5": "1111111" },
-				{ "task1": "Nathan", "task2": "MacLeod", "task3": "Tartu", "task4": "5543", "task5": "2222222" },
-				{ "task1": "Melanie", "task2": "Black", "task3": "Narva", "task4": "7768", "task5": "3333333" },
-				{ "task1": "Karen", "task2": "Hodges", "task3": "Parnu", "task4": "6567", "task5": "4444444" },
-				{ "task1": "Keith", "task2": "Short", "task3": "Riga", "task4": "2342", "task5": "5555555" },
-            ];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
+
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
         });
     </script>
+
 </body>
 </html>

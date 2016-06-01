@@ -7,45 +7,50 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
-    <div class="small-grid" style="width: 600px; height: 600px;"></div>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <button class="disableSortable">Disable column sorting</button>
+            <button class="enableSortable">Enable column sorting</button>
+        </div>
+    </div>
+
     <script>
-
-
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Float", 'field': "property1", 'width': 200, 'sortable': true, formatter : "Float"},
-				{ 'name': "Integer", 'field': "property2", 'width': 200, 'sortable': true },
-				{ 'name': "String", 'field': "property3", 'width': 200, 'sortable': true },
-				{ 'name': "Date", 'field': "property4", 'width': 200, 'sortable': true, 'formatter': 'Date', 'comparer':'Date'},
-
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, 'align': 'center' },
+                { 'name': "Registered", 'field': "registered", 'width': 150, 'formatter': 'Date', 'comparer': 'Date' },
+                { 'name': "Sales", 'field': "sales", 'width': 200, 'formatter': "Float"  },
             ];
+
             var items = [];
-            var alphabet = 'abcdefghijklmnopqrstuvwxyz';
-            for (var i = 1; i <= 600; i++) {
-                var item = {};
-                for (var ii = 1; ii < 5; ii++) {
-                    if (ii == 1) {
-                        item["property" + ii] = ii+i*0.1;
-                    } else if (ii == 2) {
-                        item["property" + ii] = i + ii -2;
-                    } else if (ii == 3) {
-                        item["property" + ii] = "text-" + (alphabet[(i + ii) % 26]) + (alphabet[ii % 26]) + (alphabet[i % 26]) + (alphabet[(i + ii) % 25]);
-                    } else if (ii == 4) {
-                        var date = new Date();
-                        date.setDate(i + ii, 0, 0);
-                        item["property" + ii] = date.toISOString();
-                    } else {
-                        item["property" + ii] = i + '' + ii;
-                    }
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
 
-                }
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
 
-                items.push(item);
-            }
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+
+            $('.disableSortable').on('click', function () {
+                var columns = grid.getColumnsModel().getColumns();
+                for (var i = 0; i < columns.length; i++) columns[i].sortable = false;
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.enableSortable').on('click', function () {
+                var columns = grid.getColumnsModel().getColumns();
+                for (var i = 0; i < columns.length; i++) columns[i].sortable = true;
+                grid.getColumnsModel().updateColumns(columns);
+            });
         });
     </script>
+
 </body>
 </html>

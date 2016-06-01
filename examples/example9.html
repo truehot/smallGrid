@@ -1,39 +1,92 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Aligned columns</title>
+    <title>Columns alignment</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            Align columns to
+            <button class="alltoright">right</button>
+            <button class="alltoleft">left</button>
+            <button class="alltocenter">center</button>
+            <!--<button class="alltotop">top</button>
+            <button class="alltomiddle">middle</button>
+            <button class="alltobaseline">baseline</button>
+            <button class="alltobottom">bottom</button>-->
+        </div>
+    </div>
 
-
-
-    <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
-
-
         $(document).ready(function () {
-			var columns = [
-				{ 'name': "Center", 'field': "property1", 'width': 200, 'align': 'center' },
-				{ 'name': "Right", 'field': "property2", 'width': 200, 'align': 'right' },
-				{ 'name': "Left", 'field': "property3", 'width': 200 },
-				{ 'name': "Left", 'field': "property4", 'width': 200 },
-				{ 'name': "Center", 'field': "property5", 'width': 200, 'align': 'center' },
-			];
-			var items = [];
-			for (var i = 1; i <= 600; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + '' + ii;
-				}
+            var columns = [
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
+                { 'name': "Phone", 'field': "phone", 'width': 120 },
+                { 'name': "Sales", 'field': "sales", 'width': 80, 'align': 'right' },
+            ];
 
-				items.push(item);
-			}
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $.getJSON("generated50.json", function (result) {
+                for (var i = 0; i < result.length; i++) result[i].height = 50;
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
+
+
+            $('.alltoright').on('click', function () {
+                var columns = grid.getViewModel().getColumns();
+                for (var i = 0; i < columns.length; i++) columns[i].align = 'right';
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.alltoleft').on('click', function () {
+                var columns = grid.getViewModel().getColumns();
+                for (var i = 0; i < columns.length; i++) columns[i].align = 'left';
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.alltocenter').on('click', function () {
+                var columns = grid.getViewModel().getColumns();
+                for (var i = 0; i < columns.length; i++) columns[i].align = 'center';
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.alltotop').on('click', function () {
+                var columns = grid.getViewModel().getColumns;
+                for (var i = 0; i < columns.length; i++) columns[i].valign = 'top';
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.alltobottom').on('click', function () {
+                var columns = grid.getViewModel().getColumns;
+                for (var i = 0; i < columns.length; i++) columns[i].valign = 'bottom';
+                grid.getColumnsModel().updateColumns(columns);
+
+            });
+
+            $('.alltomiddle').on('click', function () {
+                var columns = grid.getViewModel().getColumns;
+                for (var i = 0; i < columns.length; i++) columns[i].valign = 'middle';
+                grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.alltobaseline').on('click', function () {
+                var columns = grid.getViewModel().getColumns;
+                for (var i = 0; i < columns.length; i++) columns[i].valign = 'baseline';
+                grid.getColumnsModel().updateColumns(columns);
+            });
         });
     </script>
 </body>
