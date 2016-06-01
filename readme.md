@@ -1,9 +1,9 @@
 # SmallGrid
-SmallGrid(beta) is javascript component for displaying tabular data.
+SmallGrid is javascript component for displaying tabular data.
 
-## Demo
+## Demo (beta)
 
-> [Demo link](http://truehot.github.io/smallGrid/).
+> [Demo link](http://truehot.github.io/smallGrid/examples/example1.html).
 
 ## Requires
 
