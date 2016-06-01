@@ -9,7 +9,6 @@
         }
     });
 
-
     function SorterQuery(field, sortOrder, sortComparer, settings) {
         var self = this;
 

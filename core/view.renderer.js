@@ -52,7 +52,6 @@
             el['contentTbody'] = $("<tbody></tbody>");
             el['contentWrap'] = $("<div class='grid-content-wrap'/>");
 
-
             //header part
             el['headerCol'].appendTo(el['headerTable']);
             el['headerTbody'].appendTo(el['headerTable']);
@@ -98,7 +97,7 @@
             return html + "</tr>";
         }
 
-        function buildHeaderColumnHtml(column, opts, isLast) {
+        function buildHeaderColumnHtml(column, opts, isLastColumn) {
             var value = "",
                 html,
                 cellCssClass = settings.cssClass.headerCell;
@@ -107,10 +106,10 @@
                 cellCssClass += " " + column.headerCssClass;
             }
 
-            if (isLast && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellLast;
+            if (isLastColumn && opts.hideColumnBorder) {
+                cellCssClass += " " + settings.cssClass.cellColumnLast;
             }
-            //TODO: replace
+
             switch (column.align) {
                 case "center":
                     cellCssClass += " " + settings.cssClass.cellAlignCenter;
@@ -120,7 +119,6 @@
                     break;
             }
 
-            //TODO: add formatter
             if (column.name) {
                 value += column.name;
             }
@@ -150,7 +148,7 @@
         }
 
         function buildLastHeaderColumn(column, opts) {
-            return "<td class='" + settings.cssClass.headerCell + ' ' + settings.cssClass.cellLast + "' style='height:" + settings.header.height + "px'></td>";
+            return "<td class='" + settings.cssClass.headerCell + ' ' + settings.cssClass.cellColumnLast + "' style='height:" + settings.header.height + "px'></td>";
         }
 
         /*
@@ -187,18 +185,17 @@
         */
         function buildRowsHtml(columns, rows, opts) {
             var html = '';
-            for (var i = 0, length = rows.length; i < length; i++) {
-                html += buildRowHtml(columns, rows[i], opts);
+            for (var i = 0, length = rows.length - 1; i <= length; i++) {
+                html += buildRowHtml(columns, rows[i], opts, length == i);
             }
             return html;
         }
 
-        function buildRowHtml(columns, row, opts) {
+        function buildRowHtml(columns, row, opts, isLastRow) {
             var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
 
             if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
 
-            //TODO: remove / replace
             switch (settings.rows.valign) {
                 case "middle":
                     rowCssClass += " " + settings.cssClass.rowValignMiddle;
@@ -216,32 +213,34 @@
 
             var html = "<tr class='" + rowCssClass + "'>";
             for (var i = 0, length = columns.length - 1; i <= length; i++) {
-                html += buildCellHtml(columns[i], row, opts, length == i);
+                html += buildCellHtml(columns[i], row, opts, length == i, isLastRow);
             }
 
             if (opts.virtualColumnWidth > 0) {
-                html += buildLastCellHtml(columns[i - 1], opts);
+                html += buildLastCellHtml(columns[i - 1], opts, isLastRow);
             }
 
 
             return html + '</tr>';
         }
 
-        function buildCellHtml(column, row, opts, isLast) {
+        function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
             var cellCssClass = settings.cssClass.cell;
             if (column.cellCssClass) {
                 cellCssClass += " " + column.cellCssClass;
             }
 
-            if (isLast && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellLast;
+            if (isLastColumn && opts.hideColumnBorder) {
+                cellCssClass += " " + settings.cssClass.cellColumnLast;
             }
 
-            //TODO: remove/replace
+            if (isLastRow && opts.hideRowBorder) {
+                cellCssClass += " " + settings.cssClass.cellRowLast;
+            }
+
             if (column.align == "center") {
                 cellCssClass += " " + settings.cssClass.cellAlignCenter;
             }
-            //TODO: remove/replace
             if (column.align == "right") {
                 cellCssClass += " " + settings.cssClass.cellAlignRight;
             }
@@ -253,8 +252,10 @@
             return "<td height='" + row.height + "' class='" + cellCssClass + "'>" + getCellContentHtml(column, row) + "</td>";
         }
 
-        function buildLastCellHtml(column, opts) {
-            return "<td class='" + settings.cssClass.cell + ' ' + settings.cssClass.cellLast + "'></td>";
+        function buildLastCellHtml(column, opts, isLastRow) {
+            var cssClass = settings.cssClass.cell + ' ' + settings.cssClass.cellColumnLast;
+            if (isLastRow) cssClass += ' ' + settings.cssClass.cellRowLast;
+            return "<td class='" + cssClass + "'></td>";
         }
 
         /*
@@ -287,6 +288,10 @@
     }
 
     function Create(settings) {
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
+
         return new Renderer(settings);
     }
 

@@ -14,9 +14,6 @@
 
     function ViewModel(rowsModel, columnsModel, settings) {
         var self = this;
-        var columns = columnsModel;
-        var rows = rowsModel;
-
         var rowsTotal = { count: 0, height: 0 };
         var columnsTotal = { count: 0, width: 0 };
 
@@ -27,10 +24,6 @@
         var columnsFilters = [];
         var rowsSorters = [];
         var columnsSorters = [];
-
-
-        var bulkColumns = [];
-        var bulkRows = [];
 
         var cachedRange = {
             minTop: undefined,
@@ -44,68 +37,58 @@
         */
         function init() {
             rowsModel.onChange.subscribe(handleRowsChange);
-            rowsModel.onChangeStart.subscribe(handleRowsChangeStart);
-            rowsModel.onChangeStop.subscribe(handleRowsChangeStop);
-
             columnsModel.onChange.subscribe(handleColumnsChange);
-            columnsModel.onChangeStart.subscribe(handleColumnsChangeStart);
-            columnsModel.onChangeStop.subscribe(handleColumnsChangeStop);
             return self;
         }
 
         function destroy() {
             rowsModel.onChange.unsubscribe(handleRowsChange);
-            rowsModel.onChangeStart.unsubscribe(handleRowsChangeStart);
-            rowsModel.onChangeStop.unsubscribe(handleRowsChangeStop);
-
             columnsModel.onChange.unsubscribe(handleColumnsChange);
-            columnsModel.onChangeStart.unsubscribe(handleColumnsChangeStart);
-            columnsModel.onChangeStop.unsubscribe(handleColumnsChangeStop);
+
+        }
+        /* Rows and Columns*/
+        function getRowsModel() {
+            return rowsModel;
+        }
+
+        function getColumnsModel() {
+            return columnsModel;
         }
 
         /*
         Handlers
         */
         function handleColumnsChange(evt) {
+            updateCacheWidth();
 
-            if (bulkColumns.length === 0 && evt.id) {
-                updateCacheWidth();
-                self.onColumnsChange.notify({ ids: [evt.id] });
+            if (evt.data) {
+                var stackedIds = [];
+                for (var i = 0; i < evt.data.length; i++) {
+                    if (evt.data[i].id) {
+                        stackedIds.push(evt.data[i].id);
+                    }
+                }
+                self.onColumnsChange.notify({ "ids": stackedIds });
+
             } else if (evt.id) {
-                bulkColumns.push(evt.id);
+                self.onColumnsChange.notify({ "ids": [evt.id] });
             }
         }
 
         function handleRowsChange(evt) {
-            if (bulkRows.length === 0 && evt.id) {
-                updateCacheHeight();
-                self.onRowsChange.notify({ ids: [evt.id] });
+            updateCacheHeight();
+
+            if (evt.data) {
+                var stackedIds = [];
+                for (var i = 0; i < evt.data.length; i++) {
+                    if (evt.data[i].id) {
+                        stackedIds.push(evt.data[i].id);
+                    }
+                }
+                self.onRowsChange.notify({ "ids": stackedIds });
+
             } else if (evt.id) {
-                bulkRows.push(evt.id);
-            }
-        }
-
-        function handleColumnsChangeStart() {
-            bulkColumns = [];
-        }
-
-        function handleRowsChangeStart() {
-            bulkRows = [];
-        }
-
-        function handleColumnsChangeStop(evt) {
-            if ((evt.mode && evt.mode == "all") || bulkColumns.length > 0) {
-                updateCacheWidth();
-                self.onColumnsChange.notify({ ids: bulkColumns });
-                bulkColumns = [];
-            }
-        }
-
-        function handleRowsChangeStop(evt) {
-            if ((evt.mode && evt.mode == "all") || bulkRows.length > 0) {
-                updateCacheHeight();
-                self.onRowsChange.notify({ ids: bulkRows });
-                bulkRows = [];
+                self.onRowsChange.notify({ "ids": [evt.id] });
             }
         }
 
@@ -309,8 +292,8 @@
             "getRowsTotal": getRowsTotal,
             "getColumnsTotal": getColumnsTotal,
 
-            "columns": columns,
-            "rows": rows,
+            "getColumnsModel": getColumnsModel,
+            "getRowsModel": getRowsModel,
 
             "requestDataFromRange": requestDataFromRange,
 
@@ -340,6 +323,10 @@
     }
 
     function CreateModel(rowsModel, columnsModel, settings) {
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
+
         if (rowsModel instanceof SmallGrid.Row.Model === false) {
             throw new TypeError("Rows model is not defined.");
         }

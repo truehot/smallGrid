@@ -15,8 +15,8 @@ QUnit.test("Window", function (assert) {
     var windowManager = grid.getWindowManager();
 
     assert.ok(windowManager.createWindow(opts1.id).isWindow(opts1.id), "isWindow");
-    assert.ok(windowManager.createWindow(opts2.id, opts2.opts).isWindow(opts2.id), "isWindow");
-    assert.ok(windowManager.createWindow(opts3.id, opts3.opts, opts3.container).isWindow(opts3.id), "isWindow");
+    assert.ok(windowManager.createWindow(opts2.id, {}, opts2.opts).isWindow(opts2.id), "isWindow");
+    assert.ok(windowManager.createWindow(opts3.id, opts3.container, opts3.opts).isWindow(opts3.id), "isWindow");
     assert.ok(windowManager.isWindow("test") === false, "isWindow");
 
     assert.ok($div.find('.grid-window-' + opts1.id).length > 0, "createWindow");
@@ -50,6 +50,7 @@ QUnit.test("Window", function (assert) {
     assert.ok(windowManager.removeWindow(opts2.id).isWindow(opts2.id) == false, "removeWindow");
     assert.ok(windowManager.isWindow(opts3.id) == true, "removeWindow");
 
+    grid.destroy();
 });
 
 

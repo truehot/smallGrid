@@ -8,6 +8,12 @@ QUnit.test("Column", function (assert) {
 
     assert.ok(model.items.getItems().length == 0, "init");
 
+    var item = getItem();
+    model.items.addItems([item]);
+    assert.equal(model.items.getItems().length, 1, "items.addItems");
+    assert.deepEqual(model.items.getItems()[0], item, "items.addItems");
+    model.deleteColumns();
+
     model.items.addItems([]);
     assert.ok(model.items.getItems().length == 0, "items.addItems");
 
@@ -130,6 +136,7 @@ QUnit.test("Column", function (assert) {
     model.setColumnsProperty("editMode", true);
     assert.ok(model.getColumns()[0].editMode == true, "setColumnsProperty");
     assert.ok(model.getColumns()[1].editMode == true, "setColumnsProperty");
+
 
     function getItem() {
         return {

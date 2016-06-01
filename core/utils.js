@@ -29,24 +29,35 @@
         return (/^true$/i).test(str);
     }
 
+    function measureViewport() {
+        var $el = $('<div style="display:none;width:1vw;height:1vh;" />').appendTo(document.body);
+        var dim = {
+            width: $el.width() - $el[0].clientWidth,
+            height: $el.height() - $el[0].clientHeight,
+        };
+        $el.remove();
+
+        return dim;
+    }
+
     function measureMaxSupportedCssHeight() {
         var incHeight = 1000000, supportedHeight = 1000000, el = $('<div style="display:none; " />').appendTo(document.body);
-        while (true) {
+
+        do {
             el.css("height", supportedHeight);
             if (el.height() === supportedHeight) {
                 supportedHeight += incHeight;
-                if (supportedHeight < 16000000) {
-                    continue;
-                }
+            } else {
+                break;
             }
-            break;
-        }
+        } while (supportedHeight < 16000000)
+
         el.remove();
         return supportedHeight - incHeight;
     }
 
     function measureScrollbar() {
-        var $el = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo('body');
+        var $el = $('<div style="position:absolute; top:-100px; left:-100px; width:100px; height:100px; overflow:scroll;"></div>').appendTo(document.body);
 
         var dim = {
             width: $el.width() - $el[0].clientWidth,
@@ -59,7 +70,7 @@
 
 
     function measureTableCellDiff(cssClass) {
-        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'></table>").appendTo('body'),
+        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'></table>").appendTo(document.body),
             $tbody = $("<tbody></tbody>").appendTo($table),
             $row = $("<tr/>").appendTo($tbody),
             $cell = $("<td class='" + cssClass + "' style='width:5px; height:5px;'>-</td>").appendTo($row);
@@ -90,6 +101,7 @@
                 "measureCellDiff": measureTableCellDiff,
                 "measureMaxSupportedCssHeight": measureMaxSupportedCssHeight,
                 "measureScrollbar": measureScrollbar,
+                "measureViewport": measureViewport,
                 "parseBool": parseBool,
             }
         }

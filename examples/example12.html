@@ -7,82 +7,82 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
-    <div style="float:left;">
-        <button class="addFirstRow">Add first row</button>
-        <button class="updateFirstRow">Update first row</button>
-        <button class="deleteFirstRow">Delete first row</button>
-        <button class="addFirstColumn">Add first column</button>
-        <button class="updateFirstColumn">Update first column</button>
-        <button class="deleteFirstColumn">Delete first column</button>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <button class="addFirstRow">Add first row</button>
+            <button class="updateFirstRow">Update first row</button>
+            <button class="deleteFirstRow">Delete first row</button>
+            <button class="addFirstColumn">Add first column</button>
+            <button class="updateFirstColumn">Update first column</button>
+            <button class="deleteFirstColumn">Delete first column</button>
+        </div>
     </div>
 
-    <p class="small-grid" style="width: 600px; height: 300px;clear:both;float:left;margin-right:10px"></p>
-
     <script>
-
-
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200, 'filterable':true },
-				{ 'name': "Column 2", 'field': "property2", 'width': 200, 'filterable': true },
-				{ 'name': "Column 3", 'field': "property3", 'width': 200, 'filterable': true },
-				{ 'name': "Column 4", 'field': "property4", 'width': 200, 'filterable': true },
-				{ 'name': "Column 5", 'field': "property5", 'width': 200, 'filterable': true },
+                { 'name': "Name", 'field': "name", 'width': 100, 'filterable': true },
+                { 'name': "Surname", 'field': "surname", 'width': 100, 'filterable': true },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center', 'filterable': true },
+                { 'name': "Phone", 'field': "phone", 'width': 150, 'filterable': true },
+                { 'name': "Email", 'field': "email", 'width': 200, 'filterable': true },
             ];
-            var items = [];
-            for (var i = 1; i <= 10; i++) {
-                var item = {};
-                for (var ii = 1; ii < 6; ii++) {
-                    item["property" + ii] = i + '' + ii;
-                }
 
-                items.push(item);
-            }
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
+            });
 
             var counter = 1;
 
             $('.addFirstColumn').on('click', function () {
-                var column = grid.getViewModel().columns.createColumn(getColumnItem(++counter));
-                grid.getViewModel().columns.insertColumnBeforeIndex(0, column);
+                var column = grid.getColumnsModel().createColumn(getColumnItem(++counter));
+                grid.getColumnsModel().insertColumnBeforeIndex(0, column);
             });
 
             $('.updateFirstColumn').on('click', function () {
-                var column = grid.getViewModel().columns.createColumn(getColumnItem(++counter));
-                grid.getViewModel().columns.updateColumnByIndex(0, column);
+                var column = grid.getColumnsModel().createColumn(getColumnItem(++counter));
+                grid.getColumnsModel().updateColumnByIndex(0, column);
             });
 
             $('.deleteFirstColumn').on('click', function () {
-                grid.getViewModel().columns.deleteColumnByIndex(0);
+                grid.getColumnsModel().deleteColumnByIndex(0);
             });
 
-
             $('.addFirstRow').on('click', function () {
-                var row = grid.getViewModel().rows.createRow(getRowItem(++counter));
-                grid.getViewModel().rows.insertRowBeforeIndex(0, row);
+                var row = grid.getRowsModel().createRow(getRowItem(++counter));
+                grid.getRowsModel().insertRowBeforeIndex(0, row);
             });
 
             $('.updateFirstRow').on('click', function () {
-                grid.getViewModel().rows.items.updateItemByIndex(0, getRowItem(++counter));
+                grid.getRowsModel().items.updateItemByIndex(0, getRowItem(++counter));
             });
 
             $('.deleteFirstRow').on('click', function () {
-                grid.getViewModel().rows.deleteRowByIndex(0);
+                grid.getRowsModel().deleteRowByIndex(0);
             });
 
 
             function getRowItem(value) {
                 var item = {};
-                for (var ii = 1; ii < 6; ii++) {
-                    item["property" + ii] = value + '' + ii;
+                var columns = grid.getColumnsModel().getColumns();
+
+                for (var i = 0; i < columns.length; i++) {
+                    item[columns[i].field] = value + '' + i;
                 }
                 return item;
             }
 
             function getColumnItem(value) {
-                return { 'name': "Column" + value, 'field': "property1", 'width': 100, 'sortable': false, filterable: true, editor: "Text" };
+                return { 'name': "Column" + value, 'field': "name", 'width': 100, 'sortable': false, filterable: true };
             }
 
         });

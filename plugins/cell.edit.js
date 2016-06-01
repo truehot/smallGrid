@@ -9,9 +9,10 @@
         }
     });
 
-
-    function CellEditPlugin(view, windowManager, settings) {
+    function CellEditPlugin(context, settings) {
         var self = this;
+        var view = context.view;
+        var windowManager = context.windowManager;
         var editOptions = {
             enabled: false
         };
@@ -23,6 +24,7 @@
             view.onCellDblClick.subscribe(handleCellDblClick);
             view.onCellKeyDown.subscribe(handleCellKeyDown);
             view.onScrollStop.subscribe(handleScrollStop);
+            return self;
         }
 
         function destroy() {
@@ -66,7 +68,6 @@
         }
 
         function handleCellDblClick(evt) {
-
             if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
                 editOptions.editor.focus();
             }
@@ -77,7 +78,6 @@
         }
 
         function handleCellClick(evt) {
-
             if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
                 editOptions.editor.focus();
             }
@@ -90,14 +90,10 @@
         function handleCellKeyDown(evt) {
             if (evt && evt.event) {
                 switch (evt.event.keyCode) {
-                    //case 9:
-                    //    if (isEditMode() === true) {
-                    //        event.preventDefault();
-                    //        cancelEdit();
-                    //    }
-                    //    break;
                     case 13:
-                        applyEdit();
+                        if (evt.event.target && evt.event.target.tagName != "TEXTAREA") {
+                            applyEdit();
+                        }
                         break;
                     case 27:
                         cancelEdit();
@@ -120,6 +116,8 @@
                 var column = view.getModel().getColumnById(columnId);
                 var row = view.getModel().getRowById(rowId);
                 if (row && column && row.editable && column.editable && column.editor) {
+                    var request = view.suspendRender();
+
                     editOptions = {
                         enabled: true,
                         addFocusOnce: true,
@@ -128,25 +126,41 @@
                         editor: new SmallGrid.Cell.Editor.Create(
                             column.editor,
                             {
+                                "row": row,
+                                "column": column,
                                 "value": row.item[column.field],
+                                "windowManager": windowManager,
+                                "settings": settings
                             },
                             settings
                         ),
                     }
-                    var request = view.suspendRender();
-                    view.getModel().columns.setColumnPropertyById(
+
+                    self.onCellEdited.notify({
+                        row: editOptions.row,
+                        column: editOptions.column,
+                        editor: editOptions.editor,
+                    });
+
+                    view.getModel().getColumnsModel().setColumnPropertyById(
                         column.id,
                         'editMode',
                         true
                     );
 
-                    view.getModel().rows.setRowPropertyById(
+                    view.getModel().getRowsModel().setRowPropertyById(
                         row.id,
                         'editMode',
                         true
                     );
+
                     view.resumeRender(request);
-                    view.render();
+
+                    if (SmallGrid.Utils.isFunction("append", editOptions.editor)) {
+                        //view.render();
+                    } else {
+                        applyEdit();
+                    }
                 }
             }
         }
@@ -165,17 +179,17 @@
             if (isEditMode() === true) {
                 var request = view.suspendRender();
 
-                view.getModel().columns.setColumnPropertyById(
+                view.getModel().getColumnsModel().setColumnPropertyById(
                     editOptions.column.id,
                     'editMode',
                     false
                 );
 
-                var row = view.getModel().rows.getRowById(editOptions.row.id);
+                var row = view.getModel().getRowsModel().getRowById(editOptions.row.id);
                 if (row) {
                     row.item[editOptions.column.field] = editOptions.editor.getValue();
                     row.editMode = false;
-                    view.getModel().rows.updateRow(row);
+                    view.getModel().getRowsModel().updateRow(row);
                 }
 
                 editOptions.editor.destroy();
@@ -183,7 +197,7 @@
                     enabled: false
                 }
                 view.resumeRender(request);
-                view.render();
+                //view.render();
             }
             return self;
         }
@@ -191,25 +205,25 @@
         function cancelEdit() {
             if (isEditMode() === true) {
                 var request = view.suspendRender();
-                view.getModel().columns.setColumnPropertyById(
+
+                view.getModel().getColumnsModel().setColumnPropertyById(
                     editOptions.column.id,
                     'editMode',
                     false
                 );
 
-                var row = view.getModel().rows.getRowById(editOptions.row.id);
+                var row = view.getModel().getRowsModel().getRowById(editOptions.row.id);
                 if (row) {
                     row.editMode = false;
-                    view.getModel().rows.updateRow(row);
+                    view.getModel().getRowsModel().updateRow(row);
                 }
 
-                //undo
                 editOptions.editor.destroy();
                 editOptions = {
                     enabled: false
                 }
                 view.resumeRender(request);
-                view.render();
+                //view.render();
             }
             return self;
         }
@@ -224,6 +238,10 @@
             "editCellById": editCellById,
             "getEditor": getEditor,
             "isEditMode": isEditMode,
+
+
+            "onCellEdited": new SmallGrid.Event.Handler(),
+
         });
     }
 

@@ -39,11 +39,10 @@ QUnit.test("Click", function (assert) {
         "handleKeyDown": handleCellKeyDown,
     });
 
-    $r3el2.click();
-    $r1el3.dblclick();
-    $r2el3.keydown();
-    $r2el1.contextmenu();
-
+    $r3el2.trigger('click');
+    $r1el3.trigger('dblclick');
+    $r2el3.trigger('keydown');
+    $r2el1.trigger('contextmenu');
 
     setTimeout(function () {
         assert.equal(handleCellClickExecuted, true, "handleCellClickExecuted");

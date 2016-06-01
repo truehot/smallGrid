@@ -9,25 +9,31 @@
         }
     });
 
-    function Create(name, view, windowManager, settings, pluginSettings) {
+    function Create(name, context, settings, pluginSettings) {
         if (!name.length) {
             throw new Error("Plugin name is not defined.");
         }
 
-        if (view instanceof SmallGrid.View.View === false) {
-            throw new TypeError("View expected.");
+        if (context.view instanceof SmallGrid.View.View === false) {
+            throw new TypeError("View is not defined");
         }
 
-        if (windowManager instanceof SmallGrid.View.Window.Manager === false) {
-            throw new TypeError("Window manager expected.");
+        if (context.windowManager instanceof SmallGrid.View.Window.Manager === false) {
+            throw new TypeError("WindowManager is not defined");
         }
 
-        if (SmallGrid.Utils.isFunction(name, SmallGrid.Plugins) === true) {
-            settings.plugins[name] = jQuery.extend(true, settings.plugins[name] || {}, pluginSettings || {});
-            var plugin = new SmallGrid.Plugins[name](view, windowManager, settings);
-            plugin.init();
-            return plugin;
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
         }
+
+        if (SmallGrid.Utils.isFunction(name, SmallGrid.Plugins) !== true) {
+            throw new TypeError("name is not defined");
+        }
+
+        settings.plugins[name] = jQuery.extend(true, settings.plugins[name] || {}, pluginSettings || {});
+        var plugin = new SmallGrid.Plugins[name](context, settings);
+        return plugin.init();
+
     }
 
 })(jQuery);

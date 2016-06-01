@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+}
+
+ul.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    background-color: #f1f1f1;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+}
+
+    ul.menu li a {
+        display: block;
+        color: #000;
+        padding: 8px 0 8px 16px;
+        text-decoration: none;
+    }
+
+        ul.menu li a.active {
+            background-color: #669966;
+            color: white;
+        }
+
+        ul.menu li a:hover:not(.active) {
+            background-color: #555555;
+            color: white;
+        }
+
+body > div {
+    margin-left: 205px;
+    margin-top: 5px;
+}
+
+
+.additional-actions {
+    margin: 10px 0 5px 0;
+}

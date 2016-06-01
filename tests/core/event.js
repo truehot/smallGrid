@@ -57,6 +57,14 @@ QUnit.test("Event", function (assert) {
     handler.notify({ "counter": 1 });
     assert.ok(counter == 1, "unsubscribe");
 
+    counter = 0;
+    handler.subscribe(first);
+    handler.blockEvents();
+    handler.notify({ "counter": 1 });
+    handler.notify({ "counter": 1 });
+    handler.notifyBlocked();
+    assert.ok(counter == 1, "unsubscribe");
+
     function first(e) {
         counter++;
     }

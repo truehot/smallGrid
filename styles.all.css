@@ -1,5 +1,10 @@
 ﻿/* Common styles, Please change styles only in custom.css */
-
+.small-grid {
+    position: relative;
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+}
 
 .grid-table, .grid-header-table, .grid-col, .grid-cell {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -9,11 +14,15 @@
 
 .grid-viewport {
     position: relative;
-    border: 1px solid black;
+    outline:1px #FFCCCC solid;
     -moz-box-sizing: content-box;
     -webkit-box-sizing: content-box;
     box-sizing: content-box;
     display: inline-block;
+    width:100%;
+    height:100%;
+    min-height:20px;
+    min-width:20px;
 }
 
 .grid-header {
@@ -52,12 +61,14 @@
 }
 
 .grid-header-cell {
-    border-color: black;
+    border-color: #FFCCCC;
     border-style: solid;
     border-width: 0 1px 1px 0;
     position: relative;
     padding: 2px;
-    font-weight: bold;
+    /*font-weight: bold;*/
+    line-height:18px;
+    background-color: #ccffcc;
 }
 
 .grid-header-cell-div, .grid-cell {
@@ -70,7 +81,7 @@
 }
 
 .grid-cell {
-    border-color: black;
+    border-color: #FFCCCC;
     border-style: solid;
     border-width: 0 1px 1px 0;
     padding: 2px;
@@ -80,11 +91,15 @@
     border-right-width: 0;
 }
 
-.grid-cell-last {
+.grid-cell-row-last {
+    border-bottom-width: 0;
+}
+
+.grid-cell-column-last {
     border-right-width: 0;
 }
 
-.grid-cell-last-disabled {
+.grid-cell-column-last-disabled {
     border-right-width: 0;
     box-shadow: 1px 0 0 black;
 }
@@ -173,8 +188,13 @@
     height: 14px;
 }
 
+.grid-cell-align-right .grid-header-filter {
+    margin-left: 5px;
+    position: relative;
+}
+
 .grid-header-filter-active .grid-header-filter {
-    font-size:1.3em;
+    font-size: 1.3em;
 }
 
 .grid-header-filter:before {
@@ -185,12 +205,14 @@
 }
 
 .grid-cell-edit {
+    overflow: visible;
     padding: 0;
 }
 
     .grid-cell-edit > label {
         display: block;
     }
+
 
 .grid-row-valign-top {
     vertical-align: top;
@@ -228,16 +250,34 @@
     background-color: #DEDEBE;
 }
 
+.grid-select-editor {
+    padding: 2px;
+    width: 100%;
+    border: 0 none;
+}
 
-.grid-text-editor, .grid-integer-editor {
+.grid-text-editor, .grid-integer-editor, .grid-float-editor {
     border: 0 none;
     height: 100%;
     margin: 0;
     padding: 2px;
     width: 100%;
-    background-color: #dedebe;
+    background-color: #fff;
     font-size: 15px;
 }
+
+.grid-textarea-editor {
+    z-index: 1;
+    margin: 0;
+    padding: 2px;
+    font-size: 15px;
+    background-color: #fff;
+    border-top: 0 none;
+    border-left: 0 none;
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
 
 .grid-window {
     display: inline-block;
@@ -246,7 +286,7 @@
 .grid-preload-font {
     visibility: hidden;
     width: 1px;
-    height: 1px;
+    height: 0;
     font-family: FontAwesome;
 }
 /* Plugins styles */
@@ -291,7 +331,7 @@
         border: 1px;
         padding: 5px;
         margin-bottom: 0;
-        cursor:pointer;
+        cursor: pointer;
     }
 
     .grid-header-menu .btn-clear {
@@ -299,7 +339,7 @@
         border: 1px;
         padding: 5px;
         margin-bottom: 0;
-        cursor:pointer;
+        cursor: pointer;
     }
 
     .grid-header-menu .btn-submit + .btn-clear {
@@ -342,3 +382,29 @@
     .grid-columnpicker-menucontent input {
         vertical-align: text-bottom;
     }
+
+/* Formatters*/
+.grid-textarea-formatter {
+    overflow: hidden;
+    white-space: nowrap;
+    height: 100%;
+    width: 100%;
+}
+
+    .grid-textarea-formatter > div {
+        margin: 2px;
+    }
+
+.grid-cell-align-right .grid-textarea-formatter > div {
+    margin-right: 16px;
+}
+
+.grid-select-icon-formatter, .grid-text-icon-formatter, .grid-date-icon-formatter {
+    color:#99CCCC;
+    position: absolute;
+    right: 0;
+    padding: 0 4px 0 0;
+    top: 20%;
+}
+
+

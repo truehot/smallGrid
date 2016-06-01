@@ -103,9 +103,9 @@
             "handlescroll": undefined,
             "handlescrollStart": undefined,
             "handlescrollStop": undefined,
-            latency: 300,
-            resetLeft: true,
-            resetTop: true,
+            "latency": 300,
+            "resetLeft": true,
+            "resetTop": true,
         };
 
         settings = $.extend({}, defaultSettings, settings);

@@ -40,7 +40,7 @@
         border: 1px;
         padding: 5px;
         margin-bottom: 0;
-        cursor:pointer;
+        cursor: pointer;
     }
 
     .grid-header-menu .btn-clear {
@@ -48,7 +48,7 @@
         border: 1px;
         padding: 5px;
         margin-bottom: 0;
-        cursor:pointer;
+        cursor: pointer;
     }
 
     .grid-header-menu .btn-submit + .btn-clear {
@@ -91,3 +91,29 @@
     .grid-columnpicker-menucontent input {
         vertical-align: text-bottom;
     }
+
+/* Formatters*/
+.grid-textarea-formatter {
+    overflow: hidden;
+    white-space: nowrap;
+    height: 100%;
+    width: 100%;
+}
+
+    .grid-textarea-formatter > div {
+        margin: 2px;
+    }
+
+.grid-cell-align-right .grid-textarea-formatter > div {
+    margin-right: 16px;
+}
+
+.grid-select-icon-formatter, .grid-text-icon-formatter, .grid-date-icon-formatter {
+    color:#99CCCC;
+    position: absolute;
+    right: 0;
+    padding: 0 4px 0 0;
+    top: 20%;
+}
+
+

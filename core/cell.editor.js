@@ -9,8 +9,8 @@
                     "Checkbox": CheckboxEditor,
                     "Float": FloatEditor,
                     "Integer": IntegerEditor,
-                    "None": NoneEditor,
                     "Text": TextEditor,
+                    "Select": SelectEditor,
                 },
             }
         }
@@ -18,49 +18,18 @@
 
     function CheckboxEditor(options, settings) {
         var self = this,
-            value = options.value,
-            $label = $('<label/>'),
-            $element = $('<input type="checkbox" class="grid-checkbox-editor" ' + (convertValue(value)?'checked':'') + '/>').val(value);
-
-        this.append = function (cellNode) {
-            $element.appendTo($label);
-            $label.appendTo(cellNode);
-            return self;
-        };
-
-        this.remove = function () {
-            if ($element && $element.length) {
-                $element.detach();
-            }
-            return self;
-        };
+            value = !options.value;
 
         this.destroy = function () {
-            $label.remove();
-            self.onDestroy.notify({});
             return self;
         };
 
         this.getValue = function () {
-            return convertValue($element.prop('checked'));
-        };
-
-        this.setValue = function (value) {
-            $element.prop('checked', convertValue(value));
             self.onChange.notify({
                 "value": value
             });
-            return self;
+            return value;
         };
-
-        this.focus = function () {
-            $element.val(self.getValue()).focus();
-            return self;
-        };
-
-        function convertValue(value) {
-            return (/^true$/i).test(value);
-        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -69,14 +38,14 @@
         });
 
         self.onInitialize.notify({
-            "value": value
+            "value": options.value
         });
     }
 
     function FloatEditor(options, settings) {
         var self = this,
             value = options.value,
-            $element = $('<input type="text" class="grid-float-editor" />').val(value);
+            $element = $('<input type="text" class="grid-float-editor" />').val(value).width(options.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -109,8 +78,9 @@
         };
 
         this.focus = function () {
-            $element.val(self.getValue()).select();
-
+            if ($element.is(':focus') === false) {
+                $element.val(self.getValue()).select();
+            }
             return self;
         };
 
@@ -132,7 +102,7 @@
     function IntegerEditor(options, settings) {
         var self = this,
             value = options.value,
-            $element = $('<input type="text" class="grid-integer-editor" />').val(value);
+            $element = $('<input type="text" class="grid-integer-editor" />').val(value).width(options.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -165,8 +135,9 @@
         };
 
         this.focus = function () {
-            $element.val(self.getValue()).select();
-
+            if ($element.is(':focus') === false) {
+                $element.val(self.getValue()).select();
+            }
             return self;
         };
 
@@ -185,10 +156,10 @@
         });
     }
 
-    function NoneEditor(options, settings) {
+    function TextEditor(options, settings) {
         var self = this,
             value = options.value,
-            $element = $("<span class='grid-none-editor' />").text(value);
+            $element = $('<input type="text" class="grid-text-editor"/>').val(value).width(options.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -209,12 +180,11 @@
         };
 
         this.getValue = function () {
-            return convertValue($element.text());
+            return $element.val();
         };
 
         this.setValue = function (value) {
-
-            $element.text(convertValue(value));
+            $element.val(value);
             self.onChange.notify({
                 "value": value
             });
@@ -222,13 +192,12 @@
         };
 
         this.focus = function () {
-            $element.select();
+            if ($element.is(':focus') === false) {
+                $element.val(self.getValue()).select();
+            }
             return self;
         };
 
-        function convertValue(value) {
-            return value;
-        }
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
@@ -241,10 +210,11 @@
         });
     }
 
-    function TextEditor(options, settings) {
+
+    function SelectEditor(options, settings) {
         var self = this,
             value = options.value,
-            $element = $('<input type="text" class="grid-text-editor"/>').val(value);
+            $element = $('<select class="grid-select-editor"/>').val(value);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -265,11 +235,11 @@
         };
 
         this.getValue = function () {
-            return convertValue($element.val());
+            return $element.val();
         };
 
         this.setValue = function (value) {
-            $element.val(convertValue(value));
+            $element.val(value);
             self.onChange.notify({
                 "value": value
             });
@@ -277,12 +247,17 @@
         };
 
         this.focus = function () {
-            $element.val(self.getValue()).select();
+            $element.focus();
             return self;
         };
 
-        function convertValue(value) {
-            return value;
+        self.setSource = function (values) {
+            if (values.constructor === Array) {
+                $.each(values, function (index, item) {
+                    $element.append(new Option(item.text, item.value));
+                });
+            }
+            $element.val(value);
         }
 
         $.extend(this, {
@@ -297,9 +272,19 @@
     }
 
     function CreateEditor(name, options, settings) {
-        if (SmallGrid.Utils.isFunction(name, SmallGrid.Cell.Editor) === true) {
-            return new SmallGrid.Cell.Editor[name](options, settings);
+        if (!name.length) {
+            throw new TypeError("Editor name is not defined");
         }
+
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
+
+        if (SmallGrid.Utils.isFunction(name, SmallGrid.Cell.Editor) === false) {
+            throw new TypeError("name is not defined");
+        }
+
+        return new SmallGrid.Cell.Editor[name](options, settings);
     }
 
 })(jQuery);

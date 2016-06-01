@@ -3,14 +3,23 @@ QUnit.test("Row", function (assert) {
 
     var model = new SmallGrid.Row.Create([], SmallGrid.Settings.Create());
 
+
     assert.ok(model.items.getItems().length == 0, "Row.Create");
     assert.ok(model.isEmpty() == true, "isEmpty");
     assert.ok(model.total() == 0, "total");
 
     assert.ok(model.items.getItems().length == 0, "init");
 
+
+    var item = getItem();
+    model.items.addItems([item]);
+    assert.equal(model.items.getItems().length, 1, "items.addItems");
+    assert.deepEqual(model.items.getItems()[0], item, "items.addItems");
+    model.deleteRows();
+
     model.items.addItems([]);
     assert.ok(model.items.getItems().length == 0, "items.addItems");
+
 
     model.addRows([]);
     assert.ok(model.items.getItems().length == 0, "items.addRows");
@@ -131,6 +140,8 @@ QUnit.test("Row", function (assert) {
     model.setRowsProperty("editMode", true);
     assert.ok(model.getRows()[0].editMode == true, "setRowsProperty");
     assert.ok(model.getRows()[1].editMode == true, "setRowsProperty");
+
+
 
     function getItem() {
         return { "test": Math.random(), "test2": Math.random() };

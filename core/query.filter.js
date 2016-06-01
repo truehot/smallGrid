@@ -9,7 +9,6 @@
         }
     });
 
-
     function FilterQuery(field, settings) {
         var self = this;
         var query = [];

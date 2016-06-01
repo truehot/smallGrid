@@ -9,9 +9,11 @@
         }
     });
 
-    function ColumnFilterMenu(view, windowManager, settings) {
+    function ColumnFilterMenu(context, settings) {
         var self = this;
         var lastActiveColumnId = null;
+        var view = context.view;
+        var windowManager = context.windowManager;
 
         function handleHeaderClick(evt) {
             if (evt && evt.type && evt.type == "filter") {
@@ -25,10 +27,10 @@
 
                     windowManager.createWindow(
                         evt.column.id,
+                        buildElements(evt.column.id),
                         {
                             filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings)
-                        },
-                        buildElements(evt.column.id)
+                        }
                     );
 
                     windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
@@ -75,7 +77,7 @@
 
             var data = windowManager.getWindow(evt.data.id);
             if (data && data.opts) {
-                var column = view.getModel().columns.getColumnById(evt.data.id);
+                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
                 if (column) {
                     var filter = data.opts.filter;
                     var formValues = getFormValues(data.container);
@@ -88,7 +90,7 @@
                     }
 
                     column.headerCssClass += ' ' + settings.cssClass.headerFilterActive;
-                    view.getModel().columns.updateColumn(column);
+                    view.getModel().getColumnsModel().updateColumn(column);
                     view.getModel().setFilter(filter);
                     windowManager.hideWindow(evt.data.id);
                 }
@@ -98,10 +100,10 @@
         function handleMenuClear(evt) {
             var data = windowManager.getWindow(evt.data.id);
             if (data) {
-                var column = view.getModel().columns.getColumnById(evt.data.id);
+                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
                 if (column) {
                     column.headerCssClass = column.headerCssClass.replace(' ' + settings.cssClass.headerFilterActive, '');
-                    view.getModel().columns.updateColumn(column);
+                    view.getModel().getColumnsModel().updateColumn(column);
 
                     view.getModel().clearFilter(data.opts.filter);
                     windowManager.hideWindow(evt.data.id);

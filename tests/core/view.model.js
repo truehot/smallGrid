@@ -12,8 +12,8 @@ QUnit.test("Model", function (assert) {
     assert.deepEqual(viewModel.getRowsTotal(), { "count": 0, "height": 0 }, "getRowsTotal");
     assert.deepEqual(viewModel.getColumnsTotal(), { "count": 0, "width": 0 }, "getColumnsTotal");
 
-    assert.deepEqual(viewModel.columns, columnModel, "columnModel");
-    assert.deepEqual(viewModel.rows, rowModel, "rowModel");
+    assert.deepEqual(viewModel.getColumnsModel(), columnModel, "columnModel");
+    assert.deepEqual(viewModel.getRowsModel(), rowModel, "rowModel");
 
     assert.deepEqual(viewModel.requestDataFromRange({ top: 0, left: 0 }, { width: 0, height: 0 }, 0, 0, 0), { "columns": [], "isCached": 0, "rows": [] }, "rowModel");
 
@@ -54,7 +54,11 @@ QUnit.test("Model", function (assert) {
     assert.deepEqual(viewModel.getColumnsWidth(0), 0, "getColumnsWidth");
     assert.deepEqual(viewModel.getRowsHeight(0), 0, "getRowsHeight");
 
+    assert.notDeepEqual(viewModel.getRowsModel(), {}, "getRowsModel");
+    assert.ok(viewModel.getRowsModel() instanceof SmallGrid.Row.Model, "getRowsModel");
 
+    assert.notDeepEqual(viewModel.getColumnsModel(), {}, "getColumnsModel");
+    assert.ok(viewModel.getColumnsModel() instanceof SmallGrid.Column.Model, "getColumnsModel");
 });
 
 

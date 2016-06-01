@@ -11,16 +11,17 @@
                     "Float": floatFormatter,
                     "Integer": integerFormatter,
                     "Money": moneyFormatter,
+                    "Select": selectFormatter,
                     "None": defaultFormatter,
                     "Radio": radioFormatter,
-                    "Text": defaultFormatter,
+                    "Text": textFormatter,
                 },
             }
         }
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return (value != undefined) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return (value != null) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {
@@ -42,7 +43,8 @@
     function moneyFormatter(value, column, row, settings) {
         value = +value;
         if (!isNaN(value)) {
-            return new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
+            value = new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
+            return value + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
         }
         return defaultFormatter(value, column, row, settings);
     }
@@ -53,10 +55,21 @@
         }
 
         if (!isNaN(value)) {
-            return new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
+            value = new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
+            return value + "<i class='fa fa-calendar grid-date-icon-formatter'></i>";
         }
 
         return defaultFormatter(value, column, row, settings);
+    }
+
+    function selectFormatter(value, column, row, settings) {
+        var html = defaultFormatter(value, column, row, settings);
+        return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+    }
+
+    function textFormatter(value, column, row, settings) {
+        var html = defaultFormatter(value, column, row, settings);
+        return html + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
     }
 
 })(jQuery);

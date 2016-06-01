@@ -44,20 +44,19 @@
         var items = {
 
             addItem: function (item) {
-                var row = addRow(
-                    createRow(item)
-                );
+                var row = createRow(item);
+                addRow(row);
                 self.onChange.notify({ "id": row.id });
                 return row;
             },
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChangeStop.notify();
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             },
@@ -87,23 +86,23 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChangeStop.notify({ "mode": "all" });
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             },
 
             updateItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     for (var i = 0; i < items.length; i++) {
                         self.items.updateItem(items[i]);
                     }
-                    self.onChangeStop.notify();
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             },
@@ -150,9 +149,9 @@
 
         function sort(comparer) {
             if (data.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data.sort(comparer);
-                self.onChangeStop.notify({ "mode": "all" });
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -165,72 +164,17 @@
             return data.length;
         }
 
-        //function add(data) {
-        //    if (data instanceof RowData) {
-        //        addRow(data);
-        //    } else if (data instanceof Object) {
-        //        addItem(data);
-        //    } else if (data instanceof Array && data.length > 0) {
-        //        if (data[0] instanceof RowData) {
-        //            addRows(data);
-        //        } else if (data[0] instanceof Object) {
-        //            addItems(data);
-        //        }
-        //    }
-        //}
-
-        //function set(data) {
-        //    if (data instanceof RowData) {
-        //        setRows([data]);
-        //    } else if (data instanceof Object) {
-        //        setItems([data]);
-        //    } else if (data instanceof Array && data.length > 0) {
-        //        if (data[0] instanceof RowData) {
-        //            setRows(data);
-        //        } else if (data[0] instanceof Object) {
-        //            setItems(data);
-        //        }
-        //    }
-        //}
-
-        //function update(data) {
-        //    if (data instanceof RowData) {
-        //        updateRow(data);
-        //    } else if (data instanceof Object) {
-        //        updateItem(data);
-        //    } else if (data instanceof Array && data.length > 0) {
-        //        if (data[0] instanceof RowData) {
-        //            updateRows(data);
-        //        } else if (data[0] instanceof Object) {
-        //            updateItems(data);
-        //        }
-        //    }
-        //}
-
-        //function remove(data) {
-        //    if (data instanceof RowData) {
-        //        deleteRow(data);
-        //    } else if (data instanceof Object) {
-        //        deleteItem(data);
-        //    } else if (data instanceof Array && data.length > 0) {
-        //        if (data[0] instanceof RowData) {
-        //            deleteRows(data);
-        //        } else if (data[0] instanceof Object) {
-        //            deleteItems(data);
-        //        }
-        //    }
-        //}
 
         /*
         Batch updates
         */
         function addRows(rows) {
             if (rows.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChangeStop.notify();
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -238,43 +182,43 @@
 
         function updateRows(rows) {
             if (rows.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 for (var i = 0; i < rows.length; i++) {
                     updateRow(rows[i]);
                 }
-                self.onChangeStop.notify();
+                self.onChange.notifyBlocked();
             }
             return self;
         }
 
         function setRows(rows) {
             if (rows.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data = [];
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChangeStop.notify({ "mode": "all" });
+                self.onChange.notifyBlocked();
             }
             return self;
         }
 
         function setRowsProperty(propertyName, propertyValue) {
-            self.onChangeStart.notify();
+            self.onChange.blockEvents();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChangeStop.notify();
+            self.onChange.notifyBlocked();
             return self;
         }
 
 
         function deleteRows() {
             if (data.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data = [];
-                self.onChangeStop.notify({ "mode": "all" });
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -475,7 +419,6 @@
                     ),
                     row.minHeight
                 );
-
                 return row;
             }
         }
@@ -483,13 +426,6 @@
         $.extend(this, {
             "items": items,
             "onChange": new SmallGrid.Event.Handler(),
-            "onChangeStart": new SmallGrid.Event.Handler(),
-            "onChangeStop": new SmallGrid.Event.Handler(),
-
-            //"add": add,
-            //"update": update,
-            //"set": set,
-            //"remove": remove,
 
             "filter": filter,
 
@@ -528,9 +464,14 @@
     }
 
     function CreateModel(data, settings) {
-        if (!Array.isArray(data)) {
-            throw new TypeError("Array expected.");
+        if (Array.isArray(data) == false) {
+            throw new TypeError("Data is not defined");
         }
+
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
+
         return new RowModel(
             settings
         ).items.addItems(data);

@@ -26,12 +26,11 @@
                 data.event.preventDefault();
             }
             isDefaultPrevented = true;
-        }
+        };
 
         this.isDefaultPrevented = function () {
             return isDefaultPrevented;
-        }
-
+        };
 
         this.stopPropagation = function () {
             if (data && "event" in data && typeof (data.event.stopPropagation) === "function") {
@@ -58,15 +57,20 @@
     }
 
     function EventHandler() {
-        var handlers = [];
-        var self = this;
+        var self = this,
+            handlers = [],
+            blockEvents = false,
+            blockedEventData = [];
 
-        this.subscribe = function (func) {
-            handlers.push(func);
+
+        self.subscribe = function (func) {
+            if ($.isFunction(func)) {
+                handlers.push(func);
+            }
             return self;
         };
 
-        this.unsubscribe = function (func) {
+        self.unsubscribe = function (func) {
             for (var i = handlers.length - 1; i >= 0; i--) {
                 if (handlers[i] === func) {
                     handlers.splice(i, 1);
@@ -75,26 +79,45 @@
             return self;
         };
 
-        this.unsubscribeLast = function () {
+        self.unsubscribeLast = function () {
             if (handlers.length) {
                 handlers.pop();
             }
             return self;
         };
 
-        this.unsubscribeAll = function () {
+        self.unsubscribeAll = function () {
             handlers = [];
             return self;
         };
 
-        this.notify = function (eventData) {
+        self.blockEvents = function () {
+            blockEvents = true;
+        };
+
+        self.notifyBlocked = function (opts) {
+            blockEvents = false;
+
+            self.notify(new EventData({
+                opts: opts || {},
+                data: blockedEventData
+            }));
+
+            blockedEventData = [];
+        };
+
+        self.notify = function (eventData) {
+            if (blockEvents == true) {
+                return blockedEventData.push(eventData);
+            }
+
             if (typeof (eventData) != EventData) {
                 eventData = new EventData(eventData);
             }
 
             for (var i = 0; i < handlers.length && !eventData.isImmediatePropagationStopped() ; i++) {
-                if (handlers[i].call(this, eventData) === false) {
-                    this.stopImmediatePropagation();
+                if (handlers[i].call(self, eventData) === false) {
+                    self.stopImmediatePropagation();
                     break;
                 }
             }

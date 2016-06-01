@@ -9,10 +9,14 @@
         }
     });
 
-    function ColumnSortPlugin(view, windowManager, settings) {
+    function ColumnSortPlugin(context, settings) {
         var self = this;
+        var view = context.view;
+        var windowManager = context.windowManager;
+
         function init() {
             view.onHeaderClick.subscribe(handleHeaderClick);
+            return self;
         }
 
         function destroy() {
@@ -24,11 +28,11 @@
                 var request = view.suspendRender();
                 var column = evt.column;
                 var sortOrder = SmallGrid.Utils.changeSortOrder(column.sortOrder);
-                view.getModel().columns.setColumnsProperty("sortOrder", 0);//reset sorting
-                view.getModel().columns.setColumnPropertyById(column.id, "sortOrder", sortOrder);
+                view.getModel().getColumnsModel().setColumnsProperty("sortOrder", 0);//reset sorting
+                view.getModel().getColumnsModel().setColumnPropertyById(column.id, "sortOrder", sortOrder);
                 view.getModel().setSorter(new SmallGrid.Query.SorterQuery(column.field, sortOrder, column.sortComparer));
                 view.resumeRender(request);
-                view.render();
+                //view.render();
             }
         }
 

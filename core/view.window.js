@@ -16,9 +16,9 @@
         var self = this;
         var cache = [];
 
-        function createWindow(id, opts, $contentElement) {
+        function createWindow(id, $contentElement, opts) {
             if (isWindow(id) === false) {
-                cache.push({ id: id, opts: opts });
+                cache.push({ id: id, opts: opts || {} });
 
                 var $container = $('<div class="grid-window grid-window-' + id + '"/>');
                 if ($contentElement && $contentElement.length) $contentElement.appendTo($container);
@@ -63,22 +63,23 @@
             return self;
         }
 
-        function showWindowNearPosition(id, position) {
+        function showWindowNearPosition(id, position, margin) {
+            var containerMargin = margin || 0;
             var data = getWindow(id);
             if (data != null) {
                 data.container.show();
 
                 var $container = view.getNode('container');
 
-                var elementSizes = {
+                var elementSize = {
                     width: data.container.width(),
                     height: data.container.height()
                 };
 
-                var left = (elementSizes.width + position.x > $container.width() && elementSizes.width < position.x - $container.offset().left) ? position.x - elementSizes.width : position.x;
+                var left = (elementSize.width + position.x > $container.width() && elementSize.width < position.x - $container.offset().left) ? position.x - elementSize.width + containerMargin : position.x - containerMargin;
 
                 data.container.offset({
-                    top: position.y,
+                    top: position.y - containerMargin,
                     left: left
                 });
             }
@@ -92,7 +93,7 @@
 
                 var $container = view.getNode('container');
 
-                var elementSizes = {
+                var elementSize = {
                     width: data.container.width(),
                     height: data.container.height()
                 };
@@ -104,7 +105,7 @@
                     height: $target.height(),
                 };
 
-                var left = (elementSizes.width + targetSizes.left > $container.width() && elementSizes.width < targetSizes.left - $container.offset().left) ? targetSizes.left + targetSizes.width - elementSizes.width : targetSizes.left;
+                var left = (elementSize.width + targetSizes.left > $container.width() && elementSize.width < targetSizes.left - $container.offset().left) ? targetSizes.left + targetSizes.width - elementSize.width : targetSizes.left;
 
                 data.container.offset({
                     top: targetSizes.top + targetSizes.height,
@@ -134,13 +135,13 @@
         }
 
         function init() {
-            view.onBodyClick.subscribe(hideWindows);
+            view.onDocumentClick.subscribe(hideWindows);
             view.onColumnResizeStart.subscribe(hideWindows);
             return self;
         }
 
         function destroy() {
-            view.onBodyClick.unsubscribe(hideWindows);
+            view.onDocumentClick.unsubscribe(hideWindows);
             view.onColumnResizeStart.unsubscribe(hideWindows);
 
             cache = [];
@@ -166,7 +167,11 @@
 
     function Create(view, settings) {
         if (view instanceof SmallGrid.View.View === false) {
-            throw new TypeError("View expected.");
+            throw new TypeError("View is not defined");
+        }
+
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
         }
 
         return new SmallGrid.View.Window.Manager(view, settings).init();

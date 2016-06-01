@@ -7,39 +7,49 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
-    <p class="small-grid" style="width: 600px; height: 300px;clear:both;float:left;margin-right:10px"></p>
-    <p class="small-grid2" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
-    <p class="small-grid3" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
-    <p class="small-grid4" style="width: 600px; height: 300px;float:left;margin-right:10px"></p>
+    <div>
+        <p class="small-grid" style="width: 600px; height: 230px;clear:both;float:left;margin-right:10px"></p>
+        <p class="small-grid2" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
+        <p class="small-grid3" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
+        <p class="small-grid4" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
+    </div>
+
     <script>
-
-
         $(document).ready(function () {
-			var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200},
-				{ 'name': "Column 2", 'field': "property2", 'width': 200},
-				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
-				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
-				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
-			];
-			var items = [];
-			for (var i = 1; i <= 5000; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + '' + ii;
-				}
+            var columns = [
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
+                { 'name': "Phone", 'field': "phone", 'width': 150 },
+                { 'name': "Email", 'field': "email", 'width': 200 },
+            ];
 
-				items.push(item);
-			}
-			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
-			var grid2 = new SmallGrid.Grid.Create($('.small-grid2'), items, columns, {});
-			var grid3 = new SmallGrid.Grid.Create($('.small-grid3'), items, columns, {});
-			var grid4 = new SmallGrid.Grid.Create($('.small-grid4'), items, columns, {});
+            var items = [];
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+            var grid2 = new SmallGrid.Grid.Create($('.small-grid2'), items, columns, {});
+            var grid3 = new SmallGrid.Grid.Create($('.small-grid3'), items, columns, {});
+            var grid4 = new SmallGrid.Grid.Create($('.small-grid4'), items, columns, {});
 
+            $.getJSON("generated50.json", function (result) {
+                grid.getRowsModel().items.addItems(result);
+                grid.getView().resizeColumns().render();
 
+                grid2.getRowsModel().items.addItems(result);
+                grid2.getView().resizeColumns().render();
+
+                grid3.getRowsModel().items.addItems(result);
+                grid3.getView().resizeColumns().render();
+
+                grid4.getRowsModel().items.addItems(result);
+                grid4.getView().resizeColumns().render();
+
+            });
         });
     </script>
+
 </body>
 </html>

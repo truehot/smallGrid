@@ -9,9 +9,11 @@
         }
     });
 
-    function ColumnPickerMenu(view, windowManager, settings) {
+    function ColumnPickerMenu(context, settings) {
         var self = this;
         var currentId = "column-picker";
+        var view = context.view;
+        var windowManager = context.windowManager;
 
         function handleHeaderContextMenu(evt) {
 
@@ -20,7 +22,7 @@
 
                 windowManager.hideWindows();
                 if (windowManager.isWindow(currentId) === false) {
-                    windowManager.createWindow(currentId, {}, buildElements(currentId));
+                    windowManager.createWindow(currentId, buildElements(currentId));
                 } else {
                     var data = windowManager.getWindow(currentId);
                     if (data) {
@@ -33,7 +35,8 @@
                     {
                         x: evt.event.pageX,
                         y: evt.event.pageY
-                    }
+                    },
+                    5
                 );
             }
         }
@@ -51,7 +54,7 @@
 
         function buildContent() {
             var html = '';
-            var columns = view.getModel().columns.getColumns();
+            var columns = view.getModel().getColumnsModel().getColumns();
             for (var i = 0; i < columns.length; i++) {
                 html += '<div><label><input type="checkbox" name="" ' + ((columns[i].hidden) ? '' : ' checked ') + ' value="' + columns[i].id + '"/> ' + columns[i].name + '</label></div>';
             }
@@ -76,6 +79,7 @@
             });
 
         }
+
         function handleMenuClick(evt) {
             evt.stopPropagation();
             if (evt.target) {
@@ -84,7 +88,7 @@
                     if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
                         return false;
                     }
-                    view.getModel().columns.setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
+                    view.getModel().getColumnsModel().setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
                 }
             }
         }

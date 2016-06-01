@@ -9,8 +9,10 @@
         }
     });
 
-    function ColumnResizePlugin(view, windowManager, settings) {
+    function ColumnResizePlugin(context, settings) {
         var self = this;
+        var view = context.view;
+        var windowManager = context.windowManager;
 
         var column,
             $headerTable,
@@ -28,6 +30,7 @@
             view.onColumnResize.subscribe(handleColumnResize);
             view.onColumnResizeStart.subscribe(handleColumnResizeStart);
             view.onColumnResizeStop.subscribe(handleColumnResizeStop);
+            return self;
         }
 
         function destroy() {
@@ -71,11 +74,11 @@
                     if ($lastContentCol.length) $lastContentCol.width(0);
                 }
 
-                $headerCell = view.getNode('headerTable').find('td.' + settings.cssClass.cellLast);
-                if ($headerCell.length) toggleDisabled($headerCell, settings.cssClass.cellLast);
+                $headerCell = view.getNode('headerTable').find('td.' + settings.cssClass.cellColumnLast);
+                if ($headerCell.length) toggleDisabled($headerCell, settings.cssClass.cellColumnLast);
 
-                $contentCell = view.getNode('contentTable').find('td.' + settings.cssClass.cellLast);
-                if ($contentCell.length) toggleDisabled($contentCell, settings.cssClass.cellLast);
+                $contentCell = view.getNode('contentTable').find('td.' + settings.cssClass.cellColumnLast);
+                if ($contentCell.length) toggleDisabled($contentCell, settings.cssClass.cellColumnLast);
 
                 toggleDisabled($headerCursorCells, settings.cssClass.cursorPointer);
                 view.getNode('viewport').addClass(settings.cssClass.cursorResize);
@@ -85,15 +88,15 @@
         function handleColumnResizeStop() {
             if (column) {
 
-                if ($headerCell.length) toggleEnabled($headerCell, settings.cssClass.cellLast);
-                if ($contentCell.length) toggleEnabled($contentCell, settings.cssClass.cellLast);
+                if ($headerCell.length) toggleEnabled($headerCell, settings.cssClass.cellColumnLast);
+                if ($contentCell.length) toggleEnabled($contentCell, settings.cssClass.cellColumnLast);
 
 
                 toggleEnabled($headerCursorCells, settings.cssClass.cursorPointer);
                 view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
 
                 if (width) {
-                    view.getModel().columns.setColumnPropertyById(
+                    view.getModel().getColumnsModel().setColumnPropertyById(
                         column.id,
                         'width',
                         width

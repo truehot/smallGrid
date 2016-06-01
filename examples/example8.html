@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="../styles.all.css" type="text/css" />
     <script src="../libs/jquery-2.1.4.min.js"></script>
     <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
 </head>
 <body>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+    </div>
 
-
-
-    <div class="small-grid" style="width: 600px; height: 500px;"></div>
     <script>
         $(document).ready(function () {
 			var columns = [
@@ -31,7 +33,7 @@
 
 				items.push(item);
 			}
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, {});
+			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
         });
     </script>
 </body>

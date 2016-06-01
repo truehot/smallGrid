@@ -9,13 +9,17 @@
         }
     });
 
-    function RowSelectionPlugin(view, windowManager, settings) {
+    function RowSelectionPlugin(context, settings) {
         var self = this;
+        var view = context.view;
+        var rowsModel = context.viewModel.getRowsModel();
+        var windowManager = context.windowManager;
         var selectedRowIds = [];
         var lastFocusedRowId = null;
 
         function init() {
             view.onCellClick.subscribe(handleCellClick);
+            return self;
         }
 
         function destroy() {
@@ -27,8 +31,8 @@
             if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != evt.row.id) {
                 clearSelectedRows(selectedRowIds);
 
-                var lastFocusedRow = view.getModel().rows.getRowById(lastFocusedRowId);
-                var currentRow = view.getModel().rows.getRowById(evt.row.id);
+                var lastFocusedRow = rowsModel.getRowById(lastFocusedRowId);
+                var currentRow = rowsModel.getRowById(evt.row.id);
 
                 if (lastFocusedRow && currentRow) {
                     selectRowsRange(lastFocusedRowId, evt.row.id);
@@ -53,13 +57,13 @@
                 clearSelectedRows(clearRowsIds);
             }
             view.resumeRender(request);
-            view.render();
+
             if (evt.event.shiftKey === false) lastFocusedRowId = evt.row.id;
         }
 
         function selectRowsRange(id1, id2) {
-            var lastFocusedIndex = view.getModel().rows.getRowIndexById(id1);
-            var currentRowIndex = view.getModel().rows.getRowIndexById(id2);
+            var lastFocusedIndex = rowsModel.getRowIndexById(id1);
+            var currentRowIndex = rowsModel.getRowIndexById(id2);
             if (lastFocusedIndex !== -1 && currentRowIndex !== -1) {
                 var startIndex = Math.min(currentRowIndex, lastFocusedIndex);
                 var endIndex = Math.max(currentRowIndex, lastFocusedIndex);
@@ -73,25 +77,25 @@
 
         function selectRow(row) {
             if (row) {
-                view.getModel().rows.setRowPropertyById(
+                selectedRowIds.push(row.id);
+                rowsModel.setRowPropertyById(
                     row.id,
                     'rowCssClass',
                     row.rowCssClass + ' ' + settings.cssClass.rowSelected
                 );
-                selectedRowIds.push(row.id);
             }
         }
 
         function selectRowByIndex(idx) {
             selectRow(
-                view.getModel().rows.getRowByIndex(idx)
+                rowsModel.getRowByIndex(idx)
             );
             return self;
         }
 
         function selectRowById(id) {
             selectRow(
-                view.getModel().rows.getRowById(id)
+                rowsModel.getRowById(id)
             );
             return self;
         }
@@ -104,9 +108,9 @@
         }
 
         function clearSelectedRow(id) {
-            var row = view.getModel().rows.getRowById(id);
+            var row = rowsModel.getRowById(id);
             if (row) {
-                view.getModel().rows.setRowPropertyById(
+                rowsModel.setRowPropertyById(
                     row.id,
                     'rowCssClass',
                     row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '')

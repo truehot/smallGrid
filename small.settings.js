@@ -9,19 +9,20 @@ if (typeof SmallGrid === "undefined") {
     "use strict";
     var defaultSettings = {
         renderDelay: 0,
-        showLastColumn: true,//show last column
-        explicitInitialization: false,
+        showLastColumn: false,//show last column
         uidPrefix: "smallgrid_",
         resizeColumnsOnLoad: false,//resize columns when view loaded to fit canvas
         maxSupportedCssHeight: undefined,//internal
         scrollbarDimensions: undefined,//internal
         cellOuterSize: undefined,//internal
+        viewportDimensions:undefined,//internal
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
             cell: "grid-cell",
             cellEdit: "grid-cell-edit",
-            cellLast: "grid-cell-last",
+            cellColumnLast: "grid-cell-column-last",
+            cellRowLast: "grid-cell-row-last",
             col: "grid-col",
             collLast: "grid-coll-last",
             cursorPointer: "grid-cursor-pointer",
@@ -72,7 +73,8 @@ if (typeof SmallGrid === "undefined") {
             moneyFormatter: {
                 locales: 'en-US',
                 options: {
-                    currency: 'USD'
+                    currency: 'EUR',
+                    style: 'currency'
                 },
             },
             dateFormatter: {
@@ -99,6 +101,10 @@ if (typeof SmallGrid === "undefined") {
     function CreateSettings(settings) {
 
         var settings = $.extend(true, {}, defaultSettings, settings || {});
+
+        if (settings.viewportDimensions == undefined) {
+            defaultSettings.viewportDimensions = settings.viewportDimensions = SmallGrid.Utils.measureViewport();
+        }
 
         if (settings.maxSupportedCssHeight == undefined) {
             defaultSettings.maxSupportedCssHeight = settings.maxSupportedCssHeight = SmallGrid.Utils.measureMaxSupportedCssHeight();

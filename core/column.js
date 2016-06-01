@@ -60,20 +60,19 @@
         var data = [];
         var items = {
             addItem: function (item) {
-                var column = addColumn(
-                    createColumn(item)
-                );
+                var column = createColumn(item);
+                addColumn(column);
                 self.onChange.notify({ "id": column.id });
                 return column;
             },
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChangeStop.notify();
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             },
@@ -104,12 +103,12 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChangeStop.notify({ "mode": "all" });
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             },
@@ -142,11 +141,11 @@
 
             updateItems: function (items) {
                 if (items.length) {
-                    self.onChangeStart.notify();
+                    self.onChange.blockEvents();
                     for (var i = 0; i < items.length; i++) {
                         self.items.updateItem(items[i]);
                     }
-                    self.onChangeStop.notify();
+                    self.onChange.notifyBlocked();
                 }
                 return self;
             }
@@ -167,9 +166,9 @@
 
         function sort(comparer) {
             if (data.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data.sort(comparer);
-                self.onChangeStop.notify({ "mode": "all" });
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -192,12 +191,12 @@
 
         function addColumns(columns) {
             if (columns.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
 
-                self.onChangeStop.notify();
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -231,9 +230,9 @@
 
         function deleteColumns() {
             if (data.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data = [];
-                self.onChangeStop.notify({ "mode": "all" });
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -344,23 +343,24 @@
 
         function setColumns(columns) {
             if (columns.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 data = [];
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
-                self.onChangeStop.notify({ "mode": "all" });
+
+                self.onChange.notifyBlocked();
             }
             return self;
         }
 
         function setColumnsProperty(propertyName, propertyValue) {
-            self.onChangeStart.notify();
+            self.onChange.blockEvents();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChangeStop.notify();
+            self.onChange.notifyBlocked();
             return self;
         }
 
@@ -396,11 +396,11 @@
 
         function updateColumns(columns) {
             if (columns.length) {
-                self.onChangeStart.notify();
+                self.onChange.blockEvents();
                 for (var i = 0; i < columns.length; i++) {
                     updateColumn(columns[i]);
                 }
-                self.onChangeStop.notify();
+                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -451,24 +451,11 @@
             "items": items,
 
             "onChange": new SmallGrid.Event.Handler(),
-            "onChangeStart": new SmallGrid.Event.Handler(),
-            "onChangeStop": new SmallGrid.Event.Handler(),
 
             "filter": filter,
             "reduce": reduce,
             "sort": sort,
             "total": total,
-
-
-            //"deleteItem": deleteItem,
-            //"deleteItems": deleteColumns,
-            //"deleteItemById": deleteColumnById,
-            //"getItems": getItems,
-            //"setItems": setItems,
-            //"updateItem": updateItem,
-            //"updateItemById": updateItemById,
-            //"updateItemByIndex": updateItemByIndex,
-            //"updateItems": updateItems,
 
             "addColumn": addColumn,
             "addColumns": addColumns,
@@ -501,7 +488,13 @@
     }
 
     function CreateModel(data, settings) {
-        if (!Array.isArray(data)) throw new TypeError("Array expected.");
+        if (Array.isArray(data) == false) {
+            throw new TypeError("Data is not defined");
+        }
+
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
 
         return new ColumnModel(
             settings

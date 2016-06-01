@@ -24,7 +24,7 @@ QUnit.test("Resize", function (assert) {
 
     $wrapper.appendTo('#qunit-fixture');
 
-    var resizeHandler = new SmallGrid.Handler.Resize.Create($wrapper, {
+    var handler = new SmallGrid.Handler.Resize.Create($wrapper, {
         "cellIdentifier": "DIV",
         "handleResize": handleResize,
         "handleResizeStart": handleResizeStart,
@@ -32,7 +32,7 @@ QUnit.test("Resize", function (assert) {
         "handlerIdentifier": ".resize-handler",
     });
 
-    $hd2.mousedown();
+    $hd2.trigger("mousedown");
 
     $("body").trigger(
         $.extend(
@@ -44,9 +44,8 @@ QUnit.test("Resize", function (assert) {
             }
         )
     );
-    $hd2.mouseup();
 
-    resizeHandler.destroy();
+    $hd2.trigger("mouseup");
 
     setTimeout(function () {
         assert.equal(handleResizeExecuted, true, "handleResizeExecuted");
@@ -79,6 +78,7 @@ QUnit.test("Resize", function (assert) {
         handleResizeStopExecuted = true;
     }
 
+    handler.destroy();
 });
 
 
