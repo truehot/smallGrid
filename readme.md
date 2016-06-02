@@ -32,12 +32,8 @@ Include necessary JS and CSS files
 Example code:
 
         $(document).ready(function () {
-            var columns = [
-                { 'name': "Name", 'field': "task1", 'width': 100 }
-            ];
-            var items = [
-                { "task1": "Eric", "task2": "Ball", "task3": "Tallinn", "task4": "1232", "task5": "1111111" },
-            ];
+            var columns = [{ 'name': "Name", 'field': "task1", 'width': 100 }];
+            var items = [{ "task1": "Eric", "task2": "Ball", "task3": "Tallinn", "task4": "1232", "task5": "1111111" }];
             var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
         });
 
