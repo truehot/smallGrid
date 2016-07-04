@@ -14,20 +14,24 @@
     <div>
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
         <div class="additional-actions">
-            <form><label><input type="checkbox" class="auto-edit" autocomplete="off" /> Enable auto edit</label></form>
+            <label><input type="checkbox" class="auto-edit" autocomplete="off" /> Enable auto edit</label>
+            <button class="editCell">Edit cell (3,3)</button>
+            <button class="applyEditCell">Apply cell edit</button>
+            <button class="cancelEditCell">Cancel cell edit</button>
         </div>
     </div>
     <script>
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Text", 'field': "property1", 'width': 200, 'editor': 'Text' },
-				{ 'name': "Checkbox", 'field': "property2", 'width': 80, 'editor': 'Checkbox', 'formatter': 'Checkbox', 'align': "center" },
-				{ 'name': "Integer", 'field': "property3", 'width': 200, 'editor': 'Integer', 'formatter': 'Money' },
-				{ 'name': "Text", 'field': "property4", 'width': 200, 'editor': 'Text', 'formatter': 'Text' },
-				{ 'name': "Select", 'field': "property5", 'width': 200, 'editor': 'Select', 'formatter': 'Select' },
+                { 'name': "Text", 'field': "property1", 'width': 200, 'editor': 'Text' },
+                { 'name': "Checkbox", 'field': "property2", 'width': 80, 'editor': 'Checkbox', 'formatter': 'Checkbox', 'align': "center" },
+                { 'name': "Integer", 'field': "property3", 'width': 200, 'editor': 'Integer', 'formatter': 'Money' },
+                { 'name': "Text", 'field': "property4", 'width': 200, 'editor': 'Text', 'formatter': 'Text' },
+                { 'name': "Select", 'field': "property5", 'width': 200, 'editor': 'Select', 'formatter': 'Select' },
                 { 'name': "Text", 'field': "property6", 'width': 200, 'editor': 'Text', 'formatter': 'Text' },
-				{ 'name': "None", 'field': "property7", 'width': 200, 'editor': 'None' },
+                { 'name': "None", 'field': "property7", 'width': 200, 'editor': 'None' },
             ];
+
             var items = [];
             for (var i = 1; i <= 600; i++) {
                 var item = {};
@@ -39,23 +43,18 @@
                     }
                     if (i == 2) {
                         item["property1"] = "Not editable row";
-                        item["property6"] = "Value1";
+                        item["property5"] = "";
                         item["editable"] = false;
                     } else {
-                        item["property6"] = "";
+                        item["property5"] = { "text": "Text1", "value": "Value1" };
                     }
                 }
                 items.push(item);
             }
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
 
-            $('.auto-edit').change(function () {
-                var settings = grid.getSettings();
-                settings.plugins.CellEdit.editOnClick = this.checked;
-            });
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
 
-            var cellEdit = grid.getPlugin('CellEdit');
-            cellEdit.onCellEdited.subscribe(function (e) {
+            grid.getPlugin('CellEdit').onCellEdited.subscribe(function (e) {
                 if (e.editor.setSource) {
                     e.editor.setSource([{
                         text: "Text1",
@@ -63,10 +62,35 @@
                     }, {
                         text: "Text2",
                         value: "Value2"
+                    }, {
+                        text: "Text3",
+                        value: "Value3"
                     }]);
                 }
             });
 
+            $('.auto-edit').change(function () {
+                var settings = grid.getSettings();
+                settings.plugins.CellEdit.editOnClick = this.checked;
+            });
+
+            $('.editCell').click(function () {
+                var column = grid.getColumnsModel().getColumnByIndex(2);
+                var row = grid.getRowsModel().getRowByIndex(2);
+                grid.getPlugin('CellEdit').editCellById(column.id, row.id);
+            });
+
+            $('.applyEditCell').click(function () {
+                var column = grid.getColumnsModel().getColumnByIndex(2);
+                var row = grid.getRowsModel().getRowByIndex(2);
+                grid.getPlugin('CellEdit').applyEdit();
+            });
+
+            $('.cancelEditCell').click(function () {
+                var column = grid.getColumnsModel().getColumnByIndex(2);
+                var row = grid.getRowsModel().getRowByIndex(2);
+                grid.getPlugin('CellEdit').cancelEdit();
+            });
         });
     </script>
 </body>

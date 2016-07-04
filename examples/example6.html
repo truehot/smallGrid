@@ -21,38 +21,38 @@
 
     <script>
         $(document).ready(function () {
-			var columns = [];
-			for (var i = 1; i < 6; i++) {
-				var width = 100 * Math.round((Math.random() * 5), 2) || 40;
-				columns.push({ 'name': "Width " + width, 'field': "property" + i, 'width': width });
-			}
+            var columns = [];
+            for (var i = 1; i < 50; i++) {
+                var width = 100 * Math.round((Math.random() * 5), 2) || 40;
+                columns.push({ 'name': "Width " + width, 'field': "property" + i, 'width': width });
+            }
 
-			var items = [];
-			for (var i = 1; i <= 600; i++) {
-				var item = { height: Math.round(25 * (Math.random() * 5), 2) };
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = "height " + item.height;
-				}
+            var items = [];
+            for (var i = 1; i <= 600; i++) {
+                var item = { height: Math.round(25 * (Math.random() * 5), 2) };
+                for (var ii = 1; ii < 50; ii++) {
+                    item["property" + ii] = "height " + item.height;
+                }
+                items.push(item);
+            }
 
-				items.push(item);
-			}
-			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": false });
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "plugins": { "AutoResize": { enabled: false } } });
 
-			$('.randomWidth').on('click', function () {
-			    var columns = grid.getColumnsModel().getColumns();
-			    for (var i = 0; i < columns.length; i++) {
-			        columns[i].width = 100 * Math.round((Math.random() * 5), 2) || 40;
-			    }
-			    grid.getColumnsModel().updateColumns(columns);
-			});
+            $('.randomWidth').on('click', function () {
+                var columns = grid.getColumnsModel().getColumns();
+                for (var i = 0; i < columns.length; i++) {
+                    columns[i].width = 100 * Math.round((Math.random() * 5), 2) || 40;
+                }
+                grid.getColumnsModel().updateColumns(columns);
+            });
 
-			$('.randomHeight').on('click', function () {
-			    var rows = grid.getRowsModel().getRows();
-			    for (var i = 0; i < rows.length; i++) {
-			        rows[i].height = Math.round(25 * (Math.random() * 5), 2) || 10;
-			    }
-			    grid.getRowsModel().updateRows(rows);
-			});
+            $('.randomHeight').on('click', function () {
+                var rows = grid.getRowsModel().getRows();
+                for (var i = 0; i < rows.length; i++) {
+                    rows[i].height = Math.round(25 * (Math.random() * 5), 2) || 10;
+                }
+                grid.getRowsModel().updateRows(rows);
+            });
 
         });
     </script>

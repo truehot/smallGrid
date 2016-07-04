@@ -16,6 +16,7 @@
         <div class="additional-actions">
             <button class="disableSortable">Disable column sorting</button>
             <button class="enableSortable">Enable column sorting</button>
+            <button class="sortFirstColumn">Sort first column</button>
         </div>
     </div>
 
@@ -26,17 +27,13 @@
                 { 'name': "Surname", 'field': "surname", 'width': 100 },
                 { 'name': "Age", 'field': "age", 'width': 80, 'align': 'center' },
                 { 'name': "Registered", 'field': "registered", 'width': 150, 'formatter': 'Date', 'comparer': 'Date' },
-                { 'name': "Sales", 'field': "sales", 'width': 200, 'formatter': "Float"  },
+                { 'name': "Sales", 'field': "sales", 'width': 200, 'formatter': "Float" },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
-
 
             $('.disableSortable').on('click', function () {
                 var columns = grid.getColumnsModel().getColumns();
@@ -48,6 +45,11 @@
                 var columns = grid.getColumnsModel().getColumns();
                 for (var i = 0; i < columns.length; i++) columns[i].sortable = true;
                 grid.getColumnsModel().updateColumns(columns);
+            });
+
+            $('.sortFirstColumn').on('click', function () {
+                var plugin = grid.getPlugin("ColumnSort");
+                plugin.sortColumnByIndex(0);
             });
         });
     </script>

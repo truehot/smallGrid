@@ -16,6 +16,8 @@
         <div class="additional-actions">
             <label><input type="checkbox" class="multiselect" /> Enable multiple row selection</label>
             <button class="selectFirstRow">Select first row</button>
+            <button class="selectFewRows">Select 5 rows</button>
+            <button class="deselectRows">Clear row selection</button>
         </div>
     </div>
 
@@ -29,12 +31,9 @@
                 { 'name': "Email", 'field': "email", 'width': 100 },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
 
             $('.multiselect').change(function () {
@@ -47,6 +46,15 @@
                 plugin.selectRowByIndex(0);
             });
 
+            $('.selectFewRows').on('click', function () {
+                var plugin = grid.getPlugin("RowSelection");
+                plugin.selectRowsRangeByIndex(0, 5);
+            });
+
+            $('.deselectRows').on('click', function () {
+                var plugin = grid.getPlugin("RowSelection");
+                plugin.deselectAllRows();
+            });
         });
     </script>
 

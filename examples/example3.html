@@ -16,6 +16,8 @@
         <div class="additional-actions">
             <button class="disableFilters">Disable filter menu</button>
             <button class="enableFilters">Enable filter menu</button>
+            <button class="filterColumn">Filter first column by "M"</button>
+            <button class="clearFilter">Clear first column filter</button>
         </div>
     </div>
     <script>
@@ -28,12 +30,10 @@
                 { 'name': "Address", 'field': "address", 'width': 200, 'filterable': true },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            var filter = new SmallGrid.Query.FilterQuery('name').contains("M");
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
 
             $('.disableFilters').on('click', function () {
@@ -48,6 +48,13 @@
                 grid.getColumnsModel().updateColumns(columns);
             });
 
+            $('.filterColumn').on('click', function () {
+                grid.getViewModel().setFilter(filter);
+            });
+
+            $('.clearFilter').on('click', function () {
+                grid.getViewModel().clearFilter(filter);
+            });
         });
     </script>
 </body>

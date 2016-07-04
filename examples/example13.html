@@ -13,7 +13,12 @@
 <body>
     <div>
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
-        <div class="additional-actions">Right click on the header to view Column picker</div>
+        <div class="additional-actions">
+            Right click on the header to view Column picker
+            <button class="hideFirstColumn">Hide first column</button>
+            <button class="showFirstColumn">Show first column</button>
+        </div>
+
     </div>
 
     <script>
@@ -26,13 +31,21 @@
                 { 'name': "Email", 'field': "email", 'width': 200 },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
+
+            $('.hideFirstColumn').on('click', function () {
+                var plugin = grid.getPlugin("ColumnPickerMenu");
+                plugin.hideColumnByIndex(0);
+            });
+
+            $('.showFirstColumn').on('click', function () {
+                var plugin = grid.getPlugin("ColumnPickerMenu");
+                plugin.showColumnByIndex(0);
+            });
+
         });
     </script>
 </body>

@@ -15,13 +15,13 @@
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
         <div class="additional-actions">
             Align columns to
-            <button class="alltoright">right</button>
             <button class="alltoleft">left</button>
             <button class="alltocenter">center</button>
-            <!--<button class="alltotop">top</button>
+            <button class="alltoright">right</button>
+            <button class="alltotop">top</button>
             <button class="alltomiddle">middle</button>
             <button class="alltobaseline">baseline</button>
-            <button class="alltobottom">bottom</button>-->
+            <button class="alltobottom">bottom</button>
         </div>
     </div>
 
@@ -35,57 +35,38 @@
                 { 'name': "Sales", 'field': "sales", 'width': 80, 'align': 'right' },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                for (var i = 0; i < result.length; i++) result[i].height = 50;
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                for (var i = 0; i < items.length; i++) items[i].height = 50;
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
 
-
             $('.alltoright').on('click', function () {
-                var columns = grid.getViewModel().getColumns();
-                for (var i = 0; i < columns.length; i++) columns[i].align = 'right';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getColumnsModel().setColumnsProperty('align', 'right');
             });
 
             $('.alltoleft').on('click', function () {
-                var columns = grid.getViewModel().getColumns();
-                for (var i = 0; i < columns.length; i++) columns[i].align = 'left';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getColumnsModel().setColumnsProperty('align', 'left');
             });
 
             $('.alltocenter').on('click', function () {
-                var columns = grid.getViewModel().getColumns();
-                for (var i = 0; i < columns.length; i++) columns[i].align = 'center';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getColumnsModel().setColumnsProperty('align', 'center');
             });
 
             $('.alltotop').on('click', function () {
-                var columns = grid.getViewModel().getColumns;
-                for (var i = 0; i < columns.length; i++) columns[i].valign = 'top';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getRowsModel().setRowsProperty('valign', 'top');
             });
 
             $('.alltobottom').on('click', function () {
-                var columns = grid.getViewModel().getColumns;
-                for (var i = 0; i < columns.length; i++) columns[i].valign = 'bottom';
-                grid.getColumnsModel().updateColumns(columns);
-
+                grid.getRowsModel().setRowsProperty('valign', 'bottom');
             });
 
             $('.alltomiddle').on('click', function () {
-                var columns = grid.getViewModel().getColumns;
-                for (var i = 0; i < columns.length; i++) columns[i].valign = 'middle';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getRowsModel().setRowsProperty('valign', 'middle');
             });
 
             $('.alltobaseline').on('click', function () {
-                var columns = grid.getViewModel().getColumns;
-                for (var i = 0; i < columns.length; i++) columns[i].valign = 'baseline';
-                grid.getColumnsModel().updateColumns(columns);
+                grid.getRowsModel().setRowsProperty('valign', 'baseline');
             });
         });
     </script>

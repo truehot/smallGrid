@@ -30,7 +30,7 @@
         <div class="additional-actions">
             <button class="changeColumnBackground">First column background</button>
             <button class="changeRowBackground">First row background</button>
-            <button class="changeCellBackground">Random cell in row</button>
+            <button class="changeCellBackground">Random cell in rows</button>
         </div>
     </div>
 
@@ -44,12 +44,9 @@
                 { 'name': "Address", 'field': "address", 'width': 200, 'filterable': true },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
 
             $('.changeColumnBackground').on('click', function () {
@@ -77,7 +74,7 @@
                     } else {
                         row.cellCssClass = {};
                         row.cellCssClass[column.field] = 'dimgray';
-                       
+
                     }
                     grid.getRowsModel().updateRow(row);
                 }
