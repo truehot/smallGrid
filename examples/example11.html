@@ -16,6 +16,12 @@
         <p class="small-grid2" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
         <p class="small-grid3" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
         <p class="small-grid4" style="width: 600px; height: 230px;float:left;margin-right:10px"></p>
+        <p class="additional-actions" style="clear:both;">
+            <button class="unloadFirst">Unload first</button>
+            <button class="reloadFirst">Reload first</button>
+            <button class="unloadLast">Delete all from last</button>
+            <button class="reloadLast">Reload last</button>
+        </p>
     </div>
 
     <script>
@@ -28,26 +34,35 @@
                 { 'name': "Email", 'field': "email", 'width': 200 },
             ];
 
+
+            var grid, grid2, grid3, grid4;
             var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-            var grid2 = new SmallGrid.Grid.Create($('.small-grid2'), items, columns, {});
-            var grid3 = new SmallGrid.Grid.Create($('.small-grid3'), items, columns, {});
-            var grid4 = new SmallGrid.Grid.Create($('.small-grid4'), items, columns, {});
-
             $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
-
-                grid2.getRowsModel().items.addItems(result);
-                grid2.getView().resizeColumns().render();
-
-                grid3.getRowsModel().items.addItems(result);
-                grid3.getView().resizeColumns().render();
-
-                grid4.getRowsModel().items.addItems(result);
-                grid4.getView().resizeColumns().render();
-
+                items = result;
+                grid = SmallGrid.Grid.Create($('.small-grid'), items, columns);
+                grid2 = SmallGrid.Grid.Create($('.small-grid2'), items, columns);
+                grid3 = SmallGrid.Grid.Create($('.small-grid3'), items, columns);
+                grid4 = SmallGrid.Grid.Create($('.small-grid4'), items, columns);
             });
+
+            $('.unloadFirst').on('click', function () {
+                grid.destroy();
+            });
+            $('.reloadFirst').on('click', function () {
+                grid = SmallGrid.Grid.Create($('.small-grid'), items, columns);
+            });
+
+            $('.unloadLast').on('click', function () {
+                grid4.getRowsModel().deleteRows();
+                grid4.getColumnsModel().deleteColumns();
+            });
+            $('.reloadLast').on('click', function () {
+                grid4.getRowsModel().items.addItems(items);
+                grid4.getColumnsModel().items.addItems(columns);
+                var plugin = grid4.getPlugin("AutoResize");
+                plugin.resizeColumns();
+            });
+
         });
     </script>
 

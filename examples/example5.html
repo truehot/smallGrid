@@ -33,16 +33,14 @@
                 { 'name': "Email", 'field': "email", 'width': 200, 'resizeable': true },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "plugins": { "AutoResize": { enabled: false } } });
 
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-            });
-
-            $('.auto-chechbox').prop('checked', grid.getSettings().showLastColumn).change(function () {
-                grid.getSettings().showLastColumn = this.checked;
-                grid.getView().render();
+                $('.auto-chechbox').prop('checked', grid.getSettings().showLastColumn).change(function () {
+                    grid.getSettings().showLastColumn = this.checked;
+                    grid.getView().render();
+                });
             });
 
             $('.resizeClass').on('click', function () {
@@ -50,7 +48,7 @@
             });
 
             $('.resizeColumnsClass').on('click', function () {
-                grid.getView().resizeColumns().render();
+                grid.getPlugin('AutoResize').resizeColumns();
             });
 
         });

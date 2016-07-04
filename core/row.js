@@ -1,30 +1,15 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Row": {
-                "Create": CreateModel,
-                "Model": RowModel,
-                "RowData": RowData,
-            }
+    $.extend(true, SmallGrid, {
+        "Row": {
+            "Create": CreateModel,
+            "Model": RowModel,
+            "RowData": RowData
         }
     });
 
-    function RowData(data) {
-        if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
-        if ("disabled" in data) this.disabled = data.disabled;
-        if ("editable" in data) this.editable = data.editable;
-        if ("editMode" in data) this.editMode = data.editMode;
-        if ("height" in data) this.height = data.height;
-        if ("hidden" in data) this.hidden = data.hidden;
-        if ("id" in data) this.id = data.id;
-        if ("item" in data) this.item = data.item;
-        if ("maxHeight" in data) this.maxHeight = data.maxHeight;
-        if ("minHeight" in data) this.minHeight = data.minHeight;
-        if ("rowCssClass" in data) this.rowCssClass = data.rowCssClass;
-    }
-
+    function RowData() { }
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled
     RowData.prototype.editable = true; // true when row cells are editable
@@ -41,13 +26,11 @@
         var self = this;
         var data = [];
 
-        var items = {
+        this.items = {
 
             addItem: function (item) {
-                var row = createRow(item);
-                addRow(row);
-                self.onChange.notify({ "id": row.id });
-                return row;
+                addRow(createRow(item));
+                return self;
             },
 
             addItems: function (items) {
@@ -67,13 +50,6 @@
 
             deleteItemById: function (id) {
                 return deleteRowById(id);
-            },
-
-            deleteItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                    deleteRowById(item[settings.rows.idProperty]);
-                }
-                return self;
             },
 
             getItems: function () {
@@ -96,26 +72,9 @@
                 return self;
             },
 
-            updateItems: function (items) {
-                if (items.length) {
-                    self.onChange.blockEvents();
-                    for (var i = 0; i < items.length; i++) {
-                        self.items.updateItem(items[i]);
-                    }
-                    self.onChange.notifyBlocked();
-                }
-                return self;
-            },
-
-            updateItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                    self.items.updateItemById(item[settings.rows.idProperty], item);
-                }
-            },
-
             updateItemById: function (id, item) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
                         break;
@@ -131,8 +90,11 @@
                 }
                 return self;
             }
-        }
+        };
 
+        function destroy() {
+            data = [];
+        }
 
         function filter(callback) {
             if (data.length) {
@@ -244,7 +206,7 @@
 
         function deleteRowById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
                     break;
@@ -264,7 +226,7 @@
 
         function getRowById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return data[i];
                 }
             }
@@ -280,7 +242,7 @@
 
         function getRowIndexById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return i;
                 }
             }
@@ -347,7 +309,7 @@
 
         function setRowPropertyById(id, propertyName, propertyValue) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
@@ -378,7 +340,7 @@
         function updateRowById(id, row) {
             if (row instanceof RowData) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i] = row;
                         self.onChange.notify({ "id": id });
                         break;
@@ -398,37 +360,46 @@
             return self;
         }
 
-        function createItemData(item) {
-            if (item instanceof Object) {
-                if (settings.rows.mapProperties === true) {
-                    return $.extend({ item: item }, item);
-                }
-                return { item: item };
-            }
-        }
-
         function createRow(item) {
-            var itemData = createItemData(item);
-            if (itemData != undefined) {
-                var row = new RowData(itemData);
-                row.id = (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) ? item[settings.rows.idProperty] : SmallGrid.Utils.createGuid();
-                row.height = Math.max(
-                    Math.min(
-                        parseInt(row.height, 10),
-                        row.maxHeight
-                    ),
-                    row.minHeight
-                );
+            if (item instanceof Object) {
+                var row = new RowData();
+
+                if (settings.rows.newIdType === "number") {
+                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createId();
+                } else {
+                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createGuid();
+                }
+
+                row.item = item;
+
+                if ("cellCssClass" in item) row.cellCssClass = item.cellCssClass;
+                if ("disabled" in item) row.disabled = item.disabled;
+                if ("editable" in item) row.editable = item.editable;
+                if ("editMode" in item) row.editMode = item.editMode;
+                if ("height" in item) row.height = item.height;
+                if ("hidden" in item) row.hidden = item.hidden;
+                if ("maxHeight" in item) row.maxHeight = item.maxHeight;
+                if ("minHeight" in item) row.minHeight = item.minHeight;
+                if ("rowCssClass" in item) row.rowCssClass = item.rowCssClass;
+
+                //row.height = Math.max(
+                //    Math.min(
+                //        parseInt(row.height, 10),
+                //        row.maxHeight
+                //    ),
+                //    row.minHeight
+                //);
+
                 return row;
             }
         }
 
         $.extend(this, {
-            "items": items,
+            "destroy": destroy,
+
             "onChange": new SmallGrid.Event.Handler(),
 
             "filter": filter,
-
             "reduce": reduce,
             "sort": sort,
             "total": total,
@@ -459,12 +430,12 @@
             "updateRow": updateRow,
             "updateRowById": updateRowById,
             "updateRowByIndex": updateRowByIndex,
-            "updateRows": updateRows,
+            "updateRows": updateRows
         });
     }
 
     function CreateModel(data, settings) {
-        if (Array.isArray(data) == false) {
+        if (Array.isArray(data) === false) {
             throw new TypeError("Data is not defined");
         }
 
@@ -472,8 +443,6 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new RowModel(
-            settings
-        ).items.addItems(data);
+        return new RowModel(settings).items.addItems(data);
     }
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

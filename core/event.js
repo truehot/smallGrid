@@ -1,12 +1,10 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Event": {
-                "Data": EventData,
-                "Handler": EventHandler
-            }
+    $.extend(true, SmallGrid, {
+        "Event": {
+            "Data": EventData,
+            "Handler": EventHandler
         }
     });
 
@@ -22,7 +20,7 @@
         var isDefaultPrevented = false;
 
         this.preventDefault = function () {
-            if (data && "event" in data && typeof (data.event.preventDefault) === "function") {
+            if (data && "event" in data && typeof data.event.preventDefault === "function") {
                 data.event.preventDefault();
             }
             isDefaultPrevented = true;
@@ -33,7 +31,7 @@
         };
 
         this.stopPropagation = function () {
-            if (data && "event" in data && typeof (data.event.stopPropagation) === "function") {
+            if (data && "event" in data && typeof data.event.stopPropagation === "function") {
                 data.event.stopPropagation();
             }
             isPropagationStopped = true;
@@ -45,7 +43,7 @@
 
         //Keeps the rest of the handlers from being executed
         this.stopImmediatePropagation = function () {
-            if (data && "event" in data && typeof (data.event.stopImmediatePropagation) === "function") {
+            if (data && "event" in data && typeof data.event.stopImmediatePropagation === "function") {
                 data.event.stopImmediatePropagation();
             }
             isImmediatePropagationStopped = true;
@@ -107,11 +105,11 @@
         };
 
         self.notify = function (eventData) {
-            if (blockEvents == true) {
+            if (blockEvents === true) {
                 return blockedEventData.push(eventData);
             }
 
-            if (typeof (eventData) != EventData) {
+            if (typeof eventData !== EventData) {
                 eventData = new EventData(eventData);
             }
 
@@ -124,4 +122,4 @@
         };
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

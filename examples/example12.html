@@ -33,12 +33,9 @@
                 { 'name': "Email", 'field': "email", 'width': 200, 'filterable': true },
             ];
 
-            var items = [];
-            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
-
-            $.getJSON("generated50.json", function (result) {
-                grid.getRowsModel().items.addItems(result);
-                grid.getView().resizeColumns().render();
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
             });
 
             var counter = 1;

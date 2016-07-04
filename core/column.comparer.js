@@ -1,15 +1,13 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Column": {
-                "Comparer": {
-                    "Default": mixedComparer,
-                    "Date": dateComparer,
-                    "Number": numberComparer,
-                    "String": stringComparer,
-                }
+    $.extend(true, SmallGrid, {
+        "Column": {
+            "Comparer": {
+                "Default": mixedComparer,
+                "Date": dateComparer,
+                "Number": numberComparer,
+                "String": stringComparer,
             }
         }
     });
@@ -69,4 +67,4 @@
         };
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

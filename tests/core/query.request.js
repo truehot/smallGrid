@@ -27,9 +27,9 @@ QUnit.test("Request", function (assert) {
     var columnsRequest = new SmallGrid.Query.Request([], [], columnsModel);
 
 
-    var filter1 = new SmallGrid.Query.FilterQuery('property1', settings).contains("6");
-    var filter2 = new SmallGrid.Query.FilterQuery('field', settings).contains("property6");
-    var sorter = new SmallGrid.Query.SorterQuery('property1', 1, "Default", settings);
+    var filter1 = new SmallGrid.Query.FilterQuery('property1').contains("6");
+    var filter2 = new SmallGrid.Query.FilterQuery('field').contains("property6");
+    var sorter = new SmallGrid.Query.SorterQuery('property1', 1, "Default");
     var rowsRequestFS = new SmallGrid.Query.Request([filter1], [sorter], rowsModel);
     var columnsRequestFS = new SmallGrid.Query.Request([filter2], [sorter], columnsModel);
 

@@ -1,39 +1,15 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Column": {
-                "Create": CreateModel,
-                "Model": ColumnModel,
-                "ColumnData": ColumnData
-            }
+    $.extend(true, SmallGrid, {
+        "Column": {
+            "Create": CreateModel,
+            "Model": ColumnModel,
+            "ColumnData": ColumnData
         }
     });
 
-    function ColumnData(data) {
-        if ("align" in data) this.align = data.align;
-        if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
-        if ("editable" in data) this.editable = data.editable;
-        if ("editor" in data) this.editor = data.editor;
-        if ("editMode" in data) this.editMode = data.editMode;
-        if ("field" in data) this.field = data.field;
-        if ("filterable" in data) this.filterable = data.filterable;
-        if ("formatter" in data) this.formatter = data.formatter;
-        if ("headerCssClass" in data) this.headerCssClass = data.headerCssClass;
-        if ("hidden" in data) this.hidden = data.hidden;
-        if ("id" in data) this.id = data.id;
-        if ("item" in data) this.item = data.item;
-        if ("maxWidth" in data) this.maxWidth = data.maxWidth;
-        if ("minWidth" in data) this.minWidth = data.minWidth;
-        if ("name" in data) this.name = data.name;
-        if ("resizeable" in data) this.resizeable = data.resizeable;
-        if ("sortable" in data) this.sortable = data.sortable;
-        if ("sortOrder" in data) this.sortOrder = data.sortOrder;
-        if ("sortComparer" in data) this.sortComparer = data.sortComparer;
-        if ("width" in data) this.width = data.width;
-    }
-
+    function ColumnData() { }
     ColumnData.prototype.align = "";//column cells align - "" / center / right
     ColumnData.prototype.cellCssClass = "";//css class for column cells
     ColumnData.prototype.editable = true; //true when column cells editable
@@ -58,12 +34,12 @@
     function ColumnModel(settings) {
         var self = this;
         var data = [];
-        var items = {
+
+        this.items = {
+
             addItem: function (item) {
-                var column = createColumn(item);
-                addColumn(column);
-                self.onChange.notify({ "id": column.id });
-                return column;
+                addColumn(createColumn(item));
+                return self;
             },
 
             addItems: function (items) {
@@ -73,14 +49,6 @@
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyBlocked();
-                }
-                return self;
-            },
-
-
-            deleteItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                    deleteColumnById(item[settings.columns.idProperty]);
                 }
                 return self;
             },
@@ -113,15 +81,9 @@
                 return self;
             },
 
-            updateItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                    self.items.updateItemById(item[settings.columns.idProperty], item);
-                }
-            },
-
             updateItemById: function (id, item) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
                         break;
@@ -137,19 +99,11 @@
                 }
                 return self;
             },
-
-
-            updateItems: function (items) {
-                if (items.length) {
-                    self.onChange.blockEvents();
-                    for (var i = 0; i < items.length; i++) {
-                        self.items.updateItem(items[i]);
-                    }
-                    self.onChange.notifyBlocked();
-                }
-                return self;
-            }
         };
+
+        function destroy() {
+            data = [];
+        }
 
         function filter(callback) {
             if (data.length) {
@@ -210,7 +164,7 @@
 
         function deleteColumnById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
                     break;
@@ -239,7 +193,7 @@
 
         function getColumnById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return data[i];
                 }
             }
@@ -255,7 +209,7 @@
 
         function getColumnIndexById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return i;
                 }
             }
@@ -322,7 +276,7 @@
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
@@ -374,7 +328,7 @@
         function updateColumnById(id, column) {
             if (column instanceof ColumnData) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i] = column;
                         self.onChange.notify({ "id": id });
                         break;
@@ -405,50 +359,63 @@
             return self;
         }
 
-        function createItemData(item) {
-            if (item instanceof Object) {
-                if (settings.columns.mapProperties === true) {
-                    return $.extend({ item: item }, item);
-                }
-                return {
-                    "name": item.name,
-                    "field": item.field,
-                    "item": item
-                };
-            }
-        }
-
         function createColumn(item) {
-            var itemData = createItemData(item);
-            if (itemData != undefined) {
-                var column = new ColumnData(itemData);
-                column.id = (SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
-                column.width = Math.max(
-                    Math.min(
-                        parseInt(column.width, 10),
-                        column.maxWidth
-                    ),
-                    column.minWidth
-                );
+            if (item instanceof Object) {
+                var column = new ColumnData();
 
-                if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
-                    delete column.sortComparer;
+                if (settings.columns.newIdType === "number") {
+                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createId();
+                } else {
+                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
                 }
 
-                if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
-                    delete column.formatter;
-                }
+                column.name = item.name;
+                column.field = item.field;
+                column.item = item;
 
-                if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
-                    delete column.editor;
-                }
+                if ("align" in item) column.align = item.align;
+                if ("cellCssClass" in item) column.cellCssClass = item.cellCssClass;
+                if ("editable" in item) column.editable = item.editable;
+                if ("editor" in item) column.editor = item.editor;
+                if ("editMode" in item) column.editMode = item.editMode;
+                if ("filterable" in item) column.filterable = item.filterable;
+                if ("formatter" in item) column.formatter = item.formatter;
+                if ("headerCssClass" in item) column.headerCssClass = item.headerCssClass;
+                if ("hidden" in item) column.hidden = item.hidden;
+                if ("maxWidth" in item) column.maxWidth = item.maxWidth;
+                if ("minWidth" in item) column.minWidth = item.minWidth;
+                if ("resizeable" in item) column.resizeable = item.resizeable;
+                if ("sortable" in item) column.sortable = item.sortable;
+                if ("sortOrder" in item) column.sortOrder = item.sortOrder;
+                if ("sortComparer" in item) column.sortComparer = item.sortComparer;
+                if ("width" in item) column.width = item.width;
+
+                //column.width = Math.max(
+                //    Math.min(
+                //        parseInt(column.width, 10),
+                //        column.maxWidth
+                //    ),
+                //    column.minWidth
+                //);
+
+                //if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
+                //    delete column.sortComparer;
+                //}
+
+                //if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
+                //    delete column.formatter;
+                //}
+
+                //if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
+                //    delete column.editor;
+                //}
 
                 return column;
             }
         }
 
         $.extend(this, {
-            "items": items,
+            "destroy": destroy,
 
             "onChange": new SmallGrid.Event.Handler(),
 
@@ -483,12 +450,12 @@
             "updateColumn": updateColumn,
             "updateColumnById": updateColumnById,
             "updateColumnByIndex": updateColumnByIndex,
-            "updateColumns": updateColumns,
+            "updateColumns": updateColumns
         });
     }
 
     function CreateModel(data, settings) {
-        if (Array.isArray(data) == false) {
+        if (Array.isArray(data) === false) {
             throw new TypeError("Data is not defined");
         }
 
@@ -496,9 +463,7 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new ColumnModel(
-            settings
-        ).items.addItems(data);
+        return new ColumnModel(settings).items.addItems(data);
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

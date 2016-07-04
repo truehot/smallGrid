@@ -1,41 +1,37 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnFilterMenu": ColumnFilterMenu,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnFilterMenu": ColumnFilterMenu,
         }
     });
 
     function ColumnFilterMenu(context, settings) {
-        var self = this;
-        var lastActiveColumnId = null;
-        var view = context.view;
-        var windowManager = context.windowManager;
+        var self = this,
+            lastActiveColumnId = null;
 
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type == "filter") {
+            if (evt && evt.type && evt.type === "filter") {
                 evt.stopPropagation();
                 lastActiveColumnId = evt.column.id;
 
-                var isVisible = windowManager.isVisible(evt.column.id);
-                windowManager.hideWindows();
+                var isVisible = context.windowManager.isVisible(evt.column.id);
+                context.windowManager.hideWindows();
 
-                if (windowManager.isWindow(evt.column.id) === false) {
+                if (context.windowManager.isWindow(evt.column.id) === false) {
 
-                    windowManager.createWindow(
+                    context.windowManager.createWindow(
                         evt.column.id,
                         buildElements(evt.column.id),
                         {
-                            filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings)
+                            filter: new SmallGrid.Query.FilterQuery(evt.column.field)
                         }
                     );
 
-                    windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
+                    context.windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
                 } else if (isVisible === false) {
-                    windowManager.showWindow(evt.column.id);
+                    context.windowManager.showWindow(evt.column.id);
                 }
             }
         }
@@ -75,9 +71,9 @@
         function handleMenuSubmit(evt) {
             evt.preventDefault();
 
-            var data = windowManager.getWindow(evt.data.id);
+            var data = context.windowManager.getWindow(evt.data.id);
             if (data && data.opts) {
-                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
+                var column = context.columnsModel.getColumnById(evt.data.id);
                 if (column) {
                     var filter = data.opts.filter;
                     var formValues = getFormValues(data.container);
@@ -90,23 +86,23 @@
                     }
 
                     column.headerCssClass += ' ' + settings.cssClass.headerFilterActive;
-                    view.getModel().getColumnsModel().updateColumn(column);
-                    view.getModel().setFilter(filter);
-                    windowManager.hideWindow(evt.data.id);
+                    context.columnsModel.updateColumn(column);
+                    context.viewModel.setFilter(filter);
+                    context.windowManager.hideWindow(evt.data.id);
                 }
             }
         }
 
         function handleMenuClear(evt) {
-            var data = windowManager.getWindow(evt.data.id);
+            var data = context.windowManager.getWindow(evt.data.id);
             if (data) {
-                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
+                var column = context.columnsModel.getColumnById(evt.data.id);
                 if (column) {
                     column.headerCssClass = column.headerCssClass.replace(' ' + settings.cssClass.headerFilterActive, '');
-                    view.getModel().getColumnsModel().updateColumn(column);
+                    context.columnsModel.updateColumn(column);
 
-                    view.getModel().clearFilter(data.opts.filter);
-                    windowManager.hideWindow(evt.data.id);
+                    context.viewModel.clearFilter(data.opts.filter);
+                    context.windowManager.hideWindow(evt.data.id);
                 }
 
             }
@@ -117,8 +113,8 @@
         }
 
         function hideWindow() {
-            if (lastActiveColumnId != null) {
-                windowManager.hideWindow(lastActiveColumnId);
+            if (lastActiveColumnId !== null) {
+                context.windowManager.hideWindow(lastActiveColumnId);
                 lastActiveColumnId = null;
             }
         }
@@ -127,16 +123,23 @@
         Init && destroy
         */
         function init() {
-            view.onHeaderClick.subscribe(handleHeaderClick);
-            view.onScrollStart.subscribe(hideWindow);
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
+            context.view.onScrollStart.subscribe(hideWindow);
             return self;
         }
 
         function destroy() {
-            view.onHeaderClick.unsubscribe(handleHeaderClick);
-            view.onScrollStart.unsubscribe(hideWindow);
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
+            context.view.onScrollStart.unsubscribe(hideWindow);
         }
 
+        function filterColumnById(id, filter) {
+
+        }
+
+        function filterColumnByIndex(idx, filter) {
+
+        }
 
         $.extend(this, {
             "init": init,
@@ -146,4 +149,4 @@
 
 
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

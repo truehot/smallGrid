@@ -1,7 +1,7 @@
 QUnit.module("SmallGrid.Cell");
 QUnit.test("Formatter", function (assert) {
 
-    var settings = new SmallGrid.Settings.Create({});
+    var settings = SmallGrid.Settings.Create({});
 
     settings.formatter.integerFormatter.decimals = 2;
     settings.formatter.floatFormatter.decimals = 2

@@ -1,13 +1,11 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Window": {
-                    "Create": Create,
-                    "Manager": Manager,
-                },
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Window": {
+                "Create": Create,
+                "Manager": Manager
             }
         }
     });
@@ -29,7 +27,7 @@
 
         function isWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     return true;
                 }
             }
@@ -38,11 +36,11 @@
 
         function getWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     return {
                         id: cache[i].id,
                         opts: cache[i].opts,
-                        container: view.getNode('container').children('.grid-window-' + id),
+                        container: view.getNode('container').children('.grid-window-' + id)
                     };
                 }
             }
@@ -51,7 +49,7 @@
 
         function removeWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     cache.splice(i, 1);
                     var window = view.getNode('container').children('.grid-window-' + id);
                     if (window.length) {
@@ -66,7 +64,7 @@
         function showWindowNearPosition(id, position, margin) {
             var containerMargin = margin || 0;
             var data = getWindow(id);
-            if (data != null) {
+            if (data !== null) {
                 data.container.show();
 
                 var $container = view.getNode('container');
@@ -88,7 +86,7 @@
 
         function showWindowNearTarget(id, $target) {
             var data = getWindow(id);
-            if (data != null) {
+            if (data !== null) {
                 data.container.show();
 
                 var $container = view.getNode('container');
@@ -102,7 +100,7 @@
                     left: $target.offset().left,
                     top: $target.offset().top,
                     width: $target.width(),
-                    height: $target.height(),
+                    height: $target.height()
                 };
 
                 var left = (elementSize.width + targetSizes.left > $container.width() && elementSize.width < targetSizes.left - $container.offset().left) ? targetSizes.left + targetSizes.width - elementSize.width : targetSizes.left;
@@ -116,7 +114,7 @@
         }
 
         function isVisible(id) {
-            return (view.getNode('container').children('.grid-window-' + id + ':visible').length > 0);
+            return view.getNode('container').children('.grid-window-' + id + ':visible').length > 0;
         }
 
         function showWindow(id) {
@@ -143,7 +141,6 @@
         function destroy() {
             view.onDocumentClick.unsubscribe(hideWindows);
             view.onColumnResizeStart.unsubscribe(hideWindows);
-
             cache = [];
         }
 
@@ -160,12 +157,12 @@
             "isWindow": isWindow,
             "isVisible": isVisible,
             "removeWindow": removeWindow,
-            "showWindow": showWindow,
+            "showWindow": showWindow
         });
     }
 
 
-    function Create(view, settings) {
+    function Create(view, settings, autoInit) {
         if (view instanceof SmallGrid.View.View === false) {
             throw new TypeError("View is not defined");
         }
@@ -174,7 +171,9 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new SmallGrid.View.Window.Manager(view, settings).init();
+        var windowManager = new SmallGrid.View.Window.Manager(view, settings);
+        if (autoInit !== false) windowManager.init();
+        return windowManager;
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

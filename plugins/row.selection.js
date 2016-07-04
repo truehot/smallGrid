@@ -1,149 +1,198 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "RowSelection": RowSelectionPlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "RowSelection": RowSelectionPlugin
         }
     });
 
     function RowSelectionPlugin(context, settings) {
-        var self = this;
-        var view = context.view;
-        var rowsModel = context.viewModel.getRowsModel();
-        var windowManager = context.windowManager;
-        var selectedRowIds = [];
-        var lastFocusedRowId = null;
+        var self = this,
+            selectedIds = [],
+            lastFocusedId = null;
 
         function init() {
-            view.onCellClick.subscribe(handleCellClick);
+            context.view.onCellClick.subscribe(handleCellClick);
             return self;
         }
 
         function destroy() {
-            view.onCellClick.unsubscribe(handleCellClick);
+            context.view.onCellClick.unsubscribe(handleCellClick);
         }
 
         function handleCellClick(evt) {
-            var request = view.suspendRender();
-            if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != evt.row.id) {
-                clearSelectedRows(selectedRowIds);
+            var request = context.view.suspendRender();
+            if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedId && lastFocusedId !== evt.row.id) {
 
-                var lastFocusedRow = rowsModel.getRowById(lastFocusedRowId);
-                var currentRow = rowsModel.getRowById(evt.row.id);
+                selectRowsRangeById(lastFocusedId, evt.row.id);
 
-                if (lastFocusedRow && currentRow) {
-                    selectRowsRange(lastFocusedRowId, evt.row.id);
-                }
-
-            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection) {
-                if (isRowSelected(evt.row.id) === false) {
-                    selectRowById(evt.row.id);
+            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection === true) {
+                if (isRowSelected(evt.row.id) === true) {
+                    deselectRowById(evt.row.id);
                 } else {
-                    clearSelectedRow(evt.row.id);
+                    selectRowById(evt.row.id);
                 }
             } else {
-                var clearRowsIds = selectedRowIds.slice();
-                var selectedIndex = clearRowsIds.indexOf(evt.row.id);
-
-                if (selectedIndex === -1) {
+                if (isRowSelected(evt.row.id) === false || selectedIds.length > 1) {
+                    deselectAllRows();
                     selectRowById(evt.row.id);
-                } else {
-                    clearRowsIds.splice(selectedIndex, 1);
-                }
-
-                clearSelectedRows(clearRowsIds);
-            }
-            view.resumeRender(request);
-
-            if (evt.event.shiftKey === false) lastFocusedRowId = evt.row.id;
-        }
-
-        function selectRowsRange(id1, id2) {
-            var lastFocusedIndex = rowsModel.getRowIndexById(id1);
-            var currentRowIndex = rowsModel.getRowIndexById(id2);
-            if (lastFocusedIndex !== -1 && currentRowIndex !== -1) {
-                var startIndex = Math.min(currentRowIndex, lastFocusedIndex);
-                var endIndex = Math.max(currentRowIndex, lastFocusedIndex);
-
-                for (var i = startIndex ; i <= endIndex; i++) {
-                    selectRowByIndex(i);
                 }
             }
-            return self;
+
+            context.view.resumeRender(request);
+
+            if (evt.event.shiftKey === false) lastFocusedId = evt.row.id;
         }
 
         function selectRow(row) {
             if (row) {
-                selectedRowIds.push(row.id);
-                rowsModel.setRowPropertyById(
+                selectedIds.push(row.id);
+
+                var rowNode = context.view.getRowNodeById(row.id);
+                if (rowNode) {
+                    rowNode.className = rowNode.className + ' ' + settings.cssClass.rowSelected;
+                }
+
+                context.rowsModel.setRowPropertyById(
                     row.id,
                     'rowCssClass',
-                    row.rowCssClass + ' ' + settings.cssClass.rowSelected
+                    row.rowCssClass + (row.rowCssClass.length ? " " : "") + settings.cssClass.rowSelected
                 );
             }
+        }
+
+        function deselectRow(row) {
+            if (row) {
+                var idx = selectedIds.indexOf(row.id);
+                if (idx !== -1) {
+                    selectedIds.splice(idx, 1);
+                }
+
+                var rowNode = context.view.getRowNodeById(row.id);
+                if (rowNode) {
+                    rowNode.className = rowNode.className.replace(' ' + settings.cssClass.rowSelected, '');
+                }
+
+                context.rowsModel.setRowPropertyById(
+                    row.id,
+                    'rowCssClass',
+                    row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '')
+                );
+            }
+        }
+
+        /* Public */
+        function selectRowById(id) {
+            var request = context.view.suspendRender();
+
+            selectRow(context.rowsModel.getRowById(id));
+
+            context.view.resumeRender(request);
+            return self;
+        }
+
+        function deselectRowById(id) {
+            var request = context.view.suspendRender();
+            deselectRow(context.rowsModel.getRowById(id));
+            context.view.resumeRender(request);
+            return self;
         }
 
         function selectRowByIndex(idx) {
-            selectRow(
-                rowsModel.getRowByIndex(idx)
-            );
+            var request = context.view.suspendRender();
+
+            selectRow(context.rowsModel.getRowByIndex(idx));
+
+            context.view.resumeRender(request);
             return self;
         }
 
-        function selectRowById(id) {
-            selectRow(
-                rowsModel.getRowById(id)
-            );
+        function deselectRowByIndex(idx) {
+            var request = context.view.suspendRender();
+
+            deselectRow(context.rowsModel.getRowByIndex(idx));
+
+            context.view.resumeRender(request);
             return self;
         }
 
-        function clearSelectedRows(ids) {
-            for (var i = ids.length - 1; i >= 0; i--) {
-                clearSelectedRow(ids[i]);
+        function selectRowsRangeByIndex(firstIdx, lastIdx) {
+            if (firstIdx > -1 && lastIdx > -1) {
+                var request = context.view.suspendRender();
+
+                var startIndex = Math.min(lastIdx, firstIdx);
+                var endIndex = Math.max(lastIdx, firstIdx);
+
+                for (var i = startIndex; i <= endIndex; i++) {
+                    selectRow(context.rowsModel.getRowByIndex(i));
+                }
+                context.view.resumeRender(request);
             }
             return self;
         }
 
-        function clearSelectedRow(id) {
-            var row = rowsModel.getRowById(id);
-            if (row) {
-                rowsModel.setRowPropertyById(
-                    row.id,
-                    'rowCssClass',
-                    row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '')
-                );
+        function selectRowsRangeById(firstId, lastId) {
+            var firstFocusedIndex = context.rowsModel.getRowIndexById(firstId);
+            var lastFocusedIndex = context.rowsModel.getRowIndexById(lastId);
+            if (firstFocusedIndex !== -1 && lastFocusedIndex !== -1) {
+                var request = context.view.suspendRender();
+                var startIndex = Math.min(lastFocusedIndex, firstFocusedIndex);
+                var endIndex = Math.max(lastFocusedIndex, firstFocusedIndex);
+
+                for (var i = startIndex; i <= endIndex; i++) {
+                    selectRow(context.rowsModel.getRowByIndex(i));
+                }
+                context.view.resumeRender(request);
             }
-            var selectedIndex = selectedRowIds.indexOf(id);
-            if (selectedIndex !== -1) {
-                selectedRowIds.splice(selectedIndex, 1);
+        }
+
+        function deselectAllRows() {
+            var request = context.view.suspendRender();
+            var selectedIds = getSelectedRowsIds().slice();
+            for (var i = 0; i < selectedIds.length; i++) {
+                deselectRowById(selectedIds[i]);
             }
 
+            context.view.resumeRender(request);
+            return self;
+        }
+
+        function selectAllRows() {
+            var request = context.view.suspendRender();
+
+            var rows = context.rowsModel.getRows();
+            for (var i = 0; i < rows.length; i++) {
+                selectRowById(rows[i]);
+            }
+
+            context.view.resumeRender(request);
             return self;
         }
 
         function isRowSelected(id) {
-            return (selectedRowIds.indexOf(id) !== -1);
+            return selectedIds.indexOf(id) !== -1;
         }
 
         function getSelectedRowsIds() {
-            return selectedRowIds;
+            return selectedIds;
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
-            "clearSelectedRow": clearSelectedRow,
-            "clearSelectedRows": clearSelectedRows,
+            "deselectAllRows": deselectAllRows,
+            "deselectRowById": deselectRowById,
+            "deselectRowByIndex": deselectRowByIndex,
             "getSelectedRowsIds": getSelectedRowsIds,
             "isRowSelected": isRowSelected,
-            "selectRowByIndex": selectRowByIndex,
+            "selectAllRows": selectAllRows,
             "selectRowById": selectRowById,
-            "selectRowsRange": selectRowsRange,
+            "selectRowByIndex": selectRowByIndex,
+            "selectRowsRangeById": selectRowsRangeById,
+            "selectRowsRangeByIndex": selectRowsRangeByIndex
         });
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

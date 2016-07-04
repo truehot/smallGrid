@@ -1,27 +1,25 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Cell": {
-                "Formatter": {
-                    "Checkbox": checkboxFormatter,
-                    "Date": dateFormatter,
-                    "Default": defaultFormatter,
-                    "Float": floatFormatter,
-                    "Integer": integerFormatter,
-                    "Money": moneyFormatter,
-                    "Select": selectFormatter,
-                    "None": defaultFormatter,
-                    "Radio": radioFormatter,
-                    "Text": textFormatter,
-                },
+    $.extend(true, SmallGrid, {
+        "Cell": {
+            "Formatter": {
+                "Checkbox": checkboxFormatter,
+                "Date": dateFormatter,
+                "Default": defaultFormatter,
+                "Float": floatFormatter,
+                "Integer": integerFormatter,
+                "Money": moneyFormatter,
+                "Select": selectFormatter,
+                "None": defaultFormatter,
+                "Radio": radioFormatter,
+                "Text": textFormatter
             }
         }
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return (value != null) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return value != null ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {
@@ -63,8 +61,11 @@
     }
 
     function selectFormatter(value, column, row, settings) {
-        var html = defaultFormatter(value, column, row, settings);
-        return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        if (value instanceof Object) {
+            return value.text + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        } else {
+            return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        }
     }
 
     function textFormatter(value, column, row, settings) {
@@ -72,4 +73,4 @@
         return html + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

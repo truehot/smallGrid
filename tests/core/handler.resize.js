@@ -24,7 +24,7 @@ QUnit.test("Resize", function (assert) {
 
     $wrapper.appendTo('#qunit-fixture');
 
-    var handler = new SmallGrid.Handler.Resize.Create($wrapper, {
+    var handler = SmallGrid.Handler.Resize.Create($wrapper, {
         "cellIdentifier": "DIV",
         "handleResize": handleResize,
         "handleResizeStart": handleResizeStart,

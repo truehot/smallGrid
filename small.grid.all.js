@@ -1,28 +1,24 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Cell": {
-                "Editor": {
-                    "Create": CreateEditor,
-                    "Checkbox": CheckboxEditor,
-                    "Float": FloatEditor,
-                    "Integer": IntegerEditor,
-                    "Text": TextEditor,
-                    "Select": SelectEditor,
-                },
+    $.extend(true, SmallGrid, {
+        "Cell": {
+            "Editor": {
+                "Create": CreateEditor,
+                "Checkbox": CheckboxEditor,
+                "Float": FloatEditor,
+                "Integer": IntegerEditor,
+                "Text": TextEditor,
+                "Select": SelectEditor
             }
         }
     });
 
-    function CheckboxEditor(options, settings) {
+    function CheckboxEditor(context, settings) {
         var self = this,
-            value = !options.value;
+            value = !context.value;
 
-        this.destroy = function () {
-            return self;
-        };
+        this.destroy = function () { };
 
         this.getValue = function () {
             self.onChange.notify({
@@ -34,18 +30,18 @@
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
             "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
 
         self.onInitialize.notify({
-            "value": options.value
+            "value": context.value
         });
     }
 
-    function FloatEditor(options, settings) {
+    function FloatEditor(context, settings) {
         var self = this,
-            value = options.value,
-            $element = $('<input type="text" class="grid-float-editor" />').val(value).width(options.column.width);
+            value = context.value,
+            $element = $('<input type="text" class="grid-float-editor" />').val(value).width(context.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -61,8 +57,8 @@
 
         this.destroy = function () {
             $element.remove();
+            $element = undefined;
             self.onDestroy.notify({});
-            return self;
         };
 
         this.getValue = function () {
@@ -91,7 +87,7 @@
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
             "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
 
         self.onInitialize.notify({
@@ -99,10 +95,10 @@
         });
     }
 
-    function IntegerEditor(options, settings) {
+    function IntegerEditor(context, settings) {
         var self = this,
-            value = options.value,
-            $element = $('<input type="text" class="grid-integer-editor" />').val(value).width(options.column.width);
+            value = context.value,
+            $element = $('<input type="text" class="grid-integer-editor" />').val(value).width(context.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -118,8 +114,8 @@
 
         this.destroy = function () {
             $element.remove();
+            $element = undefined;
             self.onDestroy.notify({});
-            return self;
         };
 
         this.getValue = function () {
@@ -148,7 +144,7 @@
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
             "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
 
         self.onInitialize.notify({
@@ -156,10 +152,10 @@
         });
     }
 
-    function TextEditor(options, settings) {
+    function TextEditor(context, settings) {
         var self = this,
-            value = options.value,
-            $element = $('<input type="text" class="grid-text-editor"/>').val(value).width(options.column.width);
+            value = context.value,
+            $element = $('<input type="text" class="grid-text-editor"/>').val(value).width(context.column.width);
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -175,8 +171,8 @@
 
         this.destroy = function () {
             $element.remove();
+            $element = undefined;
             self.onDestroy.notify({});
-            return self;
         };
 
         this.getValue = function () {
@@ -202,7 +198,7 @@
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
             "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
 
         self.onInitialize.notify({
@@ -211,10 +207,10 @@
     }
 
 
-    function SelectEditor(options, settings) {
+    function SelectEditor(context, settings) {
         var self = this,
-            value = options.value,
-            $element = $('<select class="grid-select-editor"/>').val(value);
+            option = context.value || { text: "", value: "" },
+            $element = $('<select class="grid-select-editor"/>');
 
         this.append = function (cellNode) {
             $element.appendTo(cellNode);
@@ -230,12 +226,12 @@
 
         this.destroy = function () {
             $element.remove();
+            $element = undefined;
             self.onDestroy.notify({});
-            return self;
         };
 
         this.getValue = function () {
-            return $element.val();
+            return { text: $element.find('option:selected').text(), value: $element.val() };
         };
 
         this.setValue = function (value) {
@@ -251,27 +247,30 @@
             return self;
         };
 
-        self.setSource = function (values) {
+        this.setSource = function (values) {
             if (values.constructor === Array) {
-                $.each(values, function (index, item) {
-                    $element.append(new Option(item.text, item.value));
-                });
+                var options = '';
+                var selected = false;
+                for (var i = 0; i < values.length; i++) {
+                    selected = option.value === values[i].value;
+                    options += '<option value="' + values[i].value + '"' + (selected ? " selected" : "") + '>' + values[i].text + '</option>';
+                }
+                $element.append(options);
             }
-            $element.val(value);
-        }
+        };
 
         $.extend(this, {
             "onInitialize": new SmallGrid.Event.Handler(),
             "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
 
         self.onInitialize.notify({
-            "value": value
+            "value": option
         });
     }
 
-    function CreateEditor(name, options, settings) {
+    function CreateEditor(name, context, settings) {
         if (!name.length) {
             throw new TypeError("Editor name is not defined");
         }
@@ -284,33 +283,31 @@
             throw new TypeError("name is not defined");
         }
 
-        return new SmallGrid.Cell.Editor[name](options, settings);
+        return new SmallGrid.Cell.Editor[name](context, settings);
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Cell": {
-                "Formatter": {
-                    "Checkbox": checkboxFormatter,
-                    "Date": dateFormatter,
-                    "Default": defaultFormatter,
-                    "Float": floatFormatter,
-                    "Integer": integerFormatter,
-                    "Money": moneyFormatter,
-                    "Select": selectFormatter,
-                    "None": defaultFormatter,
-                    "Radio": radioFormatter,
-                    "Text": textFormatter,
-                },
+    $.extend(true, SmallGrid, {
+        "Cell": {
+            "Formatter": {
+                "Checkbox": checkboxFormatter,
+                "Date": dateFormatter,
+                "Default": defaultFormatter,
+                "Float": floatFormatter,
+                "Integer": integerFormatter,
+                "Money": moneyFormatter,
+                "Select": selectFormatter,
+                "None": defaultFormatter,
+                "Radio": radioFormatter,
+                "Text": textFormatter
             }
         }
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return (value != null) ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return value != null ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {
@@ -352,8 +349,11 @@
     }
 
     function selectFormatter(value, column, row, settings) {
-        var html = defaultFormatter(value, column, row, settings);
-        return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        if (value instanceof Object) {
+            return value.text + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        } else {
+            return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
+        }
     }
 
     function textFormatter(value, column, row, settings) {
@@ -361,18 +361,16 @@
         return html + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Column": {
-                "Comparer": {
-                    "Default": mixedComparer,
-                    "Date": dateComparer,
-                    "Number": numberComparer,
-                    "String": stringComparer,
-                }
+    $.extend(true, SmallGrid, {
+        "Column": {
+            "Comparer": {
+                "Default": mixedComparer,
+                "Date": dateComparer,
+                "Number": numberComparer,
+                "String": stringComparer,
             }
         }
     });
@@ -432,42 +430,18 @@
         };
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Column": {
-                "Create": CreateModel,
-                "Model": ColumnModel,
-                "ColumnData": ColumnData
-            }
+    $.extend(true, SmallGrid, {
+        "Column": {
+            "Create": CreateModel,
+            "Model": ColumnModel,
+            "ColumnData": ColumnData
         }
     });
 
-    function ColumnData(data) {
-        if ("align" in data) this.align = data.align;
-        if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
-        if ("editable" in data) this.editable = data.editable;
-        if ("editor" in data) this.editor = data.editor;
-        if ("editMode" in data) this.editMode = data.editMode;
-        if ("field" in data) this.field = data.field;
-        if ("filterable" in data) this.filterable = data.filterable;
-        if ("formatter" in data) this.formatter = data.formatter;
-        if ("headerCssClass" in data) this.headerCssClass = data.headerCssClass;
-        if ("hidden" in data) this.hidden = data.hidden;
-        if ("id" in data) this.id = data.id;
-        if ("item" in data) this.item = data.item;
-        if ("maxWidth" in data) this.maxWidth = data.maxWidth;
-        if ("minWidth" in data) this.minWidth = data.minWidth;
-        if ("name" in data) this.name = data.name;
-        if ("resizeable" in data) this.resizeable = data.resizeable;
-        if ("sortable" in data) this.sortable = data.sortable;
-        if ("sortOrder" in data) this.sortOrder = data.sortOrder;
-        if ("sortComparer" in data) this.sortComparer = data.sortComparer;
-        if ("width" in data) this.width = data.width;
-    }
-
+    function ColumnData() { }
     ColumnData.prototype.align = "";//column cells align - "" / center / right
     ColumnData.prototype.cellCssClass = "";//css class for column cells
     ColumnData.prototype.editable = true; //true when column cells editable
@@ -492,12 +466,12 @@
     function ColumnModel(settings) {
         var self = this;
         var data = [];
-        var items = {
+
+        this.items = {
+
             addItem: function (item) {
-                var column = createColumn(item);
-                addColumn(column);
-                self.onChange.notify({ "id": column.id });
-                return column;
+                addColumn(createColumn(item));
+                return self;
             },
 
             addItems: function (items) {
@@ -507,14 +481,6 @@
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyBlocked();
-                }
-                return self;
-            },
-
-
-            deleteItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                    deleteColumnById(item[settings.columns.idProperty]);
                 }
                 return self;
             },
@@ -547,15 +513,9 @@
                 return self;
             },
 
-            updateItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, item)) {
-                    self.items.updateItemById(item[settings.columns.idProperty], item);
-                }
-            },
-
             updateItemById: function (id, item) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
                         break;
@@ -571,19 +531,11 @@
                 }
                 return self;
             },
-
-
-            updateItems: function (items) {
-                if (items.length) {
-                    self.onChange.blockEvents();
-                    for (var i = 0; i < items.length; i++) {
-                        self.items.updateItem(items[i]);
-                    }
-                    self.onChange.notifyBlocked();
-                }
-                return self;
-            }
         };
+
+        function destroy() {
+            data = [];
+        }
 
         function filter(callback) {
             if (data.length) {
@@ -644,7 +596,7 @@
 
         function deleteColumnById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
                     break;
@@ -673,7 +625,7 @@
 
         function getColumnById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return data[i];
                 }
             }
@@ -689,7 +641,7 @@
 
         function getColumnIndexById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return i;
                 }
             }
@@ -756,7 +708,7 @@
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
@@ -808,7 +760,7 @@
         function updateColumnById(id, column) {
             if (column instanceof ColumnData) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i] = column;
                         self.onChange.notify({ "id": id });
                         break;
@@ -839,50 +791,63 @@
             return self;
         }
 
-        function createItemData(item) {
-            if (item instanceof Object) {
-                if (settings.columns.mapProperties === true) {
-                    return $.extend({ item: item }, item);
-                }
-                return {
-                    "name": item.name,
-                    "field": item.field,
-                    "item": item
-                };
-            }
-        }
-
         function createColumn(item) {
-            var itemData = createItemData(item);
-            if (itemData != undefined) {
-                var column = new ColumnData(itemData);
-                column.id = (SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
-                column.width = Math.max(
-                    Math.min(
-                        parseInt(column.width, 10),
-                        column.maxWidth
-                    ),
-                    column.minWidth
-                );
+            if (item instanceof Object) {
+                var column = new ColumnData();
 
-                if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
-                    delete column.sortComparer;
+                if (settings.columns.newIdType === "number") {
+                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createId();
+                } else {
+                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
                 }
 
-                if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
-                    delete column.formatter;
-                }
+                column.name = item.name;
+                column.field = item.field;
+                column.item = item;
 
-                if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
-                    delete column.editor;
-                }
+                if ("align" in item) column.align = item.align;
+                if ("cellCssClass" in item) column.cellCssClass = item.cellCssClass;
+                if ("editable" in item) column.editable = item.editable;
+                if ("editor" in item) column.editor = item.editor;
+                if ("editMode" in item) column.editMode = item.editMode;
+                if ("filterable" in item) column.filterable = item.filterable;
+                if ("formatter" in item) column.formatter = item.formatter;
+                if ("headerCssClass" in item) column.headerCssClass = item.headerCssClass;
+                if ("hidden" in item) column.hidden = item.hidden;
+                if ("maxWidth" in item) column.maxWidth = item.maxWidth;
+                if ("minWidth" in item) column.minWidth = item.minWidth;
+                if ("resizeable" in item) column.resizeable = item.resizeable;
+                if ("sortable" in item) column.sortable = item.sortable;
+                if ("sortOrder" in item) column.sortOrder = item.sortOrder;
+                if ("sortComparer" in item) column.sortComparer = item.sortComparer;
+                if ("width" in item) column.width = item.width;
+
+                //column.width = Math.max(
+                //    Math.min(
+                //        parseInt(column.width, 10),
+                //        column.maxWidth
+                //    ),
+                //    column.minWidth
+                //);
+
+                //if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
+                //    delete column.sortComparer;
+                //}
+
+                //if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
+                //    delete column.formatter;
+                //}
+
+                //if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
+                //    delete column.editor;
+                //}
 
                 return column;
             }
         }
 
         $.extend(this, {
-            "items": items,
+            "destroy": destroy,
 
             "onChange": new SmallGrid.Event.Handler(),
 
@@ -917,12 +882,12 @@
             "updateColumn": updateColumn,
             "updateColumnById": updateColumnById,
             "updateColumnByIndex": updateColumnByIndex,
-            "updateColumns": updateColumns,
+            "updateColumns": updateColumns
         });
     }
 
     function CreateModel(data, settings) {
-        if (Array.isArray(data) == false) {
+        if (Array.isArray(data) === false) {
             throw new TypeError("Data is not defined");
         }
 
@@ -930,20 +895,16 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new ColumnModel(
-            settings
-        ).items.addItems(data);
+        return new ColumnModel(settings).items.addItems(data);
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Event": {
-                "Data": EventData,
-                "Handler": EventHandler
-            }
+    $.extend(true, SmallGrid, {
+        "Event": {
+            "Data": EventData,
+            "Handler": EventHandler
         }
     });
 
@@ -959,7 +920,7 @@
         var isDefaultPrevented = false;
 
         this.preventDefault = function () {
-            if (data && "event" in data && typeof (data.event.preventDefault) === "function") {
+            if (data && "event" in data && typeof data.event.preventDefault === "function") {
                 data.event.preventDefault();
             }
             isDefaultPrevented = true;
@@ -970,7 +931,7 @@
         };
 
         this.stopPropagation = function () {
-            if (data && "event" in data && typeof (data.event.stopPropagation) === "function") {
+            if (data && "event" in data && typeof data.event.stopPropagation === "function") {
                 data.event.stopPropagation();
             }
             isPropagationStopped = true;
@@ -982,7 +943,7 @@
 
         //Keeps the rest of the handlers from being executed
         this.stopImmediatePropagation = function () {
-            if (data && "event" in data && typeof (data.event.stopImmediatePropagation) === "function") {
+            if (data && "event" in data && typeof data.event.stopImmediatePropagation === "function") {
                 data.event.stopImmediatePropagation();
             }
             isImmediatePropagationStopped = true;
@@ -1044,11 +1005,11 @@
         };
 
         self.notify = function (eventData) {
-            if (blockEvents == true) {
+            if (blockEvents === true) {
                 return blockedEventData.push(eventData);
             }
 
-            if (typeof (eventData) != EventData) {
+            if (typeof eventData !== EventData) {
                 eventData = new EventData(eventData);
             }
 
@@ -1061,22 +1022,20 @@
         };
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Grid": {
-                "Create": CreateModel,
-                "Model": GridModel,
-            }
+    $.extend(true, SmallGrid, {
+        "Grid": {
+            "Create": CreateModel,
+            "Model": GridModel
         }
     });
 
-    function GridModel($container, view, viewModel, windowManager, settings) {
+    function GridModel($container, context, settings) {
         var self = this,
             plugins = {},
-            version = "0.4",
+            version = "0.6 beta",
             id = SmallGrid.Utils.createGuid();
 
         /*
@@ -1084,41 +1043,52 @@
         */
         function init() {
             registerPlugins(settings.plugins);
+
+            var contextKeys = ["windowManager", "view", "viewModel"];
+            for (var i = 0; i < contextKeys.length; i++) {
+                context[contextKeys[i]].init();
+            }
+
+            self.onInitialize.notify({});
             return self;
         }
 
         function destroy() {
-            for (var i = 0; i < plugins.length; i++) {
-                unregisterPlugin(plugins[i]);
+            unregisterPlugins();
+
+            var contextKeys = ["windowManager", "view", "viewModel", "rowsModel", "columnsModel"];
+            for (var i = 0; i < contextKeys.length; i++) {
+                context[contextKeys[i]].destroy();
+                delete context[contextKeys[i]];
             }
-            windowManager.destroy();
-            view.destroy();
+
+            self.onDestroy.notify({});
         }
         /*
          WindowManager
          */
         function getWindowManager() {
-            return windowManager;
+            return context.windowManager;
         }
 
         /*
         View
         */
         function getView() {
-            return view;
+            return context.view;
         }
 
         /*View model*/
         function getViewModel() {
-            return viewModel;
+            return context.viewModel;
         }
 
         function getRowsModel() {
-            return viewModel.getRowsModel();
+            return context.rowsModel;
         }
 
         function getColumnsModel() {
-            return viewModel.getColumnsModel();
+            return context.columnsModel;
         }
 
         /*
@@ -1150,10 +1120,18 @@
                 unregisterPlugin(name);
             }
 
-            var plugin = SmallGrid.Plugins.Create(name, { view: view, viewModel: viewModel, windowManager: windowManager }, settings, pluginSettings);
-            if (plugin) {
-                plugins[name] = plugin;
+            var plugin = SmallGrid.Plugins.Create(
+                name,
+                context,
+                settings,
+                pluginSettings
+            );
+
+            if (!plugin) {
+                throw new Error("Plugin is not defined.");
             }
+
+            plugins[name] = plugin;
         }
 
         function registerPlugins(plugins) {
@@ -1166,8 +1144,6 @@
         function unregisterPlugin(name) {
             if (plugins[name]) {
                 plugins[name].destroy();
-            }
-            if (name in plugins) {
                 delete plugins[name];
             }
         }
@@ -1209,42 +1185,46 @@
             "registerPlugins": registerPlugins,
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
+
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
     }
 
-    function CreateModel($container, rows, columns, options) {
+    function CreateModel($container, rows, columns, options, autoInit) {
         var settings = SmallGrid.Settings.Create(options || {});
-
-        var viewModel = SmallGrid.View.Model.Create(
-            new SmallGrid.Row.Create(rows || [], settings),
-            new SmallGrid.Column.Create(columns || [], settings),
-            settings
-        );
-
-        var view = SmallGrid.View.Create($container, viewModel, settings);
-        var windowManager = SmallGrid.View.Window.Create(view, settings);
+        var rowsModel = SmallGrid.Row.Create(rows || [], settings);
+        var columnsModel = SmallGrid.Column.Create(columns || [], settings);
+        var viewModel = SmallGrid.View.Model.Create(rowsModel, columnsModel, settings, false);
+        var view = SmallGrid.View.Create($container, viewModel, settings, false);
+        var windowManager = SmallGrid.View.Window.Create(view, settings, false);
 
         var grid = new GridModel(
             $container,
-            view,
-            viewModel,
-            windowManager,
+            {
+                "columnsModel": columnsModel,
+                "rowsModel": rowsModel,
+                "view": view,
+                "viewModel": viewModel,
+                "windowManager": windowManager
+            },
             settings
         );
 
-        return grid.init();
+        if (autoInit !== false) grid.init();
+
+        return grid;
+
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Click": {
-                    "Create": Create,
-                    "Handler": ClickHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Click": {
+                "Create": Create,
+                "Handler": ClickHandler
             }
         }
     });
@@ -1266,7 +1246,7 @@
                         return {
                             cellIndex: $cellElement.index(),
                             rowIndex: $rowElement.index(),
-                            event: evt,
+                            event: evt
                         };
                     }
                 }
@@ -1281,39 +1261,45 @@
         }
 
         function handleClick(evt) {
-            evt = getCellEvent(evt);
-            if (evt && settings.handleClick) {
-                settings.handleClick(evt);
+            var cellEvt = getCellEvent(evt);
+            if (cellEvt && settings.handleClick) {
+                settings.handleClick(cellEvt);
             }
         }
 
         function handleContextMenu(evt) {
-            evt = getCellEvent(evt);
-            if (evt && settings.handleContextMenu) {
-                settings.handleContextMenu(evt);
+            var cellEvt = getCellEvent(evt);
+            if (cellEvt && settings.handleContextMenu) {
+                settings.handleContextMenu(cellEvt);
             }
         }
 
         function handleDblClick(evt) {
-            evt = getCellEvent(evt);
-            if (evt && settings.handleDblClick) {
-                settings.handleDblClick(evt);
+            var cellEvt = getCellEvent(evt);
+            if (cellEvt && settings.handleDblClick) {
+                settings.handleDblClick(cellEvt);
             }
         }
 
         function handleKeyDown(evt) {
-            evt = getCellEvent(evt);
-            if (evt && settings.handleKeyDown) {
-                settings.handleKeyDown(evt);
+            var cellEvt = getCellEvent(evt);
+            if (cellEvt && settings.handleKeyDown) {
+                settings.handleKeyDown(cellEvt);
             }
         }
 
         function destroy() {
             $container
                 .off("click", handleClick)
+                .off("mousedown", handleMouseDown)
                 .off("contextmenu", handleContextMenu)
                 .off("dblclick", handleDblClick)
                 .off("keydown", handleKeyDown);
+
+            var settingsKeys = Object.keys(settings);
+            for (var i = 0; i < settingsKeys.length; i++) {
+                delete settings[settingsKeys[i]];
+            }
         }
 
         $.extend(this, {
@@ -1321,76 +1307,98 @@
         });
     }
 
-    function Create($container, settings) {
+    function Create($container, options) {
+        if (!$container.length) {
+            throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length != 1) {
+            throw new TypeError("There should be only 1 container.");
+        }
+
         var defaultSettings = {
             "rowIdentifier": "TR",
             "cellIdentifier": "TD",
             "handleClick": undefined,
             "handleDblClick": undefined,
             "handleContextMenu": undefined,
-            "handleKeyDown": undefined,
+            "handleKeyDown": undefined
         };
 
-        settings = $.extend({}, defaultSettings, settings);
+        var settings = $.extend({}, defaultSettings, options);
 
         return new ClickHandler($container, settings);
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Resize": {
-                    "Create": Create,
-                    "Handler": ResizeHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Resize": {
+                "Create": Create,
+                "Handler": ResizeHandler
             }
         }
     });
 
     function ResizeHandler($container, settings) {
+        var $cellElement, cellIndex, pageX, canBeMoved = false;
+
         $container.on("mousedown", settings.handlerIdentifier, handleMouseDown);
+        $(document).on("mousemove", handleMouseMove).on("mouseup", handleMouseUp);
 
         function handleMouseDown(evt) {
-            var $cellElement = $(this).closest(settings.cellIdentifier);
-
+            $cellElement = $(this).closest(settings.cellIdentifier);
             if ($cellElement.length) {
-                var cellIndex = $cellElement.index();
-
+                cellIndex = $cellElement.index();
+                pageX = evt.pageX;
                 settings.handleResizeStart({
                     cellElement: $cellElement,
                     cellIndex: cellIndex,
                     event: evt
                 });
 
-                $(document)
-                    .bind("mousemove", function (evt) {
-                        var newWidth = evt.pageX - $cellElement.offset().left;
-                        if (newWidth > 0) {
-                            settings.handleResize({
-                                cellElement: $cellElement,
-                                cellIndex: cellIndex,
-                                width: newWidth,
-                                event: evt
-                            });
-                        }
-                    })
-                    .bind("mouseup", function (evt) {
-                        $(this).unbind("mousemove mouseup");
+                canBeMoved = true;
+            }
+        }
 
-                        settings.handleResizeStop({
-                            cellElement: $cellElement,
-                            cellIndex: cellIndex,
-                            event: evt
-                        });
+        function handleMouseMove(evt) {
+            if (canBeMoved) {
+                var newWidth = evt.pageX - $cellElement.offset().left;
+                if (newWidth > 0) {
+                    settings.handleResize({
+                        cellElement: $cellElement,
+                        cellIndex: cellIndex,
+                        xDelta: evt.pageX - pageX,
+                        width: newWidth,
+                        event: evt
                     });
+                }
+            }
+        }
+
+        function handleMouseUp(evt) {
+            if (canBeMoved) {
+                canBeMoved = false;
+
+                settings.handleResizeStop({
+                    cellElement: $cellElement,
+                    cellIndex: cellIndex,
+                    event: evt
+                });
             }
         }
 
         function destroy() {
             $container.off('mousedown', handleMouseDown);
+            $(document).off("mousemove", handleMouseMove).off("mouseup", handleMouseUp);
+            $cellElement = undefined;
+
+            var settingsKeys = Object.keys(settings);
+            for (var i = 0; i < settingsKeys.length; i++) {
+                delete settings[settingsKeys[i]];
+            }
         }
 
         $.extend(this, {
@@ -1398,30 +1406,36 @@
         });
     }
 
-    function Create($container, settings) {
+    function Create($container, options) {
+        if (!$container.length) {
+            throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length !== 1) {
+            throw new TypeError("There should be only 1 container.");
+        }
+
         var defaultSettings = {
             "cellIdentifier": "TD",
             "handleResize": undefined,
             "handleResizeStart": undefined,
             "handleResizeStop": undefined,
-            "handlerIdentifier": undefined,
+            "handlerIdentifier": undefined
         };
 
-        settings = $.extend({}, defaultSettings, settings);
+        var settings = $.extend({}, defaultSettings, options);
 
         return new ResizeHandler($container, settings);
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Scroll": {
-                    "Create": Create,
-                    "Handler": ScrollHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Scroll": {
+                "Create": Create,
+                "Handler": ScrollHandler
             }
         }
     });
@@ -1430,24 +1444,24 @@
     TODO: direction change
     https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
     */
-    function ScrollHandler($element, settings) {
+    function ScrollHandler($container, settings) {
 
         if (settings.resetTop) {
-            $element[0].scrollTop = 0;
+            $container[0].scrollTop = 0;
         }
         if (settings.resetLeft) {
-            $element[0].scrollLeft = 0;
+            $container[0].scrollLeft = 0;
         }
 
         var scrollStopTimer, wheelStopTimer,
             isScrollMoved = false, isWheelMoved = false,
             lastScroll = {
-                scrollTop: $element[0].scrollTop,
-                scrollLeft: $element[0].scrollLeft,
+                scrollTop: $container[0].scrollTop,
+                scrollLeft: $container[0].scrollLeft
             };
 
-        $element.on('scroll', handleScroll);
-        $element.on('wheel', handleMouseWheel);
+        $container.on('scroll', handleScroll);
+        $container.on('wheel', handleMouseWheel);
 
         function handleMouseWheel(evt) {
             clearTimeout(wheelStopTimer);
@@ -1468,11 +1482,11 @@
 
         function handleScroll(evt) {
             var scroll = {
-                scrollTop: $element[0].scrollTop,
-                scrollLeft: $element[0].scrollLeft,
-                topDelta: $element[0].scrollTop - lastScroll.scrollTop,
-                leftDelta: $element[0].scrollLeft - lastScroll.scrollLeft,
-                event: evt,
+                scrollTop: $container[0].scrollTop,
+                scrollLeft: $container[0].scrollLeft,
+                topDelta: $container[0].scrollTop - lastScroll.scrollTop,
+                leftDelta: $container[0].scrollLeft - lastScroll.scrollLeft,
+                event: evt
             };
 
             clearTimeout(scrollStopTimer);
@@ -1491,7 +1505,7 @@
 
             lastScroll = {
                 scrollTop: scroll.scrollTop,
-                scrollLeft: scroll.scrollLeft,
+                scrollLeft: scroll.scrollLeft
             };
         }
 
@@ -1499,8 +1513,13 @@
             clearTimeout(scrollStopTimer);
             clearTimeout(wheelStopTimer);
 
-            $element.off('scroll', handleScroll);
-            $element.off('wheel', handleMouseWheel);
+            $container.off('scroll', handleScroll);
+            $container.off('wheel', handleMouseWheel);
+
+            var settingsKeys = Object.keys(settings);
+            for (var i = 0; i < settingsKeys.length; i++) {
+                delete settings[settingsKeys[i]];
+            }
         }
 
         $.extend(this, {
@@ -1508,7 +1527,14 @@
         });
     }
 
-    function Create($container, settings) {
+    function Create($container, options) {
+        if (!$container.length) {
+            throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length != 1) {
+            throw new TypeError("There should be only 1 container.");
+        }
 
         var defaultSettings = {
             "handleMouseWheel": undefined,
@@ -1519,24 +1545,22 @@
             "handlescrollStop": undefined,
             "latency": 300,
             "resetLeft": true,
-            "resetTop": true,
+            "resetTop": true
         };
 
-        settings = $.extend({}, defaultSettings, settings);
+        var settings = $.extend({}, defaultSettings, options);
 
         return new ScrollHandler($container, settings);
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Shared": {
-                    "GetInstance": GetInstance,
-                    "Handler": SharedHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Shared": {
+                "GetInstance": GetInstance,
+                "Handler": SharedHandler
             }
         }
     });
@@ -1575,10 +1599,11 @@
         }
 
         function destroy() {
+            clearTimeout(resizeTimer);
             $(window)
                 .off("click", handleClick)
                 .off("contextmenu", handleContextMenu)
-                .off("resize", handleResize)
+                .off("resize", handleResize);
         }
 
         $.extend(this, {
@@ -1600,14 +1625,12 @@
         return handler;
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "Create": Create,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "Create": Create
         }
     });
 
@@ -1638,18 +1661,16 @@
 
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Query": {
-                "FilterQuery": FilterQuery,
-            }
+    $.extend(true, SmallGrid, {
+        "Query": {
+            "FilterQuery": FilterQuery
         }
     });
 
-    function FilterQuery(field, settings) {
+    function FilterQuery(field) {
         var self = this;
         var query = [];
         var id = SmallGrid.Utils.createGuid();
@@ -1737,14 +1758,12 @@
             "startswith": startswith,
         });
     }
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Query": {
-                "Request": Request,
-            }
+    $.extend(true, SmallGrid, {
+        "Query": {
+            "Request": Request
         }
     });
 
@@ -1776,17 +1795,17 @@
 
         function getRowsInRange(top, height, outerHeight) {
             sortRows();
-            return dataModel.filter(new RowsRangeByHeight(top, height, outerHeight, getRowFilter()));
+            return dataModel.filter(RowsRangeByHeight(top, height, outerHeight, getRowFilter()));
         }
 
         function getColumnsInRange(left, width, outerWidth) {
-            return dataModel.filter(new ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
+            return dataModel.filter(ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
         }
 
         function getColumnsTotal(width) {
             var total = {
                 width: 0,
-                count: 0,
+                count: 0
             };
             var columns = dataModel.getColumns();
             var filter = getColumnFilter();
@@ -1803,7 +1822,7 @@
         function getRowsTotal(height) {
             var total = {
                 height: 0,
-                count: 0,
+                count: 0
             };
             var rows = dataModel.getRows();
             var filter = getRowFilter();
@@ -1924,18 +1943,16 @@
             "getRowsInRange": getRowsInRange
         });
     }
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Query": {
-                "SorterQuery": SorterQuery,
-            }
+    $.extend(true, SmallGrid, {
+        "Query": {
+            "SorterQuery": SorterQuery
         }
     });
 
-    function SorterQuery(field, sortOrder, sortComparer, settings) {
+    function SorterQuery(field, sortOrder, sortComparer) {
         var self = this;
 
         function getField() {
@@ -1953,36 +1970,21 @@
         $.extend(this, {
             "getField": getField,
             "getSortOrder": getSortOrder,
-            "getSortComparer": getSortComparer,
+            "getSortComparer": getSortComparer
         });
     }
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Row": {
-                "Create": CreateModel,
-                "Model": RowModel,
-                "RowData": RowData,
-            }
+    $.extend(true, SmallGrid, {
+        "Row": {
+            "Create": CreateModel,
+            "Model": RowModel,
+            "RowData": RowData
         }
     });
 
-    function RowData(data) {
-        if ("cellCssClass" in data) this.cellCssClass = data.cellCssClass;
-        if ("disabled" in data) this.disabled = data.disabled;
-        if ("editable" in data) this.editable = data.editable;
-        if ("editMode" in data) this.editMode = data.editMode;
-        if ("height" in data) this.height = data.height;
-        if ("hidden" in data) this.hidden = data.hidden;
-        if ("id" in data) this.id = data.id;
-        if ("item" in data) this.item = data.item;
-        if ("maxHeight" in data) this.maxHeight = data.maxHeight;
-        if ("minHeight" in data) this.minHeight = data.minHeight;
-        if ("rowCssClass" in data) this.rowCssClass = data.rowCssClass;
-    }
-
+    function RowData() { }
     RowData.prototype.cellCssClass = "";// row based cell class
     RowData.prototype.disabled = false; // is row disabled
     RowData.prototype.editable = true; // true when row cells are editable
@@ -1999,13 +2001,11 @@
         var self = this;
         var data = [];
 
-        var items = {
+        this.items = {
 
             addItem: function (item) {
-                var row = createRow(item);
-                addRow(row);
-                self.onChange.notify({ "id": row.id });
-                return row;
+                addRow(createRow(item));
+                return self;
             },
 
             addItems: function (items) {
@@ -2025,13 +2025,6 @@
 
             deleteItemById: function (id) {
                 return deleteRowById(id);
-            },
-
-            deleteItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                    deleteRowById(item[settings.rows.idProperty]);
-                }
-                return self;
             },
 
             getItems: function () {
@@ -2054,26 +2047,9 @@
                 return self;
             },
 
-            updateItems: function (items) {
-                if (items.length) {
-                    self.onChange.blockEvents();
-                    for (var i = 0; i < items.length; i++) {
-                        self.items.updateItem(items[i]);
-                    }
-                    self.onChange.notifyBlocked();
-                }
-                return self;
-            },
-
-            updateItem: function (item) {
-                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
-                    self.items.updateItemById(item[settings.rows.idProperty], item);
-                }
-            },
-
             updateItemById: function (id, item) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
                         break;
@@ -2089,8 +2065,11 @@
                 }
                 return self;
             }
-        }
+        };
 
+        function destroy() {
+            data = [];
+        }
 
         function filter(callback) {
             if (data.length) {
@@ -2202,7 +2181,7 @@
 
         function deleteRowById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
                     break;
@@ -2222,7 +2201,7 @@
 
         function getRowById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return data[i];
                 }
             }
@@ -2238,7 +2217,7 @@
 
         function getRowIndexById(id) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     return i;
                 }
             }
@@ -2305,7 +2284,7 @@
 
         function setRowPropertyById(id, propertyName, propertyValue) {
             for (var i = 0; i < data.length; i++) {
-                if (data[i].id == id) {
+                if (data[i].id === id) {
                     if (propertyName && propertyName in data[i]) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
@@ -2336,7 +2315,7 @@
         function updateRowById(id, row) {
             if (row instanceof RowData) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].id == id) {
+                    if (data[i].id === id) {
                         data[i] = row;
                         self.onChange.notify({ "id": id });
                         break;
@@ -2356,37 +2335,46 @@
             return self;
         }
 
-        function createItemData(item) {
-            if (item instanceof Object) {
-                if (settings.rows.mapProperties === true) {
-                    return $.extend({ item: item }, item);
-                }
-                return { item: item };
-            }
-        }
-
         function createRow(item) {
-            var itemData = createItemData(item);
-            if (itemData != undefined) {
-                var row = new RowData(itemData);
-                row.id = (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) ? item[settings.rows.idProperty] : SmallGrid.Utils.createGuid();
-                row.height = Math.max(
-                    Math.min(
-                        parseInt(row.height, 10),
-                        row.maxHeight
-                    ),
-                    row.minHeight
-                );
+            if (item instanceof Object) {
+                var row = new RowData();
+
+                if (settings.rows.newIdType === "number") {
+                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createId();
+                } else {
+                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createGuid();
+                }
+
+                row.item = item;
+
+                if ("cellCssClass" in item) row.cellCssClass = item.cellCssClass;
+                if ("disabled" in item) row.disabled = item.disabled;
+                if ("editable" in item) row.editable = item.editable;
+                if ("editMode" in item) row.editMode = item.editMode;
+                if ("height" in item) row.height = item.height;
+                if ("hidden" in item) row.hidden = item.hidden;
+                if ("maxHeight" in item) row.maxHeight = item.maxHeight;
+                if ("minHeight" in item) row.minHeight = item.minHeight;
+                if ("rowCssClass" in item) row.rowCssClass = item.rowCssClass;
+
+                //row.height = Math.max(
+                //    Math.min(
+                //        parseInt(row.height, 10),
+                //        row.maxHeight
+                //    ),
+                //    row.minHeight
+                //);
+
                 return row;
             }
         }
 
         $.extend(this, {
-            "items": items,
+            "destroy": destroy,
+
             "onChange": new SmallGrid.Event.Handler(),
 
             "filter": filter,
-
             "reduce": reduce,
             "sort": sort,
             "total": total,
@@ -2417,12 +2405,12 @@
             "updateRow": updateRow,
             "updateRowById": updateRowById,
             "updateRowByIndex": updateRowByIndex,
-            "updateRows": updateRows,
+            "updateRows": updateRows
         });
     }
 
     function CreateModel(data, settings) {
-        if (Array.isArray(data) == false) {
+        if (Array.isArray(data) === false) {
             throw new TypeError("Data is not defined");
         }
 
@@ -2430,50 +2418,40 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new RowModel(
-            settings
-        ).items.addItems(data);
+        return new RowModel(settings).items.addItems(data);
     }
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    var guid = function () {
-        var e = {};
+    var createGuid = function () {
         var t = [];
-        for (var n = 0; n < 256; n++) {
-            t[n] = (n < 16 ? "0" : "") + n.toString(16);
+        for (var i = 0; i < 256; i++) {
+            t[i] = i < 16 ? "0" + i.toString(16) : i.toString(16);
         }
-        e.newGuid = function () {
-            var e = Math.random() * 4294967295 | 0;
-            var n = Math.random() * 4294967295 | 0;
-            var r = Math.random() * 4294967295 | 0;
-            var i = Math.random() * 4294967295 | 0;
-            return t[e & 255] + t[e >> 8 & 255] + t[e >> 16 & 255] + t[e >> 24 & 255] + "-" + t[n & 255] + t[n >> 8 & 255] + "-" + t[n >> 16 & 15 | 64] + t[n >> 24 & 255] + "-" + t[r & 63 | 128] + t[r >> 8 & 255] + "-" + t[r >> 16 & 255] + t[r >> 24 & 255] + t[i & 255] + t[i >> 8 & 255] + t[i >> 16 & 255] + t[i >> 24 & 255];
+        return function () {
+            var e = Math.random() * 4294967295 | 0, n = Math.random() * 4294967295 | 0, r = Math.random() * 4294967295 | 0, i = Math.random() * 4294967295 | 0;
+            return (t[e & 255] + t[e >> 8 & 255] + t[e >> 16 & 255] + t[e >> 24 & 255] + "-" + t[n & 255] + t[n >> 8 & 255] + "-" + t[n >> 16 & 15 | 64] + t[n >> 24 & 255] + "-" + t[r & 63 | 128] + t[r >> 8 & 255] + "-" + t[r >> 16 & 255] + t[r >> 24 & 255] + t[i & 255] + t[i >> 8 & 255] + t[i >> 16 & 255] + t[i >> 24 & 255]).toLowerCase();
         };
-        return e;
     }();
 
+    var createId = function () {
+        var lastId = 0;
+        return function () {
+            return "" + lastId++;
+        };
+    }();
+
+
     function isFunction(funcName, obj) {
-        return (obj && funcName && funcName in obj && typeof (obj[funcName]) === "function");
+        return obj && funcName && funcName in obj && typeof obj[funcName] === "function";
     }
 
     function isProperty(property, obj) {
-        return (property && property in obj);
+        return property && property in obj;
     }
 
     function parseBool(str) {
         return (/^true$/i).test(str);
-    }
-
-    function measureViewport() {
-        var $el = $('<div style="display:none;width:1vw;height:1vh;" />').appendTo(document.body);
-        var dim = {
-            width: $el.width() - $el[0].clientWidth,
-            height: $el.height() - $el[0].clientHeight,
-        };
-        $el.remove();
-
-        return dim;
     }
 
     function measureMaxSupportedCssHeight() {
@@ -2486,7 +2464,7 @@
             } else {
                 break;
             }
-        } while (supportedHeight < 16000000)
+        } while (supportedHeight < 16000000);
 
         el.remove();
         return supportedHeight - incHeight;
@@ -2506,84 +2484,394 @@
 
 
     function measureTableCellDiff(cssClass) {
-        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'></table>").appendTo(document.body),
-            $tbody = $("<tbody></tbody>").appendTo($table),
-            $row = $("<tr/>").appendTo($tbody),
-            $cell = $("<td class='" + cssClass + "' style='width:5px; height:5px;'>-</td>").appendTo($row);
+        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'><tbody><tr><td class='" + cssClass + "' style='width:5px; height:5px;'>-</td></tr></tbody></table>").appendTo(document.body)
+        var $cell = $table.find('TD');
 
         var cellDiff = {
             width: $cell.outerWidth() - $cell.width(),
-            height: $cell.outerHeight() - $cell.height(),
+            height: $cell.outerHeight() - $cell.height()
         };
 
-        $cell.remove();
-        $row.remove();
-        $tbody.remove();
         $table.remove();
+        $table = $cell = undefined;
+
         return cellDiff;
     }
 
     function changeSortOrder(sortOrder) {
-        return -1 * (sortOrder < 0 ? -1 : 1);
+        return sortOrder < 0 ? 1 : -1;
     }
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Utils": {
-                "changeSortOrder": changeSortOrder,
-                "createGuid": guid.newGuid,
-                "isFunction": isFunction,
-                "isProperty": isProperty,
-                "measureCellDiff": measureTableCellDiff,
-                "measureMaxSupportedCssHeight": measureMaxSupportedCssHeight,
-                "measureScrollbar": measureScrollbar,
-                "measureViewport": measureViewport,
-                "parseBool": parseBool,
-            }
+    $.extend(true, SmallGrid, {
+        "Utils": {
+            "changeSortOrder": changeSortOrder,
+            "createGuid": createGuid,
+            "createId": createId,
+            "isFunction": isFunction,
+            "isProperty": isProperty,
+            "measureCellDiff": measureTableCellDiff,
+            "measureMaxSupportedCssHeight": measureMaxSupportedCssHeight,
+            "measureScrollbar": measureScrollbar,
+            "parseBool": parseBool
         }
     });
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Create": CreateView,
-                "View": ViewData,
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Builder": {
+                "Create": Create,
+                "Builder": Builder
             }
         }
     });
 
-    function ViewData($container, viewModel, renderer, settings) {
+    function Builder(settings) {
+        var self = this;
+
+        /*
+        Structure
+        */
+        function buildViewPortElements($container) {
+            var el = {
+                'headerCol': null,
+                'headerTbody': null,
+                'headerTable': null,
+                'headerWrap': null,
+                'contentCol': null,
+                'contentTbody': null,
+                'contentTable': null,
+                'contentWrap': null,
+                'header': null,
+                'content': null,
+                'footer': null,
+                'preload': null,
+                'viewport': null,
+                'container': $container
+            };
+
+            //create
+            el['viewport'] = $("<div class='grid-viewport'/>");
+            el['header'] = $("<div class='grid-header'/>");
+            el['content'] = $("<div class='grid-content'/>");
+            el['footer'] = $("<div class='grid-footer'/>");
+            el['preload'] = $("<div class='grid-preload-font'/>");
+
+            el['headerCol'] = $("<colgroup></colgroup>");
+            el['headerTable'] = $("<table class='grid-header-table'></table>");
+            el['headerTbody'] = $("<tbody></tbody>");
+            el['headerWrap'] = $("<div class='grid-header-wrap'/>");
+
+            el['contentCol'] = $("<colgroup></colgroup>");
+            el['contentTable'] = $("<table class='grid-content-table'></table>");
+            el['contentTbody'] = $("<tbody></tbody>");
+            el['contentWrap'] = $("<div class='grid-content-wrap'/>");
+
+            //header part
+            el['headerCol'].appendTo(el['headerTable']);
+            el['headerTbody'].appendTo(el['headerTable']);
+            el['headerTable'].appendTo(el['headerWrap']);
+            el['headerWrap'].appendTo(el['header']);
+
+            //content part
+            el['contentCol'].appendTo(el['contentTable']);
+            el['contentTbody'].appendTo(el['contentTable']);
+            el['contentTable'].appendTo(el['contentWrap']);
+            el['contentWrap'].appendTo(el['content']);
+
+            //main structure
+            el['header'].appendTo(el['viewport']);
+            el['content'].appendTo(el['viewport']);
+            el['footer'].appendTo(el['viewport']);
+            el['preload'].appendTo(el['viewport']);
+
+            if (settings.header.disableTextSelection) {
+                el['header'].addClass(settings.cssClass.disableTextSelection);
+            }
+
+            if (settings.rows.disableTextSelection) {
+                el['content'].addClass(settings.cssClass.disableTextSelection);
+            }
+
+            return el;
+        }
+
+        /*
+        Header columns
+        */
+        function buildHeaderColumnsHtml(columns, opts) {
+            var html = "<tr class='" + settings.cssClass.headerRow + "'>";
+            for (var i = 0, length = columns.length - 1; i <= length; i++) {
+                html += buildHeaderColumnHtml(columns[i], opts, length === i);
+            }
+
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
+                html += buildLastHeaderColumn(columns[i - 1], opts);
+            }
+
+            return html + "</tr>";
+        }
+
+        function buildHeaderColumnCss(column, opts, isLastColumn) {
+            var cellCssClass = settings.cssClass.headerCell;
+
+            if (column.headerCssClass) {
+                cellCssClass += " " + column.headerCssClass;
+            }
+
+            if (isLastColumn && opts.hideColumnBorder) {
+                cellCssClass += " " + settings.cssClass.cellColumnLast;
+            }
+
+            switch (column.align) {
+                case "center":
+                    cellCssClass += " " + settings.cssClass.cellAlignCenter;
+                    break;
+                case "right":
+                    cellCssClass += " " + settings.cssClass.cellAlignRight;
+                    break;
+            }
+
+
+            if (column.sortable || column.filterable) {
+                cellCssClass += " " + settings.cssClass.cursorPointer;
+            }
+
+            return cellCssClass;
+        }
+
+        function buildHeaderColumnHtml(column, opts, isLastColumn) {
+            var html;
+
+            html = "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.name || "") + "</span>";
+
+
+            if (column.sortable && column.sortOrder !== 0) {
+                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
+            }
+
+            if (column.filterable) {
+                html += "<span class='" + settings.cssClass.headerFilter + "'></span>";
+            }
+
+            html += "</div>";
+
+            if (column.resizeable) {
+                html += "<span class='" + settings.cssClass.headerResizeHandle + "'></span>";
+            }
+
+            return html + "</td>";
+        }
+
+        function buildLastHeaderColumn(column, opts) {
+            return "<td class='" + settings.cssClass.headerCell + ' ' + settings.cssClass.cellColumnLast + "' style='height:" + settings.header.height + "px'></td>";
+        }
+
+        /*
+        Cols
+        */
+        function buildColsHtml(columns, opts) {
+            var html = '';
+            for (var i = 0, length = columns.length; i < length; i++) {
+                html += buildColHtml(columns[i]);
+            }
+
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
+                html += buildLastColHtml(columns[i - 1], opts);
+            }
+
+            return html;
+        }
+
+        function buildColCss(column) {
+            var cellCssClass = settings.cssClass.col;
+            if (column.headerCssClass) {
+                cellCssClass += " " + column.headerCssClass;
+            }
+
+            return cellCssClass;
+        }
+
+        function buildColHtml(column) {
+            return "<col style='width:" + (column.width + settings.cellOuterSize.width) + "px;' class='" + buildColCss(column) + "'/>";
+        }
+
+        function buildLastColHtml(column, opts) {
+            return "<col style='width:" + opts.virtualColumnWidth + "px;' class='" + settings.cssClass.col + " " + settings.cssClass.collLast + "'/>";
+        }
+
+        /*
+        Rows
+        */
+        function buildRowsHtml(columns, rows, opts) {
+            var html = '';
+            for (var i = 0, length = rows.length - 1; i <= length; i++) {
+                html += buildRowHtml(columns, rows[i], opts, length === i);
+            }
+            return html;
+        }
+
+        function buildRowCss(columns, row, opts, isLastRow) {
+            var rowCssClass = settings.cssClass.row + (row.calcIndex & 1 === 1 ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+
+            if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
+
+            switch (row.valign || settings.rows.valign) {
+                case "middle":
+                    rowCssClass += " " + settings.cssClass.rowValignMiddle;
+                    break;
+                case "top":
+                    rowCssClass += " " + settings.cssClass.rowValignTop;
+                    break;
+                case "bottom":
+                    rowCssClass += " " + settings.cssClass.rowValignBottom;
+                    break;
+                case "baseline":
+                    rowCssClass += " " + settings.cssClass.rowValignBaseline;
+                    break;
+            }
+
+            return rowCssClass;
+        }
+
+        function buildRowHtml(columns, row, opts, isLastRow) {
+            var html = "<tr class='" + buildRowCss(columns, row, opts, isLastRow) + "'>";
+            for (var i = 0, length = columns.length - 1; i <= length; i++) {
+                html += buildCellHtml(columns[i], row, opts, length === i, isLastRow);
+            }
+
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
+                html += buildLastCellHtml(columns[i - 1], opts, isLastRow);
+            }
+
+            return html + '</tr>';
+        }
+
+        function buildCellCss(column, row, opts, isLastColumn, isLastRow) {
+            var cellCssClass = settings.cssClass.cell;
+            if (column.cellCssClass) {
+                cellCssClass += " " + column.cellCssClass;
+            }
+
+            if (isLastColumn && opts.hideColumnBorder) {
+                cellCssClass += " " + settings.cssClass.cellColumnLast;
+            }
+
+            if (isLastRow && opts.hideRowBorder) {
+                cellCssClass += " " + settings.cssClass.cellRowLast;
+            }
+
+            if (column.align === "center") {
+                cellCssClass += " " + settings.cssClass.cellAlignCenter;
+            }
+
+            if (column.align === "right") {
+                cellCssClass += " " + settings.cssClass.cellAlignRight;
+            }
+
+            if (row.cellCssClass && column.field in row.cellCssClass) {
+                cellCssClass += " " + row.cellCssClass[column.field];
+            }
+
+            if (row.editMode === true && column.editMode === true) {
+                cellCssClass += " " + settings.cssClass.cellEdit;
+            }
+
+            return cellCssClass;
+        }
+
+        function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
+            return "<td height='" + row.height + "' class='" + buildCellCss(column, row, opts, isLastColumn, isLastRow) + "'>" + buildCellContentHtml(column, row) + "</td>";
+        }
+
+        function buildLastCellHtml(column, opts, isLastRow) {
+            var cssClass = settings.cssClass.cell + ' ' + settings.cssClass.cellColumnLast;
+            if (isLastRow && opts.hideRowBorder) cssClass += ' ' + settings.cssClass.cellRowLast;
+            return "<td class='" + cssClass + "'></td>";
+        }
+
+        /*
+        Cell content
+        */
+        function buildCellContentHtml(column, row) {
+            var value = "";
+
+            if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
+                value = getCellFormatter(column, row);
+            }
+            return value;
+        }
+
+        function getCellFormatter(column, row) {
+            return column.formatter ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
+        }
+
+        function getCellValue(column, row) {
+            return row.item[column.field];
+        }
+
+
+        $.extend(this, {
+            "buildCellContentHtml": buildCellContentHtml,
+            "buildColsHtml": buildColsHtml,
+            "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
+            "buildRowsHtml": buildRowsHtml,
+            "buildViewPortElements": buildViewPortElements
+        });
+    }
+
+    function Create(settings) {
+        if (settings instanceof Object === false) {
+            throw new TypeError("Settings is not defined");
+        }
+
+        return new Builder(settings);
+    }
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Create": CreateView,
+            "View": ViewData
+        }
+    });
+
+    function ViewData($container, viewModel, builder, settings) {
         var self = this,
             contentSize =
             {
                 width: 0,
-                height: 0,
+                height: 0
+            },
+            modelSize = {
+                rowsHeight: 0,
+                columnsWidth: 0
             },
             el = {},
             handlers = [],
-            heightRatio = 1,
-            requestDataTimer = null,
+            requestDataCounter = null,
             requestRenderTimer = null,
+            renderDelayTimer = null,
             scrollVisibility =
             {
                 horisontal: false,
-                vertical: false,
+                vertical: false
             },
             suspendRequests = [],
             suspendScrollEvent = false,
             suspendRenderRequests = 0;
 
+        el = builder.buildViewPortElements($container);
+        el.container.empty().addClass(settings.uid);
+        el.viewport.appendTo(el.container);
+
         /*Init and destroy*/
         function init() {
             var request = suspendRender();
-
-            el = renderer.buildViewPortElements($container);
-            el.container.empty().addClass(settings.uid);
-
-            el.viewport.appendTo(el.container);
 
             //bind events
             handlers.push(
@@ -2591,18 +2879,18 @@
                     "handleResize": handleHeaderResize,
                     "handleResizeStart": handleHeaderResizeStart,
                     "handleResizeStop": handleHeaderResizeStop,
-                    "handlerIdentifier": "." + settings.cssClass.headerResizeHandle,
+                    "handlerIdentifier": "." + settings.cssClass.headerResizeHandle
                 }),
                 SmallGrid.Handler.Click.Create(el.header, {
                     "handleClick": handleHeaderClick,
                     "handleDblClick": handleHeaderDblClick,
-                    "handleContextMenu": handleHeaderContextMenu,
+                    "handleContextMenu": handleHeaderContextMenu
                 }),
                 SmallGrid.Handler.Click.Create(el.content, {
                     "handleClick": handleCellClick,
                     "handleDblClick": handleCellDblClick,
                     "handleContextMenu": handleCellContextMenu,
-                    "handleKeyDown": handleCellKeyDown,
+                    "handleKeyDown": handleCellKeyDown
                 }),
                 SmallGrid.Handler.Scroll.Create(el.content, {
                     "handleScrollStart": handleScrollStart,
@@ -2610,7 +2898,7 @@
                     "handleScroll": handleScroll,
                     "handleMouseWheelStart": handleMouseWheelStart,
                     "handleMouseWheelStop": handleMouseWheelStop,
-                    "handleMouseWheel": handleMouseWheel,
+                    "handleMouseWheel": handleMouseWheel
                 })
             );
 
@@ -2621,14 +2909,9 @@
 
             viewModel.onRowsChange.subscribe(handleRowsChange);
             viewModel.onColumnsChange.subscribe(handleColumnsChange);
-
-            resize();
-            if (settings.resizeColumnsOnLoad === true) resizeColumns();
-            renderView();
+            viewModel.onInitialize.subscribe(handleModelInit);
 
             resumeRender(request);
-
-            self.onInitialize.notify({});
 
             return self;
         }
@@ -2636,10 +2919,12 @@
         function destroy() {
             suspendRender();
 
-            renderer = null;
+            clearTimeout(requestRenderTimer);
+            clearTimeout(renderDelayTimer);
 
             viewModel.onRowsChange.unsubscribe(handleRowsChange);
             viewModel.onColumnsChange.unsubscribe(handleColumnsChange);
+            viewModel.onInitialize.unsubscribe(handleModelInit);
 
             var sharedHandler = SmallGrid.Handler.Shared.GetInstance();
             sharedHandler.onClick.unsubscribe(handleDocumentClick);
@@ -2649,13 +2934,41 @@
             if (el.container.length) {
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].destroy();
+                    handlers[i] = undefined;
                 }
-                el.container.empty().removeClass(settings.uid);
+
+                el.container.removeClass(settings.uid);
+                delete el.container;
             }
 
-            self.onDestroy.notify({});
+            var elKeys = Object.keys(el);
+            for (var idx = 0; idx < elKeys.length; idx++) {
+                el[elKeys[idx]].empty().remove();
+                delete el[elKeys[idx]];
+            }
+
+            $container.empty();
         }
 
+        function handleModelInit() {
+            var request = suspendRender();
+            resize();
+            renderView();
+            resumeRender(request);
+
+            self.onInitialize.notify({});
+        }
+
+        /*
+         Other
+         */
+        function getContentSize() {
+            return contentSize;
+        }
+
+        function getBuilder() {
+            return builder;
+        }
         /* 
         Scroll
         */
@@ -2680,7 +2993,7 @@
         function isRowVisible(rowId) {
             var row = viewModel.getRowById(rowId);
             if (row) {
-                return (row.calcHeight - row.height - settings.cellOuterSize.height >= el.content[0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el.content[0].scrollTop);
+                return row.calcHeight - row.height - settings.cellOuterSize.height >= el.content[0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el.content[0].scrollTop;
 
             }
             return false;
@@ -2692,7 +3005,7 @@
 
         function getRowNodeById(rowId) {
             var rowIndex = viewModel.getRowIndexById(rowId);
-            if (rowIndex != -1) {
+            if (rowIndex !== -1) {
                 return getRowNodeByIndex(rowIndex);
             }
         }
@@ -2713,7 +3026,7 @@
         function getCellNodeById(columnId, rowId) {
             var rowIndex = viewModel.getRowIndexById(rowId);
             var columnIndex = viewModel.getColumnIndexById(columnId);
-            if (rowIndex != -1 && columnIndex != -1) {
+            if (rowIndex !== -1 && columnIndex !== -1) {
                 return getCellNodeByIndex(columnIndex, rowIndex);
             }
         }
@@ -2724,16 +3037,9 @@
         function isColumnVisible(columnId) {
             var column = viewModel.getColumnById(columnId);
             if (column) {
-                return (column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft);
+                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
             }
             return false;
-        }
-
-        /*
-        Model
-        */
-        function getModel() {
-            return viewModel;
         }
 
         /*
@@ -2747,19 +3053,19 @@
 
         function renderRequests() {
             if (suspendRenderRequests > 0) {
-                if (requestDataTimer != null || isSuspended() === true) {
+                if (requestDataCounter !== null || isSuspended() === true) {
                     clearTimeout(requestRenderTimer);
                     requestRenderTimer = setTimeout(render, 187);
                 } else {
-                    requestDataTimer++;
+                    requestDataCounter++;
                     clearTimeout(requestRenderTimer);
                     renderView();
                     if (settings.renderDelay) {
-                        setTimeout(function () {
-                            requestDataTimer = null;
-                        }, settings.renderDelay)
+                        renderDelayTimer = setTimeout(function () {
+                            requestDataCounter = null;
+                        }, settings.renderDelay);
                     } else {
-                        requestDataTimer = null;
+                        requestDataCounter = null;
                     }
                 }
             }
@@ -2769,7 +3075,14 @@
         function renderView() {
 
             var request = suspendRender();
+
             suspendRenderRequests = 0;
+
+            var heightRatio = 1;
+            if (modelSize.rowsHeight >= settings.maxSupportedCssHeight) {
+                var contentSizeHeight = contentSize.height + (scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0);
+                heightRatio = (modelSize.rowsHeight - contentSizeHeight) / (settings.maxSupportedCssHeight - contentSizeHeight);
+            }
 
             var result = viewModel.requestDataFromRange(
                 {
@@ -2780,9 +3093,9 @@
                 settings.cellOuterSize,
                 {
                     width: scrollVisibility.vertical ? settings.scrollbarDimensions.width : 0,
-                    height: scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0,
+                    height: scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0
                 },
-                heightRatio == 1
+                heightRatio === 1
             );
 
             if (result.isCached === 0) {
@@ -2793,7 +3106,7 @@
 
                     if (result.rows.length > 0) {
                         el.contentTable.css({
-                            'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el.content[0].scrollTop * heightRatio) + el.content[0].scrollTop,
+                            'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - el.content[0].scrollTop * heightRatio + el.content[0].scrollTop,
                             'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
                         });
                     }
@@ -2801,15 +3114,15 @@
                     var lastColumn = result.columns[result.columns.length - 1];
 
                     var opts = {
-                        hideRowBorder: (scrollVisibility.horisontal === false && scrollVisibility.vertical == true),
-                        hideColumnBorder: (scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth),
-                        virtualColumnWidth: (settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth) ? contentSize.width - lastColumn.calcWidth : 0,
+                        hideRowBorder: scrollVisibility.horisontal === false && scrollVisibility.vertical === true,
+                        hideColumnBorder: scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth,
+                        virtualColumnWidth: settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth ? contentSize.width - lastColumn.calcWidth : 0
                     };
 
                     renderViewHtml(
-                        renderer.buildHeaderColumnsHtml(result.columns, opts),
-                        renderer.buildColsHtml(result.columns, opts),
-                        renderer.buildRowsHtml(result.columns, result.rows, opts)
+                        builder.buildHeaderColumnsHtml(result.columns, opts),
+                        builder.buildColsHtml(result.columns, opts),
+                        builder.buildRowsHtml(result.columns, result.rows, opts)
                     );
 
                 } else {
@@ -2823,9 +3136,34 @@
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
             self.onBeforeRowsRendered.notify({});
 
-            el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
-            el.headerTbody[0].innerHTML = columnsHtml;
-            el.contentTbody[0].innerHTML = rowsHtml;
+            var contentTbody = el.contentTbody[0].cloneNode(false);
+            var headerTbody = el.headerTbody[0].cloneNode(false);
+            var headerCol = el.headerCol[0].cloneNode(false);
+            var contentCol = el.contentCol[0].cloneNode(false);
+
+            headerCol.innerHTML = contentCol.innerHTML = colsHtml;
+            contentTbody.innerHTML = rowsHtml;
+            headerTbody.innerHTML = columnsHtml;
+
+            if (el.contentCol[0].innerHTML !== contentCol.innerHTML) {
+                el.contentTable[0].replaceChild(contentCol, el.contentCol[0]);
+                el.contentCol = $(contentCol);
+            }
+
+            if (el.contentTbody[0].innerHTML !== contentTbody.innerHTML) {
+                el.contentTable[0].replaceChild(contentTbody, el.contentTbody[0]);
+                el.contentTbody = $(contentTbody);
+            }
+
+            if (el.headerCol[0].innerHTML !== headerCol.innerHTML) {
+                el.headerTable[0].replaceChild(headerCol, el.headerCol[0]);
+                el.headerCol = $(headerCol);
+            }
+
+            if (el.headerTbody[0].innerHTML !== headerTbody.innerHTML) {
+                el.headerTable[0].replaceChild(headerTbody, el.headerTbody[0]);
+                el.headerTbody = $(headerTbody);
+            }
 
             self.onAfterRowsRendered.notify({});
         }
@@ -2834,15 +3172,19 @@
             return suspendRequests.length > 0;
         }
 
-        function suspendRender() {
+        function suspendRender(callback) {
             var id = SmallGrid.Utils.createGuid();
             suspendRequests.push(id);
+            if (callback) {
+                callback();
+                return resumeRender(id);
+            }
             return id;
         }
 
         function resumeRender(value) {
             for (var i = 0; i < suspendRequests.length; i++) {
-                if (suspendRequests[i] == value) {
+                if (suspendRequests[i] === value) {
                     suspendRequests.splice(i, 1);
                     return true;
                 }
@@ -2850,15 +3192,14 @@
             return false;
         }
 
-
         /*
         Calc private funcs
         */
         function getColumnEventType(targetClass, column) {
             var type = "";
-            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) != -1) {
+            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) !== -1) {
                 type = "resize";
-            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) != -1) {
+            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) !== -1) {
                 type = "filter";
             } else if (column.sortable) {
                 type = "sort";
@@ -2904,79 +3245,6 @@
         /*
         Resize 
         */
-        function resizeColumnsWidth(allColumns, scrollBarWidth, cellOuterWidth) {
-            var updateColumns = allColumns.slice();
-            var total =
-                {
-                    minWidth: 0,
-                    maxWidth: 0,
-                    width: 0
-                },
-                contentWidth = contentSize.width - updateColumns.length * cellOuterWidth - scrollBarWidth;
-
-            for (var i = updateColumns.length - 1; i >= 0; i--) {
-                var updateColumn = updateColumns[i];
-                if (updateColumn.resizeable === false) {
-                    contentWidth -= updateColumn.width;
-                    updateColumns.splice(i, 1);
-                    continue;
-                }
-                total.minWidth += updateColumn.minWidth;
-                total.maxWidth += updateColumn.maxWidth;
-                total.width += updateColumn.width;
-            }
-
-            if (total.minWidth <= contentWidth && contentWidth <= total.maxWidth) {
-                var columns = updateColumns.slice();
-                while (columns.length > 0) {
-                    var ratio = contentWidth / total.width;
-                    total.width = 0;
-
-                    for (i = columns.length - 1; i >= 0; i--) {
-                        var column = columns[i];
-                        var newColumnWidth = Math.max(
-                            Math.min(
-                                Math.floor(column.width * ratio),
-                                column.maxWidth
-                            ),
-                            column.minWidth
-                        );
-
-                        total.width += newColumnWidth;
-
-                        if (column.width == newColumnWidth) {
-                            if (columns.length == 1 && contentWidth != column.width) {
-                                column.width += contentWidth - column.width;
-                            }
-                            contentWidth -= column.width;
-                            columns.splice(i, 1);
-                            continue;
-                        }
-
-                        column.width = newColumnWidth;
-                    }
-                }
-            }
-            return updateColumns;
-        }
-
-        function resizeColumns() {
-
-            var updateColumns = resizeColumnsWidth(
-                viewModel.getColumnsModel().getColumns(),
-                (scrollVisibility.vertical === true) ? settings.scrollbarDimensions.width : 0,
-                settings.cellOuterSize.width
-            );
-
-            var request = suspendRender();
-
-            viewModel.getColumnsModel().updateColumns(updateColumns);
-
-            resumeRender(request);
-
-            return self;
-        }
-
         function resize() {
             contentSize.width = el.container.width();
             contentSize.height = Math.max(el.container.height() - settings.header.height - settings.cellOuterSize.height, 0);
@@ -2986,6 +3254,8 @@
             applyRowsChange();
             applyColumnsChange();
 
+            self.onViewResized.notify({});
+
             return self;
         }
 
@@ -2993,57 +3263,52 @@
         Data handlers
         */
         function applyRowsChange() {
-            var rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
-            scrollVisibility.vertical = scrollVisibility.horisontal ? (rowsHeight > (contentSize.height - settings.scrollbarDimensions.height)) : (rowsHeight > contentSize.height);
+            modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
-            if (settings.showLastColumn == true) {
-                el.headerWrap.css({
-                    'width': Math.max(el.headerWrap.width(), contentSize.width)
-                });
+            scrollVisibility.vertical = scrollVisibility.horisontal ? modelSize.rowsHeight > contentSize.height - settings.scrollbarDimensions.height : modelSize.rowsHeight > contentSize.height;
 
-                el.contentWrap.css({
-                    'width': Math.max(el.contentWrap.width(), contentSize.width),
-                });
-            }
-
-            if (rowsHeight > settings.maxSupportedCssHeight) {
-                heightRatio = (rowsHeight - contentSize.height + settings.scrollbarDimensions.height) / (settings.maxSupportedCssHeight - contentSize.height + settings.scrollbarDimensions.height);
-                rowsHeight = settings.maxSupportedCssHeight;
-            }
-
+            //for rigth corner in the header
             el.header.css({
                 'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
             });
 
             el.contentWrap.css({
-                'height': rowsHeight,
+                'height': getWrapHeight()
             });
-
-        }
-
-        function handleRowsChange() {
-            applyRowsChange();
-            render();
         }
 
         function applyColumnsChange() {
-            var columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
-            scrollVisibility.horisontal = scrollVisibility.vertical ? (columnsWidth > (contentSize.width - settings.scrollbarDimensions.width)) : (columnsWidth > contentSize.width);
+            modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
-            var width = Math.max(
-                columnsWidth,
-                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
-            );
+            scrollVisibility.horisontal = scrollVisibility.vertical ? modelSize.columnsWidth > contentSize.width - settings.scrollbarDimensions.width : modelSize.columnsWidth > contentSize.width;
+
+            var width = getWrapWidth();
 
             el.headerWrap.css({
                 'width': width
             });
 
             el.contentWrap.css({
-                'width': width,
+                'width': width
             });
+        }
+
+        function getWrapHeight() {
+            return Math.min(modelSize.rowsHeight, settings.maxSupportedCssHeight);
+        }
+
+        function getWrapWidth() {
+            return Math.max(
+                modelSize.columnsWidth,
+                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
+            );
+        }
+
+        function handleRowsChange() {
+            applyRowsChange();
+            render();
         }
 
         function handleColumnsChange() {
@@ -3141,15 +3406,13 @@
         Handle document events
         */
         function handleDocumentResize(evt) {
-            var request = suspendRender();
-            resize();
-
-            notifyEvent(evt, "onDocumentResize");
-
-            renderView();
-            resumeRender(request);
-
+            suspendRender(function () {
+                notifyEvent(evt, "onDocumentResize");
+                resize();
+                renderView();
+            });
         }
+
         function handleDocumentContextMenu(evt) {
             notifyEvent(evt, "onDocumentContextMenu");
         }
@@ -3190,9 +3453,11 @@
             "init": init,
             "destroy": destroy,
 
+            "getBuilder": getBuilder,
+            "getContentSize": getContentSize,
+
             "getCellNodeById": getCellNodeById,
             "getCellNodeByIndex": getCellNodeByIndex,
-            "getModel": getModel,
             "getNode": getNode,
             "getRowNodeById": getRowNodeById,
             "getRowNodeByIndex": getRowNodeByIndex,
@@ -3204,9 +3469,11 @@
             "isVerticalScrollVisible": isVerticalScrollVisible,
             "render": render,
             "resize": resize,
-            "resizeColumns": resizeColumns,
+
             "resumeRender": resumeRender,
             "suspendRender": suspendRender,
+
+            "onViewResized": new SmallGrid.Event.Handler(),
 
             "onScroll": new SmallGrid.Event.Handler(),
             "onScrollStart": new SmallGrid.Event.Handler(),
@@ -3237,15 +3504,19 @@
             "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
 
             "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
     }
 
 
-    function CreateView(container, viewModel, settings) {
+    function CreateView(container, viewModel, settings, autoInit) {
         var $container = $(container);
         if (!$container.length) {
             throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length !== 1) {
+            throw new TypeError("There should be only 1 container.");
         }
 
         if (viewModel instanceof SmallGrid.View.Model.Model === false) {
@@ -3256,21 +3527,21 @@
             throw new TypeError("Settings is not defined");
         }
 
-        var renderer = SmallGrid.View.Renderer.Create(settings);
+        var builder = SmallGrid.View.Builder.Create(settings);
 
-        return new ViewData($container, viewModel, renderer, settings).init();
+        var view = new ViewData($container, viewModel, builder, settings);
+        if (autoInit !== false) view.init();
+        return view;
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Model": {
-                    "Model": ViewModel,
-                    "Create": CreateModel,
-                }
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Model": {
+                "Model": ViewModel,
+                "Create": CreateModel
             }
         }
     });
@@ -3292,7 +3563,7 @@
             minTop: undefined,
             maxTop: undefined,
             minLeft: undefined,
-            maxLeft: undefined,
+            maxLeft: undefined
         };
 
         /*
@@ -3301,21 +3572,19 @@
         function init() {
             rowsModel.onChange.subscribe(handleRowsChange);
             columnsModel.onChange.subscribe(handleColumnsChange);
+
+            self.onInitialize.notify({});
             return self;
         }
 
         function destroy() {
             rowsModel.onChange.unsubscribe(handleRowsChange);
             columnsModel.onChange.unsubscribe(handleColumnsChange);
-
-        }
-        /* Rows and Columns*/
-        function getRowsModel() {
-            return rowsModel;
-        }
-
-        function getColumnsModel() {
-            return columnsModel;
+            rowsCache = undefined;
+            columnsCache = undefined;
+            rowsFilters = undefined;
+            columnsFilters = undefined;
+            rowsSorters = undefined;
         }
 
         /*
@@ -3375,7 +3644,7 @@
 
         function getRowIndexById(id) {
             for (var i = 0; i < rowsCache.length; i++) {
-                if (rowsCache[i].id == id) {
+                if (rowsCache[i].id === id) {
                     return i;
                 }
             }
@@ -3384,7 +3653,7 @@
 
         function getColumnIndexById(id) {
             for (var i = 0; i < columnsCache.length; i++) {
-                if (columnsCache[i].id == id) {
+                if (columnsCache[i].id === id) {
                     return i;
                 }
             }
@@ -3393,7 +3662,7 @@
 
         function getRowById(id) {
             for (var i = 0; i < rowsCache.length; i++) {
-                if (rowsCache[i].id == id) {
+                if (rowsCache[i].id === id) {
                     return rowsCache[i];
                 }
             }
@@ -3401,7 +3670,7 @@
 
         function getColumnById(id) {
             for (var i = 0; i < columnsCache.length; i++) {
-                if (columnsCache[i].id == id) {
+                if (columnsCache[i].id === id) {
                     return columnsCache[i];
                 }
             }
@@ -3425,7 +3694,7 @@
         function setFilter(filterObj) {
             if (filterObj instanceof SmallGrid.Query.FilterQuery) {
                 for (var i = 0; i < rowsFilters.length; i++) {
-                    if (rowsFilters[i].getId() == filterObj.getId()) {
+                    if (rowsFilters[i].getId() === filterObj.getId()) {
                         break;
                     }
                 }
@@ -3439,7 +3708,7 @@
         function clearFilter(filterObj) {
             if (filterObj instanceof SmallGrid.Query.FilterQuery) {
                 for (var i = 0; i < rowsFilters.length; i++) {
-                    if (rowsFilters[i].getId() == filterObj.getId()) {
+                    if (rowsFilters[i].getId() === filterObj.getId()) {
                         rowsFilters.splice(i, 1);
                         updateCacheHeight();
                         self.onRowsChange.notify();
@@ -3474,7 +3743,7 @@
         function clearSorter(sorterObj) {
             if (sorterObj instanceof SmallGrid.Query.SorterQuery) {
                 for (var i = 0; i < rowsSorters.length; i++) {
-                    if (rowsSorters[i].getField() == sorterObj.getField()) {
+                    if (rowsSorters[i].getField() === sorterObj.getField()) {
                         rowsSorters.splice(i, 1);
                         updateCacheHeight();
                         self.onRowsChange.notify();
@@ -3518,9 +3787,9 @@
             }
 
             return {
-                isCached: (rowsCached && columnsCached),
+                isCached: rowsCached && columnsCached,
                 rows: rowsCache,
-                columns: columnsCache,
+                columns: columnsCache
             };
         }
 
@@ -3555,9 +3824,6 @@
             "getRowsTotal": getRowsTotal,
             "getColumnsTotal": getColumnsTotal,
 
-            "getColumnsModel": getColumnsModel,
-            "getRowsModel": getRowsModel,
-
             "requestDataFromRange": requestDataFromRange,
 
             "clearSorter": clearSorter,
@@ -3579,13 +3845,14 @@
             "setFilter": setFilter,
             "setSorter": setSorter,
 
-
             "onColumnsChange": new SmallGrid.Event.Handler(),
             "onRowsChange": new SmallGrid.Event.Handler(),
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
     }
 
-    function CreateModel(rowsModel, columnsModel, settings) {
+    function CreateModel(rowsModel, columnsModel, settings, autoInit) {
         if (settings instanceof Object === false) {
             throw new TypeError("Settings is not defined");
         }
@@ -3598,316 +3865,19 @@
             throw new TypeError("Column model is not defined.");
         }
 
-        return new ViewModel(rowsModel, columnsModel, settings).init();
+        var viewModel = new ViewModel(rowsModel, columnsModel, settings);
+        if (autoInit !== false) viewModel.init();
+        return viewModel;
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Renderer": {
-                    "Create": Create,
-                    "Renderer": Renderer,
-                }
-            }
-        }
-    });
-
-    function Renderer(settings) {
-        var self = this;
-
-        /*
-        Structure
-        */
-        function buildViewPortElements($container) {
-            var el = {
-                'container': $container,
-                'content': null,
-                'contentCol': null,
-                'contentTable': null,
-                'contentTbody': null,
-                'contentWrap': null,
-                'footer': null,
-                'header': null,
-                'headerCol': null,
-                'headerTable': null,
-                'headerTbody': null,
-                'headerWrap': null,
-                'viewport': null,
-            };
-
-            //create
-            el['viewport'] = $("<div class='small-grid grid-viewport'/>");
-            el['header'] = $("<div class='grid-header'/>");
-            el['content'] = $("<div class='grid-content'/>");
-            el['footer'] = $("<div class='grid-footer'/>");
-            el['preload'] = $("<div class='grid-preload-font'/>");
-
-            el['headerCol'] = $("<colgroup></colgroup>");
-            el['headerTable'] = $("<table class='grid-header-table'></table>");
-            el['headerTbody'] = $("<tbody></tbody>");
-            el['headerWrap'] = $("<div class='grid-header-wrap'/>");
-
-            el['contentCol'] = $("<colgroup></colgroup>");
-            el['contentTable'] = $("<table class='grid-content-table'></table>");
-            el['contentTbody'] = $("<tbody></tbody>");
-            el['contentWrap'] = $("<div class='grid-content-wrap'/>");
-
-            //header part
-            el['headerCol'].appendTo(el['headerTable']);
-            el['headerTbody'].appendTo(el['headerTable']);
-            el['headerTable'].appendTo(el['headerWrap']);
-            el['headerWrap'].appendTo(el['header']);
-
-            //content part
-            el['contentCol'].appendTo(el['contentTable']);
-            el['contentTbody'].appendTo(el['contentTable']);
-            el['contentTable'].appendTo(el['contentWrap']);
-            el['contentWrap'].appendTo(el['content']);
-
-            //main structure
-            el['header'].appendTo(el['viewport']);
-            el['content'].appendTo(el['viewport']);
-            el['footer'].appendTo(el['viewport']);
-            el['preload'].appendTo(el['viewport']);
-
-            if (settings.header.disableTextSelection) {
-                el['header'].addClass(settings.cssClass.disableTextSelection);
-            }
-
-            if (settings.rows.disableTextSelection) {
-                el['content'].addClass(settings.cssClass.disableTextSelection);
-            }
-
-            return el;
-        }
-
-        /*
-        Header columns
-        */
-        function buildHeaderColumnsHtml(columns, opts) {
-            var html = "<tr class='" + settings.cssClass.headerRow + "'>";
-            for (var i = 0, length = columns.length - 1; i <= length; i++) {
-                html += buildHeaderColumnHtml(columns[i], opts, length == i);
-            }
-
-            if (opts.virtualColumnWidth > 0) {
-                html += buildLastHeaderColumn(columns[i - 1], opts);
-            }
-
-            return html + "</tr>";
-        }
-
-        function buildHeaderColumnHtml(column, opts, isLastColumn) {
-            var value = "",
-                html,
-                cellCssClass = settings.cssClass.headerCell;
-
-            if (column.headerCssClass) {
-                cellCssClass += " " + column.headerCssClass;
-            }
-
-            if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
-            }
-
-            switch (column.align) {
-                case "center":
-                    cellCssClass += " " + settings.cssClass.cellAlignCenter;
-                    break;
-                case "right":
-                    cellCssClass += " " + settings.cssClass.cellAlignRight;
-                    break;
-            }
-
-            if (column.name) {
-                value += column.name;
-            }
-
-            if (column.sortable || column.filterable) {
-                cellCssClass += " " + settings.cssClass.cursorPointer;
-            }
-
-            html = "<td style='height:" + settings.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
-
-
-            if (column.sortable && column.sortOrder !== 0) {
-                html += "<span class='" + ((column.sortOrder == 1) ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
-            }
-
-            if (column.filterable) {
-                html += "<span class='" + settings.cssClass.headerFilter + "'></span>";
-            }
-
-            html += "</div>";
-
-            if (column.resizeable) {
-                html += "<span class='" + settings.cssClass.headerResizeHandle + "'></span>";
-            }
-
-            return html + "</td>";
-        }
-
-        function buildLastHeaderColumn(column, opts) {
-            return "<td class='" + settings.cssClass.headerCell + ' ' + settings.cssClass.cellColumnLast + "' style='height:" + settings.header.height + "px'></td>";
-        }
-
-        /*
-        Cols
-        */
-        function buildColsHtml(columns, opts) {
-            var html = '';
-            for (var i = 0, length = columns.length; i < length; i++) {
-                html += buildColHtml(columns[i]);
-            }
-
-            if (opts.virtualColumnWidth > 0) {
-                html += buildLastColHtml(columns[i - 1], opts);
-            }
-
-            return html;
-        }
-
-        function buildColHtml(column) {
-            var cellCssClass = settings.cssClass.col;
-            if (column.headerCssClass) {
-                cellCssClass += " " + column.headerCssClass;
-            }
-
-            return "<col style='width:" + (column.width + settings.cellOuterSize.width) + "px;' class='" + cellCssClass + "'/>";
-        }
-
-        function buildLastColHtml(column, opts) {
-            return "<col style='width:" + opts.virtualColumnWidth + "px;' class='" + settings.cssClass.col + " " + settings.cssClass.collLast + "'/>";
-        }
-
-        /*
-        Rows
-        */
-        function buildRowsHtml(columns, rows, opts) {
-            var html = '';
-            for (var i = 0, length = rows.length - 1; i <= length; i++) {
-                html += buildRowHtml(columns, rows[i], opts, length == i);
-            }
-            return html;
-        }
-
-        function buildRowHtml(columns, row, opts, isLastRow) {
-            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
-
-            if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
-
-            switch (settings.rows.valign) {
-                case "middle":
-                    rowCssClass += " " + settings.cssClass.rowValignMiddle;
-                    break;
-                case "top":
-                    rowCssClass += " " + settings.cssClass.rowValignTop;
-                    break;
-                case "bottom":
-                    rowCssClass += " " + settings.cssClass.rowValignBottom;
-                    break;
-                case "baseline":
-                    rowCssClass += " " + settings.cssClass.rowValignBaseline;
-                    break;
-            }
-
-            var html = "<tr class='" + rowCssClass + "'>";
-            for (var i = 0, length = columns.length - 1; i <= length; i++) {
-                html += buildCellHtml(columns[i], row, opts, length == i, isLastRow);
-            }
-
-            if (opts.virtualColumnWidth > 0) {
-                html += buildLastCellHtml(columns[i - 1], opts, isLastRow);
-            }
-
-
-            return html + '</tr>';
-        }
-
-        function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
-            var cellCssClass = settings.cssClass.cell;
-            if (column.cellCssClass) {
-                cellCssClass += " " + column.cellCssClass;
-            }
-
-            if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
-            }
-
-            if (isLastRow && opts.hideRowBorder) {
-                cellCssClass += " " + settings.cssClass.cellRowLast;
-            }
-
-            if (column.align == "center") {
-                cellCssClass += " " + settings.cssClass.cellAlignCenter;
-            }
-            if (column.align == "right") {
-                cellCssClass += " " + settings.cssClass.cellAlignRight;
-            }
-
-            if (row.cellCssClass && (column.field in row.cellCssClass)) {
-                cellCssClass += " " + row.cellCssClass[column.field];
-            }
-
-            return "<td height='" + row.height + "' class='" + cellCssClass + "'>" + getCellContentHtml(column, row) + "</td>";
-        }
-
-        function buildLastCellHtml(column, opts, isLastRow) {
-            var cssClass = settings.cssClass.cell + ' ' + settings.cssClass.cellColumnLast;
-            if (isLastRow) cssClass += ' ' + settings.cssClass.cellRowLast;
-            return "<td class='" + cssClass + "'></td>";
-        }
-
-        /*
-        Cell content
-        */
-        function getCellContentHtml(column, row) {
-            var value = "";
-
-            if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
-                value = getCellFormatter(column, row);
-            }
-            return value;
-        }
-
-        function getCellFormatter(column, row) {
-            return (column.formatter) ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
-        }
-
-        function getCellValue(column, row) {
-            return row.item[column.field];
-        }
-
-
-        $.extend(this, {
-            "buildViewPortElements": buildViewPortElements,
-            "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
-            "buildColsHtml": buildColsHtml,
-            "buildRowsHtml": buildRowsHtml,
-        });
-    }
-
-    function Create(settings) {
-        if (settings instanceof Object === false) {
-            throw new TypeError("Settings is not defined");
-        }
-
-        return new Renderer(settings);
-    }
-
-})(jQuery);(function ($) {
-    "use strict";
-
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Window": {
-                    "Create": Create,
-                    "Manager": Manager,
-                },
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Window": {
+                "Create": Create,
+                "Manager": Manager
             }
         }
     });
@@ -3929,7 +3899,7 @@
 
         function isWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     return true;
                 }
             }
@@ -3938,11 +3908,11 @@
 
         function getWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     return {
                         id: cache[i].id,
                         opts: cache[i].opts,
-                        container: view.getNode('container').children('.grid-window-' + id),
+                        container: view.getNode('container').children('.grid-window-' + id)
                     };
                 }
             }
@@ -3951,7 +3921,7 @@
 
         function removeWindow(id) {
             for (var i = 0; i < cache.length; i++) {
-                if (cache[i].id == id) {
+                if (cache[i].id === id) {
                     cache.splice(i, 1);
                     var window = view.getNode('container').children('.grid-window-' + id);
                     if (window.length) {
@@ -3966,7 +3936,7 @@
         function showWindowNearPosition(id, position, margin) {
             var containerMargin = margin || 0;
             var data = getWindow(id);
-            if (data != null) {
+            if (data !== null) {
                 data.container.show();
 
                 var $container = view.getNode('container');
@@ -3988,7 +3958,7 @@
 
         function showWindowNearTarget(id, $target) {
             var data = getWindow(id);
-            if (data != null) {
+            if (data !== null) {
                 data.container.show();
 
                 var $container = view.getNode('container');
@@ -4002,7 +3972,7 @@
                     left: $target.offset().left,
                     top: $target.offset().top,
                     width: $target.width(),
-                    height: $target.height(),
+                    height: $target.height()
                 };
 
                 var left = (elementSize.width + targetSizes.left > $container.width() && elementSize.width < targetSizes.left - $container.offset().left) ? targetSizes.left + targetSizes.width - elementSize.width : targetSizes.left;
@@ -4016,7 +3986,7 @@
         }
 
         function isVisible(id) {
-            return (view.getNode('container').children('.grid-window-' + id + ':visible').length > 0);
+            return view.getNode('container').children('.grid-window-' + id + ':visible').length > 0;
         }
 
         function showWindow(id) {
@@ -4043,7 +4013,6 @@
         function destroy() {
             view.onDocumentClick.unsubscribe(hideWindows);
             view.onColumnResizeStart.unsubscribe(hideWindows);
-
             cache = [];
         }
 
@@ -4060,12 +4029,12 @@
             "isWindow": isWindow,
             "isVisible": isVisible,
             "removeWindow": removeWindow,
-            "showWindow": showWindow,
+            "showWindow": showWindow
         });
     }
 
 
-    function Create(view, settings) {
+    function Create(view, settings, autoInit) {
         if (view instanceof SmallGrid.View.View === false) {
             throw new TypeError("View is not defined");
         }
@@ -4074,45 +4043,46 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new SmallGrid.View.Window.Manager(view, settings).init();
+        var windowManager = new SmallGrid.View.Window.Manager(view, settings);
+        if (autoInit !== false) windowManager.init();
+        return windowManager;
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "CellEdit": CellEditPlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "CellEdit": CellEditPlugin
         }
     });
 
     function CellEditPlugin(context, settings) {
         var self = this;
-        var view = context.view;
-        var windowManager = context.windowManager;
+
         var editOptions = {
             enabled: false
         };
 
         function init() {
-            view.onAfterRowsRendered.subscribe(handleAfterRowsRendered);
-            view.onBeforeRowsRendered.subscribe(handleBeforeRowsRendered);
-            view.onCellClick.subscribe(handleCellClick);
-            view.onCellDblClick.subscribe(handleCellDblClick);
-            view.onCellKeyDown.subscribe(handleCellKeyDown);
-            view.onScrollStop.subscribe(handleScrollStop);
+            context.view.onAfterRowsRendered.subscribe(handleAfterRowsRendered);
+            context.view.onBeforeRowsRendered.subscribe(handleBeforeRowsRendered);
+            context.view.onCellClick.subscribe(handleCellClick);
+            context.view.onCellDblClick.subscribe(handleCellDblClick);
+            context.view.onCellKeyDown.subscribe(handleCellKeyDown);
+            context.view.onScrollStop.subscribe(handleScrollStop);
             return self;
         }
 
         function destroy() {
-            view.onAfterRowsRendered.unsubscribe(handleAfterRowsRendered);
-            view.onBeforeRowsRendered.unsubscribe(handleBeforeRowsRendered);
-            view.onCellClick.unsubscribe(handleCellClick);
-            view.onCellDblClick.unsubscribe(handleCellDblClick);
-            view.onCellKeyDown.unsubscribe(handleCellKeyDown);
-            view.onScrollStop.unsubscribe(handleScrollStop);
+            context.view.onAfterRowsRendered.unsubscribe(handleAfterRowsRendered);
+            context.view.onBeforeRowsRendered.unsubscribe(handleBeforeRowsRendered);
+            context.view.onCellClick.unsubscribe(handleCellClick);
+            context.view.onCellDblClick.unsubscribe(handleCellDblClick);
+            context.view.onCellKeyDown.unsubscribe(handleCellKeyDown);
+            context.view.onScrollStop.unsubscribe(handleScrollStop);
+
+            cancelEdit();
         }
 
         /*
@@ -4120,7 +4090,7 @@
          */
         function handleScrollStop(evt) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
-                if (view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
+                if (context.view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
                     editOptions.editor.focus();
                 }
             }
@@ -4134,9 +4104,8 @@
 
         function handleAfterRowsRendered(evt) {
             if (isEditMode() === true) {
-                var cellNode = view.getCellNodeById(editOptions.column.id, editOptions.row.id);
+                var cellNode = context.view.getCellNodeById(editOptions.column.id, editOptions.row.id);
                 if (cellNode) {
-                    cellNode.className += " " + settings.cssClass.cellEdit;
                     editOptions.editor.append(cellNode);
                     if (editOptions.addFocusOnce === true) {
                         editOptions.addFocusOnce = false;
@@ -4147,7 +4116,7 @@
         }
 
         function handleCellDblClick(evt) {
-            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+            if (isEditMode() === true && evt.column.id === editOptions.column.id && evt.row.id === editOptions.row.id) {
                 editOptions.editor.focus();
             }
 
@@ -4157,7 +4126,7 @@
         }
 
         function handleCellClick(evt) {
-            if (isEditMode() === true && evt.column.id == editOptions.column.id && evt.row.id == editOptions.row.id) {
+            if (isEditMode() === true && evt.column.id === editOptions.column.id && evt.row.id === editOptions.row.id) {
                 editOptions.editor.focus();
             }
 
@@ -4170,7 +4139,7 @@
             if (evt && evt.event) {
                 switch (evt.event.keyCode) {
                     case 13:
-                        if (evt.event.target && evt.event.target.tagName != "TEXTAREA") {
+                        if (evt.event.target && evt.event.target.tagName !== "TEXTAREA") {
                             applyEdit();
                         }
                         break;
@@ -4186,58 +4155,62 @@
         */
         function editCellById(columnId, rowId) {
             if (isEditMode() === true) {
-                if (editOptions.column.id != columnId || editOptions.row.id != rowId) {
+                if (editOptions.column.id !== columnId || editOptions.row.id !== rowId) {
                     applyEdit();
                 }
             }
 
             if (isEditMode() === false) {
-                var column = view.getModel().getColumnById(columnId);
-                var row = view.getModel().getRowById(rowId);
+                var column = context.viewModel.getColumnById(columnId);
+                var row = context.viewModel.getRowById(rowId);
                 if (row && column && row.editable && column.editable && column.editor) {
-                    var request = view.suspendRender();
+                    var request = context.view.suspendRender();
 
                     editOptions = {
                         enabled: true,
                         addFocusOnce: true,
                         row: row,
                         column: column,
-                        editor: new SmallGrid.Cell.Editor.Create(
+                        editor: SmallGrid.Cell.Editor.Create(
                             column.editor,
                             {
                                 "row": row,
                                 "column": column,
                                 "value": row.item[column.field],
-                                "windowManager": windowManager,
+                                "windowManager": context.windowManager,
                                 "settings": settings
                             },
                             settings
-                        ),
-                    }
+                        )
+                    };
 
                     self.onCellEdited.notify({
                         row: editOptions.row,
                         column: editOptions.column,
-                        editor: editOptions.editor,
+                        editor: editOptions.editor
                     });
 
-                    view.getModel().getColumnsModel().setColumnPropertyById(
+                    context.columnsModel.setColumnPropertyById(
                         column.id,
                         'editMode',
                         true
                     );
 
-                    view.getModel().getRowsModel().setRowPropertyById(
+                    context.rowsModel.setRowPropertyById(
                         row.id,
                         'editMode',
                         true
                     );
 
-                    view.resumeRender(request);
+                    var cellNode = context.view.getCellNodeById(column.id, row.id);
+                    if (cellNode) {
+                        cellNode.className += ' ' + settings.cssClass.cellEdit;
+                        cellNode.innerHTML = '';
+                    }
 
-                    if (SmallGrid.Utils.isFunction("append", editOptions.editor)) {
-                        //view.render();
-                    } else {
+                    context.view.resumeRender(request);
+
+                    if (SmallGrid.Utils.isFunction("append", editOptions.editor) === false) {
                         applyEdit();
                     }
                 }
@@ -4251,58 +4224,64 @@
         }
 
         function isEditMode() {
-            return (editOptions.enabled === true);
+            return editOptions.enabled === true;
         }
 
         function applyEdit() {
             if (isEditMode() === true) {
-                var request = view.suspendRender();
+                var request = context.view.suspendRender();
 
-                view.getModel().getColumnsModel().setColumnPropertyById(
-                    editOptions.column.id,
-                    'editMode',
-                    false
-                );
+                var column = context.columnsModel.getColumnById(editOptions.column.id);
+                var row = context.rowsModel.getRowById(editOptions.row.id);
+                if (column && row) {
+                    column.editMode = false;
+                    context.columnsModel.updateColumn(column);
 
-                var row = view.getModel().getRowsModel().getRowById(editOptions.row.id);
-                if (row) {
                     row.item[editOptions.column.field] = editOptions.editor.getValue();
                     row.editMode = false;
-                    view.getModel().getRowsModel().updateRow(row);
+                    context.rowsModel.updateRow(row);
+
+                    var cellNode = context.view.getCellNodeById(editOptions.column.id, editOptions.row.id);
+                    if (cellNode) {
+                        cellNode.className = cellNode.className.replace(' ' + settings.cssClass.cellEdit, '');
+                        cellNode.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                    }
                 }
 
                 editOptions.editor.destroy();
                 editOptions = {
                     enabled: false
-                }
-                view.resumeRender(request);
-                //view.render();
+                };
+                context.view.resumeRender(request);
             }
             return self;
         }
 
         function cancelEdit() {
             if (isEditMode() === true) {
-                var request = view.suspendRender();
+                var request = context.view.suspendRender();
 
-                view.getModel().getColumnsModel().setColumnPropertyById(
-                    editOptions.column.id,
-                    'editMode',
-                    false
-                );
+                var column = context.columnsModel.getColumnById(editOptions.column.id);
+                var row = context.rowsModel.getRowById(editOptions.row.id);
+                if (column && row) {
+                    column.editMode = false;
+                    context.columnsModel.updateColumn(column);
 
-                var row = view.getModel().getRowsModel().getRowById(editOptions.row.id);
-                if (row) {
                     row.editMode = false;
-                    view.getModel().getRowsModel().updateRow(row);
+                    context.rowsModel.updateRow(row);
+
+                    var cellNode = context.view.getCellNodeById(editOptions.column.id, editOptions.row.id);
+                    if (cellNode) {
+                        cellNode.className = cellNode.className.replace(' ' + settings.cssClass.cellEdit, '');
+                        cellNode.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                    }
                 }
 
                 editOptions.editor.destroy();
                 editOptions = {
                     enabled: false
-                }
-                view.resumeRender(request);
-                //view.render();
+                };
+                context.view.resumeRender(request);
             }
             return self;
         }
@@ -4318,50 +4297,153 @@
             "getEditor": getEditor,
             "isEditMode": isEditMode,
 
-
-            "onCellEdited": new SmallGrid.Event.Handler(),
+            "onCellEdited": new SmallGrid.Event.Handler()
 
         });
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnFilterMenu": ColumnFilterMenu,
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "AutoResize": AutoResizePlugin
+        }
+    });
+
+    function AutoResizePlugin(context, settings) {
+        var self = this;
+
+        function init() {
+            context.view.onViewResized.subscribe(handleViewResized);
+            return self;
+        }
+
+        function destroy() {
+            context.view.onViewResized.unsubscribe(handleViewResized);
+        }
+
+
+        function handleViewResized() {
+            if (settings.plugins.AutoResize.enabled === true) {
+                resizeColumns();
             }
+        }
+
+        function resizeColumns() {
+            var updateColumns = resizeColumnsWidth(
+                context.columnsModel.getColumns(),
+                context.view.isVerticalScrollVisible() === true ? settings.scrollbarDimensions.width : 0,
+                settings.cellOuterSize.width
+            );
+
+            context.view.suspendRender(function () {
+                context.columnsModel.updateColumns(updateColumns);
+            });
+
+            return self;
+        }
+
+        function resizeColumnsWidth(allColumns, scrollBarWidth, cellOuterWidth) {
+            var contentSize = context.view.getContentSize();
+            var updateColumns = allColumns.slice();
+            var total =
+                {
+                    minWidth: 0,
+                    maxWidth: 0,
+                    width: 0
+                },
+                contentWidth = contentSize.width - updateColumns.length * cellOuterWidth - scrollBarWidth;
+
+            for (var i = updateColumns.length - 1; i >= 0; i--) {
+                var updateColumn = updateColumns[i];
+                if (updateColumn.resizeable === false) {
+                    contentWidth -= updateColumn.width;
+                    updateColumns.splice(i, 1);
+                    continue;
+                }
+                total.minWidth += updateColumn.minWidth;
+                total.maxWidth += updateColumn.maxWidth;
+                total.width += updateColumn.width;
+            }
+
+            if (total.minWidth <= contentWidth && contentWidth <= total.maxWidth) {
+                var columns = updateColumns.slice();
+                while (columns.length > 0) {
+                    var ratio = contentWidth / total.width;
+                    total.width = 0;
+
+                    for (i = columns.length - 1; i >= 0; i--) {
+                        var column = columns[i];
+                        var newColumnWidth = Math.max(
+                            Math.min(
+                                Math.floor(column.width * ratio),
+                                column.maxWidth
+                            ),
+                            column.minWidth
+                        );
+
+                        total.width += newColumnWidth;
+
+                        if (column.width === newColumnWidth) {
+                            if (columns.length === 1 && contentWidth !== column.width) {
+                                column.width += contentWidth - column.width;
+                            }
+                            contentWidth -= column.width;
+                            columns.splice(i, 1);
+                            continue;
+                        }
+
+                        column.width = newColumnWidth;
+                    }
+                }
+            }
+            return updateColumns;
+        }
+
+        $.extend(this, {
+            "init": init,
+            "resizeColumns": resizeColumns,
+            "destroy": destroy
+        });
+
+    }
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});
+(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnFilterMenu": ColumnFilterMenu,
         }
     });
 
     function ColumnFilterMenu(context, settings) {
-        var self = this;
-        var lastActiveColumnId = null;
-        var view = context.view;
-        var windowManager = context.windowManager;
+        var self = this,
+            lastActiveColumnId = null;
 
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type == "filter") {
+            if (evt && evt.type && evt.type === "filter") {
                 evt.stopPropagation();
                 lastActiveColumnId = evt.column.id;
 
-                var isVisible = windowManager.isVisible(evt.column.id);
-                windowManager.hideWindows();
+                var isVisible = context.windowManager.isVisible(evt.column.id);
+                context.windowManager.hideWindows();
 
-                if (windowManager.isWindow(evt.column.id) === false) {
+                if (context.windowManager.isWindow(evt.column.id) === false) {
 
-                    windowManager.createWindow(
+                    context.windowManager.createWindow(
                         evt.column.id,
                         buildElements(evt.column.id),
                         {
-                            filter: new SmallGrid.Query.FilterQuery(evt.column.field, settings)
+                            filter: new SmallGrid.Query.FilterQuery(evt.column.field)
                         }
                     );
 
-                    windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
+                    context.windowManager.showWindowNearTarget(evt.column.id, $(evt.event.target));
                 } else if (isVisible === false) {
-                    windowManager.showWindow(evt.column.id);
+                    context.windowManager.showWindow(evt.column.id);
                 }
             }
         }
@@ -4401,9 +4483,9 @@
         function handleMenuSubmit(evt) {
             evt.preventDefault();
 
-            var data = windowManager.getWindow(evt.data.id);
+            var data = context.windowManager.getWindow(evt.data.id);
             if (data && data.opts) {
-                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
+                var column = context.columnsModel.getColumnById(evt.data.id);
                 if (column) {
                     var filter = data.opts.filter;
                     var formValues = getFormValues(data.container);
@@ -4416,23 +4498,23 @@
                     }
 
                     column.headerCssClass += ' ' + settings.cssClass.headerFilterActive;
-                    view.getModel().getColumnsModel().updateColumn(column);
-                    view.getModel().setFilter(filter);
-                    windowManager.hideWindow(evt.data.id);
+                    context.columnsModel.updateColumn(column);
+                    context.viewModel.setFilter(filter);
+                    context.windowManager.hideWindow(evt.data.id);
                 }
             }
         }
 
         function handleMenuClear(evt) {
-            var data = windowManager.getWindow(evt.data.id);
+            var data = context.windowManager.getWindow(evt.data.id);
             if (data) {
-                var column = view.getModel().getColumnsModel().getColumnById(evt.data.id);
+                var column = context.columnsModel.getColumnById(evt.data.id);
                 if (column) {
                     column.headerCssClass = column.headerCssClass.replace(' ' + settings.cssClass.headerFilterActive, '');
-                    view.getModel().getColumnsModel().updateColumn(column);
+                    context.columnsModel.updateColumn(column);
 
-                    view.getModel().clearFilter(data.opts.filter);
-                    windowManager.hideWindow(evt.data.id);
+                    context.viewModel.clearFilter(data.opts.filter);
+                    context.windowManager.hideWindow(evt.data.id);
                 }
 
             }
@@ -4443,8 +4525,8 @@
         }
 
         function hideWindow() {
-            if (lastActiveColumnId != null) {
-                windowManager.hideWindow(lastActiveColumnId);
+            if (lastActiveColumnId !== null) {
+                context.windowManager.hideWindow(lastActiveColumnId);
                 lastActiveColumnId = null;
             }
         }
@@ -4453,16 +4535,23 @@
         Init && destroy
         */
         function init() {
-            view.onHeaderClick.subscribe(handleHeaderClick);
-            view.onScrollStart.subscribe(hideWindow);
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
+            context.view.onScrollStart.subscribe(hideWindow);
             return self;
         }
 
         function destroy() {
-            view.onHeaderClick.unsubscribe(handleHeaderClick);
-            view.onScrollStart.unsubscribe(hideWindow);
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
+            context.view.onScrollStart.unsubscribe(hideWindow);
         }
 
+        function filterColumnById(id, filter) {
+
+        }
+
+        function filterColumnByIndex(idx, filter) {
+
+        }
 
         $.extend(this, {
             "init": init,
@@ -4472,45 +4561,41 @@
 
 
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnPickerMenu": ColumnPickerMenu,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnPickerMenu": ColumnPickerMenu
         }
     });
 
     function ColumnPickerMenu(context, settings) {
         var self = this;
         var currentId = "column-picker";
-        var view = context.view;
-        var windowManager = context.windowManager;
 
         function handleHeaderContextMenu(evt) {
 
             if (evt) {
                 evt.preventDefault();
 
-                windowManager.hideWindows();
-                if (windowManager.isWindow(currentId) === false) {
-                    windowManager.createWindow(currentId, buildElements(currentId));
+                context.windowManager.hideWindows();
+                if (context.windowManager.isWindow(currentId) === false) {
+                    context.windowManager.createWindow(currentId, buildElements(currentId));
                 } else {
-                    var data = windowManager.getWindow(currentId);
+                    var data = context.windowManager.getWindow(currentId);
                     if (data) {
                         data.container.empty().append(buildElements(currentId));
                     }
                 }
 
-                windowManager.showWindowNearPosition(
+                context.windowManager.showWindowNearPosition(
                     currentId,
                     {
                         x: evt.event.pageX,
                         y: evt.event.pageY
                     },
-                    5
+                    10
                 );
             }
         }
@@ -4528,20 +4613,22 @@
 
         function buildContent() {
             var html = '';
-            var columns = view.getModel().getColumnsModel().getColumns();
-            for (var i = 0; i < columns.length; i++) {
-                html += '<div><label><input type="checkbox" name="" ' + ((columns[i].hidden) ? '' : ' checked ') + ' value="' + columns[i].id + '"/> ' + columns[i].name + '</label></div>';
+            var columns = context.columnsModel.getColumns();
+            var totalHidden = columns.length - totalHiddenColumns(columns);
+
+            for (var i = 0, length = columns.length; i < length; i++) {
+                html += '<div><label><input type="checkbox" name="" ' + (columns[i].hidden === true ? '' : ' checked ') + ' value="' + columns[i].id + '" ' + (totalHidden === 1 && columns[i].hidden === false ? ' disabled="disabled" ' : '') + '/> ' + columns[i].name + '</label></div>';
             }
+
             return html;
         }
 
-        function checkHiddenColumns(columns) {
+        function totalHiddenColumns(columns) {
             var counter = 0;
             for (var i = 0; i < columns.length; i++) {
-                if (columns[i].hidden === false) counter++;
-                if (counter > 1) return true;
+                if (columns[i].hidden === true) counter++;
             }
-            return false;
+            return counter;
         }
 
         /*
@@ -4549,7 +4636,7 @@
         */
         function handleMenuMouseEnter(evt) {
             $(this).off("mouseleave").on("mouseleave", function () {
-                windowManager.hideWindow(evt.data.id);
+                context.windowManager.hideWindow(evt.data.id);
             });
 
         }
@@ -4559,10 +4646,30 @@
             if (evt.target) {
                 var $checkbox = $(evt.target).closest('input');
                 if ($checkbox.length) {
-                    if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
+                    var columns = context.viewModel.getColumns();
+                    var totalHidden = columns.length - totalHiddenColumns(columns);
+                    if (totalHidden === 1 && $checkbox[0].checked === false) {
                         return false;
                     }
-                    view.getModel().getColumnsModel().setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
+
+                    if (totalHidden === 1 && $checkbox[0].checked === true) {
+                        //enable disabled checkbox
+                        var data = context.windowManager.getWindow(currentId);
+                        if (data) {
+                            data.container.find('input:disabled').removeAttr('disabled');
+                        }
+                    } else if (totalHidden === 2 && $checkbox[0].checked === false) {
+                        //disable last checkbox
+                        var data = context.windowManager.getWindow(currentId);
+                        if (data) {
+                            var $checked = data.container.find('input:checked');
+                            if ($checked.length) {
+                                $checked.attr('disabled', 'disabled');
+                            }
+                        }
+                    }
+
+                    context.columnsModel.setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
                 }
             }
         }
@@ -4571,64 +4678,79 @@
         Init && destroy
         */
         function init() {
-            view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
+            context.view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
             return self;
         }
 
         function destroy() {
-            view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
+            context.view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
         }
 
+        function hideColumnById(id) {
+            context.columnsModel.setColumnPropertyById(id, "hidden", true);
+        }
+
+        function hideColumnByIndex(idx) {
+            context.columnsModel.setColumnPropertyByIndex(idx, "hidden", true);
+        }
+
+        function showColumnById(id) {
+            context.columnsModel.setColumnPropertyById(id, "hidden", false);
+        }
+
+        function showColumnByIndex(idx) {
+            context.columnsModel.setColumnPropertyByIndex(idx, "hidden", false);
+        }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
+
+            "hideColumnById": hideColumnById,
+            "hideColumnByIndex": hideColumnByIndex,
+            "showColumnById": showColumnById,
+            "showColumnByIndex": showColumnByIndex
         });
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnResize": ColumnResizePlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnResize": ColumnResizePlugin
         }
     });
 
     function ColumnResizePlugin(context, settings) {
-        var self = this;
-        var view = context.view;
-        var windowManager = context.windowManager;
-
-        var column,
-            $headerTable,
-            $contentCell,
-            $contentCol,
-            $headerCell,
-            $headerCursorCells,
-            $headerCol,
-            $lastContentCol,
-            $lastHeaderCol,
-            headerWidth,
+        var self = this,
+            column,
+            el = {},
             width;
 
         function init() {
-            view.onColumnResize.subscribe(handleColumnResize);
-            view.onColumnResizeStart.subscribe(handleColumnResizeStart);
-            view.onColumnResizeStop.subscribe(handleColumnResizeStop);
+            context.view.onColumnResize.subscribe(handleColumnResize);
+            context.view.onColumnResizeStart.subscribe(handleColumnResizeStart);
+            context.view.onColumnResizeStop.subscribe(handleColumnResizeStop);
             return self;
         }
 
         function destroy() {
-            view.onColumnResize.unsubscribe(handleColumnResize);
-            view.onColumnResizeStart.subscribe(handleColumnResizeStart);
-            view.onColumnResizeStop.subscribe(handleColumnResizeStop);
+            context.view.onColumnResize.unsubscribe(handleColumnResize);
+            context.view.onColumnResizeStart.unsubscribe(handleColumnResizeStart);
+            context.view.onColumnResizeStop.unsubscribe(handleColumnResizeStop);
+
+            var elKeys = Object.keys(el);
+            for (var i = 0; i < elKeys.length; i++) {
+                el[elKeys[i]].empty().remove();
+                delete el[elKeys[i]];
+            }
+
+            column = null;
         }
 
         function handleColumnResize(evt) {
-            if (column && $lastHeaderCol.length) {
+            if (column && el.lastHeaderCol.length) {
                 width = Math.max(
                     Math.min(
                         parseInt(evt.width, 10),
@@ -4637,54 +4759,53 @@
                     column.minWidth
                 );
 
-                if ($headerCol.length) $headerCol.css("width", width + settings.cellOuterSize.width);
-                if ($contentCol.length) $contentCol.css("width", width + settings.cellOuterSize.width);
-
-                var wrapWidth = Math.max(view.getNode('headerTable').width(), headerWidth);
-                view.getNode('headerWrap').width(wrapWidth);
-                view.getNode('contentWrap').width(wrapWidth);
+                if (el.headerCol.length) el.headerCol.css("width", width + settings.cellOuterSize.width);
+                if (el.contentCol.length) el.contentCol.css("width", width + settings.cellOuterSize.width);
             }
         }
 
         function handleColumnResizeStart(evt) {
-            headerWidth = view.getNode('header').width();
-            column = view.getModel().getColumnByIndex(evt.cellIndex);
-            $headerCursorCells = view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer);
-            $headerCol = view.getNode('headerTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
-            $contentCol = view.getNode('contentTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
-            $lastHeaderCol = view.getNode('headerTable').find("colgroup > col:last");
-            $lastContentCol = view.getNode('contentTable').find("colgroup > col:last");
+            column = context.viewModel.getColumnByIndex(evt.cellIndex);
 
-            if (column && $lastHeaderCol.length) {
+            el = {
+                headerCursorCells: context.view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer),
+                headerCol: context.view.getNode('headerTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")"),
+                contentCol: context.view.getNode('contentTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")"),
+                lastHeaderCol: context.view.getNode('headerTable').find("colgroup > col:last"),
+                lastContentCol: context.view.getNode('contentTable').find("colgroup > col:last"),
+                contentCell: "",
+                headerCell: ""
+            };
 
-                if (settings.showLastColumn == true && $lastHeaderCol.hasClass(settings.cssClass.collLast)) {
-                    $lastHeaderCol.width(0);
-                    if ($lastContentCol.length) $lastContentCol.width(0);
+            if (column && el.lastHeaderCol.length) {
+
+                if (settings.showLastColumn === true && el.lastHeaderCol.hasClass(settings.cssClass.collLast)) {
+                    el.lastHeaderCol.width($(window).width());
+                    if (el.lastContentCol.length) el.lastContentCol.width($(window).width());
                 }
 
-                $headerCell = view.getNode('headerTable').find('td.' + settings.cssClass.cellColumnLast);
-                if ($headerCell.length) toggleDisabled($headerCell, settings.cssClass.cellColumnLast);
+                el.headerCell = context.view.getNode('headerTable').find('td.' + settings.cssClass.cellColumnLast);
+                if (el.headerCell.length) toggleDisabled(el.headerCell, settings.cssClass.cellColumnLast);
 
-                $contentCell = view.getNode('contentTable').find('td.' + settings.cssClass.cellColumnLast);
-                if ($contentCell.length) toggleDisabled($contentCell, settings.cssClass.cellColumnLast);
+                el.contentCell = context.view.getNode('contentTable').find('td.' + settings.cssClass.cellColumnLast);
+                if (el.contentCell.length) toggleDisabled(el.contentCell, settings.cssClass.cellColumnLast);
 
-                toggleDisabled($headerCursorCells, settings.cssClass.cursorPointer);
-                view.getNode('viewport').addClass(settings.cssClass.cursorResize);
+                toggleDisabled(el.headerCursorCells, settings.cssClass.cursorPointer);
+                context.view.getNode('viewport').addClass(settings.cssClass.cursorResize);
             }
         }
 
         function handleColumnResizeStop() {
             if (column) {
 
-                if ($headerCell.length) toggleEnabled($headerCell, settings.cssClass.cellColumnLast);
-                if ($contentCell.length) toggleEnabled($contentCell, settings.cssClass.cellColumnLast);
+                if (el.headerCell.length) toggleEnabled(el.headerCell, settings.cssClass.cellColumnLast);
+                if (el.contentCell.length) toggleEnabled(el.contentCell, settings.cssClass.cellColumnLast);
 
-
-                toggleEnabled($headerCursorCells, settings.cssClass.cursorPointer);
-                view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
+                toggleEnabled(el.headerCursorCells, settings.cssClass.cursorPointer);
+                context.view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
 
                 if (width) {
-                    view.getModel().getColumnsModel().setColumnPropertyById(
+                    context.columnsModel.setColumnPropertyById(
                         column.id,
                         'width',
                         width
@@ -4703,222 +4824,304 @@
 
         $.extend(this, {
             "init": init,
-            "destroy": destroy,
+            "destroy": destroy
         });
 
     }
-
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnSort": ColumnSortPlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnSort": ColumnSortPlugin
         }
     });
 
     function ColumnSortPlugin(context, settings) {
         var self = this;
-        var view = context.view;
-        var windowManager = context.windowManager;
 
         function init() {
-            view.onHeaderClick.subscribe(handleHeaderClick);
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
             return self;
         }
 
         function destroy() {
-            view.onHeaderClick.unsubscribe(handleHeaderClick);
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
         }
 
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type == "sort") {
-                var request = view.suspendRender();
-                var column = evt.column;
-                var sortOrder = SmallGrid.Utils.changeSortOrder(column.sortOrder);
-                view.getModel().getColumnsModel().setColumnsProperty("sortOrder", 0);//reset sorting
-                view.getModel().getColumnsModel().setColumnPropertyById(column.id, "sortOrder", sortOrder);
-                view.getModel().setSorter(new SmallGrid.Query.SorterQuery(column.field, sortOrder, column.sortComparer));
-                view.resumeRender(request);
-                //view.render();
+            if (evt && evt.type && evt.type === "sort") {
+                var request = context.view.suspendRender();
+                sortColumn(evt.column);
+                context.view.resumeRender(request);
+            }
+        }
+
+        function sortColumn(column, sortOrder) {
+            if (column) {
+                var newSortOrder = sortOrder === undefined ? SmallGrid.Utils.changeSortOrder(column.sortOrder) : sortOrder;
+                context.columnsModel.setColumnsProperty("sortOrder", 0);//reset sorting
+                context.columnsModel.setColumnPropertyById(column.id, "sortOrder", newSortOrder);
+                context.viewModel.setSorter(new SmallGrid.Query.SorterQuery(column.field, newSortOrder, column.sortComparer));
+            }
+        }
+        /*
+         * Public API
+         */
+        function sortColumnById(id, sortOrder) {
+            var column = context.columnsModel.getColumnById(id);
+            if (column) {
+                var request = context.view.suspendRender();
+                sortColumn(column, sortOrder);
+                context.view.resumeRender(request);
+            }
+        }
+
+        function sortColumnByIndex(idx, sortOrder) {
+            var column = context.columnsModel.getColumnByIndex(idx);
+            if (column) {
+                var request = context.view.suspendRender();
+                sortColumn(column, sortOrder);
+                context.view.resumeRender(request);
             }
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
+
+            "sortColumnById": sortColumnById,
+            "sortColumnByIndex": sortColumnByIndex
         });
 
     }
 
-})(jQuery);(function ($) {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "RowSelection": RowSelectionPlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "Footer": FooterPlugin
+        }
+    });
+
+    function FooterPlugin(context, settings) {
+        var self = this;
+
+    }
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "RowSelection": RowSelectionPlugin
         }
     });
 
     function RowSelectionPlugin(context, settings) {
-        var self = this;
-        var view = context.view;
-        var rowsModel = context.viewModel.getRowsModel();
-        var windowManager = context.windowManager;
-        var selectedRowIds = [];
-        var lastFocusedRowId = null;
+        var self = this,
+            selectedIds = [],
+            lastFocusedId = null;
 
         function init() {
-            view.onCellClick.subscribe(handleCellClick);
+            context.view.onCellClick.subscribe(handleCellClick);
             return self;
         }
 
         function destroy() {
-            view.onCellClick.unsubscribe(handleCellClick);
+            context.view.onCellClick.unsubscribe(handleCellClick);
         }
 
         function handleCellClick(evt) {
-            var request = view.suspendRender();
-            if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedRowId && lastFocusedRowId != evt.row.id) {
-                clearSelectedRows(selectedRowIds);
+            var request = context.view.suspendRender();
+            if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedId && lastFocusedId !== evt.row.id) {
 
-                var lastFocusedRow = rowsModel.getRowById(lastFocusedRowId);
-                var currentRow = rowsModel.getRowById(evt.row.id);
+                selectRowsRangeById(lastFocusedId, evt.row.id);
 
-                if (lastFocusedRow && currentRow) {
-                    selectRowsRange(lastFocusedRowId, evt.row.id);
-                }
-
-            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection) {
-                if (isRowSelected(evt.row.id) === false) {
-                    selectRowById(evt.row.id);
+            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection === true) {
+                if (isRowSelected(evt.row.id) === true) {
+                    deselectRowById(evt.row.id);
                 } else {
-                    clearSelectedRow(evt.row.id);
+                    selectRowById(evt.row.id);
                 }
             } else {
-                var clearRowsIds = selectedRowIds.slice();
-                var selectedIndex = clearRowsIds.indexOf(evt.row.id);
-
-                if (selectedIndex === -1) {
+                if (isRowSelected(evt.row.id) === false || selectedIds.length > 1) {
+                    deselectAllRows();
                     selectRowById(evt.row.id);
-                } else {
-                    clearRowsIds.splice(selectedIndex, 1);
-                }
-
-                clearSelectedRows(clearRowsIds);
-            }
-            view.resumeRender(request);
-
-            if (evt.event.shiftKey === false) lastFocusedRowId = evt.row.id;
-        }
-
-        function selectRowsRange(id1, id2) {
-            var lastFocusedIndex = rowsModel.getRowIndexById(id1);
-            var currentRowIndex = rowsModel.getRowIndexById(id2);
-            if (lastFocusedIndex !== -1 && currentRowIndex !== -1) {
-                var startIndex = Math.min(currentRowIndex, lastFocusedIndex);
-                var endIndex = Math.max(currentRowIndex, lastFocusedIndex);
-
-                for (var i = startIndex ; i <= endIndex; i++) {
-                    selectRowByIndex(i);
                 }
             }
-            return self;
+
+            context.view.resumeRender(request);
+
+            if (evt.event.shiftKey === false) lastFocusedId = evt.row.id;
         }
 
         function selectRow(row) {
             if (row) {
-                selectedRowIds.push(row.id);
-                rowsModel.setRowPropertyById(
+                selectedIds.push(row.id);
+
+                var rowNode = context.view.getRowNodeById(row.id);
+                if (rowNode) {
+                    rowNode.className = rowNode.className + ' ' + settings.cssClass.rowSelected;
+                }
+
+                context.rowsModel.setRowPropertyById(
                     row.id,
                     'rowCssClass',
-                    row.rowCssClass + ' ' + settings.cssClass.rowSelected
+                    row.rowCssClass + (row.rowCssClass.length ? " " : "") + settings.cssClass.rowSelected
                 );
             }
+        }
+
+        function deselectRow(row) {
+            if (row) {
+                var idx = selectedIds.indexOf(row.id);
+                if (idx !== -1) {
+                    selectedIds.splice(idx, 1);
+                }
+
+                var rowNode = context.view.getRowNodeById(row.id);
+                if (rowNode) {
+                    rowNode.className = rowNode.className.replace(' ' + settings.cssClass.rowSelected, '');
+                }
+
+                context.rowsModel.setRowPropertyById(
+                    row.id,
+                    'rowCssClass',
+                    row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '')
+                );
+            }
+        }
+
+        /* Public */
+        function selectRowById(id) {
+            var request = context.view.suspendRender();
+
+            selectRow(context.rowsModel.getRowById(id));
+
+            context.view.resumeRender(request);
+            return self;
+        }
+
+        function deselectRowById(id) {
+            var request = context.view.suspendRender();
+            deselectRow(context.rowsModel.getRowById(id));
+            context.view.resumeRender(request);
+            return self;
         }
 
         function selectRowByIndex(idx) {
-            selectRow(
-                rowsModel.getRowByIndex(idx)
-            );
+            var request = context.view.suspendRender();
+
+            selectRow(context.rowsModel.getRowByIndex(idx));
+
+            context.view.resumeRender(request);
             return self;
         }
 
-        function selectRowById(id) {
-            selectRow(
-                rowsModel.getRowById(id)
-            );
+        function deselectRowByIndex(idx) {
+            var request = context.view.suspendRender();
+
+            deselectRow(context.rowsModel.getRowByIndex(idx));
+
+            context.view.resumeRender(request);
             return self;
         }
 
-        function clearSelectedRows(ids) {
-            for (var i = ids.length - 1; i >= 0; i--) {
-                clearSelectedRow(ids[i]);
+        function selectRowsRangeByIndex(firstIdx, lastIdx) {
+            if (firstIdx > -1 && lastIdx > -1) {
+                var request = context.view.suspendRender();
+
+                var startIndex = Math.min(lastIdx, firstIdx);
+                var endIndex = Math.max(lastIdx, firstIdx);
+
+                for (var i = startIndex; i <= endIndex; i++) {
+                    selectRow(context.rowsModel.getRowByIndex(i));
+                }
+                context.view.resumeRender(request);
             }
             return self;
         }
 
-        function clearSelectedRow(id) {
-            var row = rowsModel.getRowById(id);
-            if (row) {
-                rowsModel.setRowPropertyById(
-                    row.id,
-                    'rowCssClass',
-                    row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '')
-                );
+        function selectRowsRangeById(firstId, lastId) {
+            var firstFocusedIndex = context.rowsModel.getRowIndexById(firstId);
+            var lastFocusedIndex = context.rowsModel.getRowIndexById(lastId);
+            if (firstFocusedIndex !== -1 && lastFocusedIndex !== -1) {
+                var request = context.view.suspendRender();
+                var startIndex = Math.min(lastFocusedIndex, firstFocusedIndex);
+                var endIndex = Math.max(lastFocusedIndex, firstFocusedIndex);
+
+                for (var i = startIndex; i <= endIndex; i++) {
+                    selectRow(context.rowsModel.getRowByIndex(i));
+                }
+                context.view.resumeRender(request);
             }
-            var selectedIndex = selectedRowIds.indexOf(id);
-            if (selectedIndex !== -1) {
-                selectedRowIds.splice(selectedIndex, 1);
+        }
+
+        function deselectAllRows() {
+            var request = context.view.suspendRender();
+            var selectedIds = getSelectedRowsIds().slice();
+            for (var i = 0; i < selectedIds.length; i++) {
+                deselectRowById(selectedIds[i]);
             }
 
+            context.view.resumeRender(request);
+            return self;
+        }
+
+        function selectAllRows() {
+            var request = context.view.suspendRender();
+
+            var rows = context.rowsModel.getRows();
+            for (var i = 0; i < rows.length; i++) {
+                selectRowById(rows[i]);
+            }
+
+            context.view.resumeRender(request);
             return self;
         }
 
         function isRowSelected(id) {
-            return (selectedRowIds.indexOf(id) !== -1);
+            return selectedIds.indexOf(id) !== -1;
         }
 
         function getSelectedRowsIds() {
-            return selectedRowIds;
+            return selectedIds;
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
 
-            "clearSelectedRow": clearSelectedRow,
-            "clearSelectedRows": clearSelectedRows,
+            "deselectAllRows": deselectAllRows,
+            "deselectRowById": deselectRowById,
+            "deselectRowByIndex": deselectRowByIndex,
             "getSelectedRowsIds": getSelectedRowsIds,
             "isRowSelected": isRowSelected,
-            "selectRowByIndex": selectRowByIndex,
+            "selectAllRows": selectAllRows,
             "selectRowById": selectRowById,
-            "selectRowsRange": selectRowsRange,
+            "selectRowByIndex": selectRowByIndex,
+            "selectRowsRangeById": selectRowsRangeById,
+            "selectRowsRangeByIndex": selectRowsRangeByIndex
         });
     }
 
-})(jQuery);if (typeof jQuery === "undefined") {
+})(jQuery, window.SmallGrid = window.SmallGrid || {});if (typeof jQuery === "undefined") {
     throw new Error("Small grid requires jquery module to be loaded.");
 }
 if (typeof SmallGrid === "undefined") {
     throw new Error("Small grid required to be loaded.");
 }
 
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
     var defaultSettings = {
         renderDelay: 0,
-        showLastColumn: false,//show last column
+        showLastColumn: true,//show last column
         uidPrefix: "smallgrid_",
-        resizeColumnsOnLoad: false,//resize columns when view loaded to fit canvas
         maxSupportedCssHeight: undefined,//internal
         scrollbarDimensions: undefined,//internal
         cellOuterSize: undefined,//internal
-        viewportDimensions:undefined,//internal
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
@@ -4949,44 +5152,48 @@ if (typeof SmallGrid === "undefined") {
             rowValignBottom: "grid-row-valign-bottom",
             rowValignBaseline: "grid-row-valign-baseline",
             cellAlignCenter: "grid-cell-align-center",
-            cellAlignRight: "grid-cell-align-right",
+            cellAlignRight: "grid-cell-align-right"
         },
         header: {
             height: 20,
-            disableTextSelection: true,
+            disableTextSelection: true
         },
 
         columns: {
             idProperty: undefined,
-            mapProperties: true,
+            newIdType: "",//number, guid
         },
         rows: {
             disableTextSelection: false,
             idProperty: undefined,//TODO: other fields mapping
-            mapProperties: true,
-            valign: "", //middle, top, bottom, baseline
+            newIdType: "",//number, guid
+            valign: "" //middle, top, bottom, baseline
         },
         formatter: {
             floatFormatter: {
-                decimals: 2,
+                decimals: 2
             },
             integerFormatter: {
-                decimals: 0,
+                decimals: 0
             },
             moneyFormatter: {
                 locales: 'en-US',
                 options: {
                     currency: 'EUR',
                     style: 'currency'
-                },
+                }
             },
             dateFormatter: {
                 locales: 'en-US',
-                options: {},
+                options: {}
             }
         },
 
         plugins: {
+            AutoResize: {
+                enabled: true,
+                resizeOnce: true//resize columns when view loaded to fit canvas
+            },
             ColumnSort: {},
             ColumnResize: {},
             RowSelection: {
@@ -4997,43 +5204,37 @@ if (typeof SmallGrid === "undefined") {
                 autoFocus: true//autofocus edited cell when scrolling
             },
             ColumnFilterMenu: {},
-            ColumnPickerMenu: {},
+            ColumnPickerMenu: {}
         }
     };
 
-    function CreateSettings(settings) {
+    function CreateSettings(opts) {
 
-        var settings = $.extend(true, {}, defaultSettings, settings || {});
+        var settings = $.extend(true, {}, defaultSettings, opts || {});
 
-        if (settings.viewportDimensions == undefined) {
-            defaultSettings.viewportDimensions = settings.viewportDimensions = SmallGrid.Utils.measureViewport();
-        }
-
-        if (settings.maxSupportedCssHeight == undefined) {
+        if (settings.maxSupportedCssHeight === undefined) {
             defaultSettings.maxSupportedCssHeight = settings.maxSupportedCssHeight = SmallGrid.Utils.measureMaxSupportedCssHeight();
         }
 
-        if (settings.scrollbarDimensions == undefined) {
+        if (settings.scrollbarDimensions === undefined) {
             defaultSettings.scrollbarDimensions = settings.scrollbarDimensions = SmallGrid.Utils.measureScrollbar();
         }
 
-        if (settings.cellOuterSize == undefined) {
+        if (settings.cellOuterSize === undefined) {
             settings.cellOuterSize = SmallGrid.Utils.measureCellDiff(settings.cssClass.cell);
         }
 
-        if (settings.uid == undefined) {
+        if (settings.uid === undefined) {
             settings.uid = SmallGrid.Utils.createGuid();
         }
 
         return settings;
     }
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Settings": {
-                "Create": CreateSettings,
-                "Default": defaultSettings,
-            }
+    $.extend(true, SmallGrid, {
+        "Settings": {
+            "Create": CreateSettings,
+            "Default": defaultSettings
         }
     });
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

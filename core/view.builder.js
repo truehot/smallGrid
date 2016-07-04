@@ -1,18 +1,16 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Renderer": {
-                    "Create": Create,
-                    "Renderer": Renderer,
-                }
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Builder": {
+                "Create": Create,
+                "Builder": Builder
             }
         }
     });
 
-    function Renderer(settings) {
+    function Builder(settings) {
         var self = this;
 
         /*
@@ -20,23 +18,24 @@
         */
         function buildViewPortElements($container) {
             var el = {
-                'container': $container,
-                'content': null,
-                'contentCol': null,
-                'contentTable': null,
-                'contentTbody': null,
-                'contentWrap': null,
-                'footer': null,
-                'header': null,
                 'headerCol': null,
-                'headerTable': null,
                 'headerTbody': null,
+                'headerTable': null,
                 'headerWrap': null,
+                'contentCol': null,
+                'contentTbody': null,
+                'contentTable': null,
+                'contentWrap': null,
+                'header': null,
+                'content': null,
+                'footer': null,
+                'preload': null,
                 'viewport': null,
+                'container': $container
             };
 
             //create
-            el['viewport'] = $("<div class='small-grid grid-viewport'/>");
+            el['viewport'] = $("<div class='grid-viewport'/>");
             el['header'] = $("<div class='grid-header'/>");
             el['content'] = $("<div class='grid-content'/>");
             el['footer'] = $("<div class='grid-footer'/>");
@@ -87,20 +86,18 @@
         function buildHeaderColumnsHtml(columns, opts) {
             var html = "<tr class='" + settings.cssClass.headerRow + "'>";
             for (var i = 0, length = columns.length - 1; i <= length; i++) {
-                html += buildHeaderColumnHtml(columns[i], opts, length == i);
+                html += buildHeaderColumnHtml(columns[i], opts, length === i);
             }
 
-            if (opts.virtualColumnWidth > 0) {
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
                 html += buildLastHeaderColumn(columns[i - 1], opts);
             }
 
             return html + "</tr>";
         }
 
-        function buildHeaderColumnHtml(column, opts, isLastColumn) {
-            var value = "",
-                html,
-                cellCssClass = settings.cssClass.headerCell;
+        function buildHeaderColumnCss(column, opts, isLastColumn) {
+            var cellCssClass = settings.cssClass.headerCell;
 
             if (column.headerCssClass) {
                 cellCssClass += " " + column.headerCssClass;
@@ -119,19 +116,22 @@
                     break;
             }
 
-            if (column.name) {
-                value += column.name;
-            }
 
             if (column.sortable || column.filterable) {
                 cellCssClass += " " + settings.cssClass.cursorPointer;
             }
 
-            html = "<td style='height:" + settings.header.height + "px' class='" + cellCssClass + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + value + "</span>";
+            return cellCssClass;
+        }
+
+        function buildHeaderColumnHtml(column, opts, isLastColumn) {
+            var html;
+
+            html = "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.name || "") + "</span>";
 
 
             if (column.sortable && column.sortOrder !== 0) {
-                html += "<span class='" + ((column.sortOrder == 1) ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
+                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
             }
 
             if (column.filterable) {
@@ -160,20 +160,24 @@
                 html += buildColHtml(columns[i]);
             }
 
-            if (opts.virtualColumnWidth > 0) {
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
                 html += buildLastColHtml(columns[i - 1], opts);
             }
 
             return html;
         }
 
-        function buildColHtml(column) {
+        function buildColCss(column) {
             var cellCssClass = settings.cssClass.col;
             if (column.headerCssClass) {
                 cellCssClass += " " + column.headerCssClass;
             }
 
-            return "<col style='width:" + (column.width + settings.cellOuterSize.width) + "px;' class='" + cellCssClass + "'/>";
+            return cellCssClass;
+        }
+
+        function buildColHtml(column) {
+            return "<col style='width:" + (column.width + settings.cellOuterSize.width) + "px;' class='" + buildColCss(column) + "'/>";
         }
 
         function buildLastColHtml(column, opts) {
@@ -186,17 +190,17 @@
         function buildRowsHtml(columns, rows, opts) {
             var html = '';
             for (var i = 0, length = rows.length - 1; i <= length; i++) {
-                html += buildRowHtml(columns, rows[i], opts, length == i);
+                html += buildRowHtml(columns, rows[i], opts, length === i);
             }
             return html;
         }
 
-        function buildRowHtml(columns, row, opts, isLastRow) {
-            var rowCssClass = settings.cssClass.row + ((row.calcIndex & 1 == 1) ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+        function buildRowCss(columns, row, opts, isLastRow) {
+            var rowCssClass = settings.cssClass.row + (row.calcIndex & 1 === 1 ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
 
             if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
 
-            switch (settings.rows.valign) {
+            switch (row.valign || settings.rows.valign) {
                 case "middle":
                     rowCssClass += " " + settings.cssClass.rowValignMiddle;
                     break;
@@ -211,20 +215,23 @@
                     break;
             }
 
-            var html = "<tr class='" + rowCssClass + "'>";
+            return rowCssClass;
+        }
+
+        function buildRowHtml(columns, row, opts, isLastRow) {
+            var html = "<tr class='" + buildRowCss(columns, row, opts, isLastRow) + "'>";
             for (var i = 0, length = columns.length - 1; i <= length; i++) {
-                html += buildCellHtml(columns[i], row, opts, length == i, isLastRow);
+                html += buildCellHtml(columns[i], row, opts, length === i, isLastRow);
             }
 
-            if (opts.virtualColumnWidth > 0) {
+            if (opts.virtualColumnWidth >= 0 && settings.showLastColumn === true) {
                 html += buildLastCellHtml(columns[i - 1], opts, isLastRow);
             }
-
 
             return html + '</tr>';
         }
 
-        function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
+        function buildCellCss(column, row, opts, isLastColumn, isLastRow) {
             var cellCssClass = settings.cssClass.cell;
             if (column.cellCssClass) {
                 cellCssClass += " " + column.cellCssClass;
@@ -238,30 +245,39 @@
                 cellCssClass += " " + settings.cssClass.cellRowLast;
             }
 
-            if (column.align == "center") {
+            if (column.align === "center") {
                 cellCssClass += " " + settings.cssClass.cellAlignCenter;
             }
-            if (column.align == "right") {
+
+            if (column.align === "right") {
                 cellCssClass += " " + settings.cssClass.cellAlignRight;
             }
 
-            if (row.cellCssClass && (column.field in row.cellCssClass)) {
+            if (row.cellCssClass && column.field in row.cellCssClass) {
                 cellCssClass += " " + row.cellCssClass[column.field];
             }
 
-            return "<td height='" + row.height + "' class='" + cellCssClass + "'>" + getCellContentHtml(column, row) + "</td>";
+            if (row.editMode === true && column.editMode === true) {
+                cellCssClass += " " + settings.cssClass.cellEdit;
+            }
+
+            return cellCssClass;
+        }
+
+        function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
+            return "<td height='" + row.height + "' class='" + buildCellCss(column, row, opts, isLastColumn, isLastRow) + "'>" + buildCellContentHtml(column, row) + "</td>";
         }
 
         function buildLastCellHtml(column, opts, isLastRow) {
             var cssClass = settings.cssClass.cell + ' ' + settings.cssClass.cellColumnLast;
-            if (isLastRow) cssClass += ' ' + settings.cssClass.cellRowLast;
+            if (isLastRow && opts.hideRowBorder) cssClass += ' ' + settings.cssClass.cellRowLast;
             return "<td class='" + cssClass + "'></td>";
         }
 
         /*
         Cell content
         */
-        function getCellContentHtml(column, row) {
+        function buildCellContentHtml(column, row) {
             var value = "";
 
             if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
@@ -271,7 +287,7 @@
         }
 
         function getCellFormatter(column, row) {
-            return (column.formatter) ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
+            return column.formatter ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
         }
 
         function getCellValue(column, row) {
@@ -280,10 +296,11 @@
 
 
         $.extend(this, {
-            "buildViewPortElements": buildViewPortElements,
-            "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
+            "buildCellContentHtml": buildCellContentHtml,
             "buildColsHtml": buildColsHtml,
+            "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
+            "buildViewPortElements": buildViewPortElements
         });
     }
 
@@ -292,7 +309,7 @@
             throw new TypeError("Settings is not defined");
         }
 
-        return new Renderer(settings);
+        return new Builder(settings);
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

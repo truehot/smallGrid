@@ -1,46 +1,41 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnResize": ColumnResizePlugin,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnResize": ColumnResizePlugin
         }
     });
 
     function ColumnResizePlugin(context, settings) {
-        var self = this;
-        var view = context.view;
-        var windowManager = context.windowManager;
-
-        var column,
-            $headerTable,
-            $contentCell,
-            $contentCol,
-            $headerCell,
-            $headerCursorCells,
-            $headerCol,
-            $lastContentCol,
-            $lastHeaderCol,
-            headerWidth,
+        var self = this,
+            column,
+            el = {},
             width;
 
         function init() {
-            view.onColumnResize.subscribe(handleColumnResize);
-            view.onColumnResizeStart.subscribe(handleColumnResizeStart);
-            view.onColumnResizeStop.subscribe(handleColumnResizeStop);
+            context.view.onColumnResize.subscribe(handleColumnResize);
+            context.view.onColumnResizeStart.subscribe(handleColumnResizeStart);
+            context.view.onColumnResizeStop.subscribe(handleColumnResizeStop);
             return self;
         }
 
         function destroy() {
-            view.onColumnResize.unsubscribe(handleColumnResize);
-            view.onColumnResizeStart.subscribe(handleColumnResizeStart);
-            view.onColumnResizeStop.subscribe(handleColumnResizeStop);
+            context.view.onColumnResize.unsubscribe(handleColumnResize);
+            context.view.onColumnResizeStart.unsubscribe(handleColumnResizeStart);
+            context.view.onColumnResizeStop.unsubscribe(handleColumnResizeStop);
+
+            var elKeys = Object.keys(el);
+            for (var i = 0; i < elKeys.length; i++) {
+                el[elKeys[i]].empty().remove();
+                delete el[elKeys[i]];
+            }
+
+            column = null;
         }
 
         function handleColumnResize(evt) {
-            if (column && $lastHeaderCol.length) {
+            if (column && el.lastHeaderCol.length) {
                 width = Math.max(
                     Math.min(
                         parseInt(evt.width, 10),
@@ -49,54 +44,53 @@
                     column.minWidth
                 );
 
-                if ($headerCol.length) $headerCol.css("width", width + settings.cellOuterSize.width);
-                if ($contentCol.length) $contentCol.css("width", width + settings.cellOuterSize.width);
-
-                var wrapWidth = Math.max(view.getNode('headerTable').width(), headerWidth);
-                view.getNode('headerWrap').width(wrapWidth);
-                view.getNode('contentWrap').width(wrapWidth);
+                if (el.headerCol.length) el.headerCol.css("width", width + settings.cellOuterSize.width);
+                if (el.contentCol.length) el.contentCol.css("width", width + settings.cellOuterSize.width);
             }
         }
 
         function handleColumnResizeStart(evt) {
-            headerWidth = view.getNode('header').width();
-            column = view.getModel().getColumnByIndex(evt.cellIndex);
-            $headerCursorCells = view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer);
-            $headerCol = view.getNode('headerTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
-            $contentCol = view.getNode('contentTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")");
-            $lastHeaderCol = view.getNode('headerTable').find("colgroup > col:last");
-            $lastContentCol = view.getNode('contentTable').find("colgroup > col:last");
+            column = context.viewModel.getColumnByIndex(evt.cellIndex);
 
-            if (column && $lastHeaderCol.length) {
+            el = {
+                headerCursorCells: context.view.getNode('headerTbody').find("." + settings.cssClass.cursorPointer),
+                headerCol: context.view.getNode('headerTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")"),
+                contentCol: context.view.getNode('contentTable').find("colgroup > col:nth-child(" + (evt.cellIndex + 1) + ")"),
+                lastHeaderCol: context.view.getNode('headerTable').find("colgroup > col:last"),
+                lastContentCol: context.view.getNode('contentTable').find("colgroup > col:last"),
+                contentCell: "",
+                headerCell: ""
+            };
 
-                if (settings.showLastColumn == true && $lastHeaderCol.hasClass(settings.cssClass.collLast)) {
-                    $lastHeaderCol.width(0);
-                    if ($lastContentCol.length) $lastContentCol.width(0);
+            if (column && el.lastHeaderCol.length) {
+
+                if (settings.showLastColumn === true && el.lastHeaderCol.hasClass(settings.cssClass.collLast)) {
+                    el.lastHeaderCol.width($(window).width());
+                    if (el.lastContentCol.length) el.lastContentCol.width($(window).width());
                 }
 
-                $headerCell = view.getNode('headerTable').find('td.' + settings.cssClass.cellColumnLast);
-                if ($headerCell.length) toggleDisabled($headerCell, settings.cssClass.cellColumnLast);
+                el.headerCell = context.view.getNode('headerTable').find('td.' + settings.cssClass.cellColumnLast);
+                if (el.headerCell.length) toggleDisabled(el.headerCell, settings.cssClass.cellColumnLast);
 
-                $contentCell = view.getNode('contentTable').find('td.' + settings.cssClass.cellColumnLast);
-                if ($contentCell.length) toggleDisabled($contentCell, settings.cssClass.cellColumnLast);
+                el.contentCell = context.view.getNode('contentTable').find('td.' + settings.cssClass.cellColumnLast);
+                if (el.contentCell.length) toggleDisabled(el.contentCell, settings.cssClass.cellColumnLast);
 
-                toggleDisabled($headerCursorCells, settings.cssClass.cursorPointer);
-                view.getNode('viewport').addClass(settings.cssClass.cursorResize);
+                toggleDisabled(el.headerCursorCells, settings.cssClass.cursorPointer);
+                context.view.getNode('viewport').addClass(settings.cssClass.cursorResize);
             }
         }
 
         function handleColumnResizeStop() {
             if (column) {
 
-                if ($headerCell.length) toggleEnabled($headerCell, settings.cssClass.cellColumnLast);
-                if ($contentCell.length) toggleEnabled($contentCell, settings.cssClass.cellColumnLast);
+                if (el.headerCell.length) toggleEnabled(el.headerCell, settings.cssClass.cellColumnLast);
+                if (el.contentCell.length) toggleEnabled(el.contentCell, settings.cssClass.cellColumnLast);
 
-
-                toggleEnabled($headerCursorCells, settings.cssClass.cursorPointer);
-                view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
+                toggleEnabled(el.headerCursorCells, settings.cssClass.cursorPointer);
+                context.view.getNode('viewport').removeClass(settings.cssClass.cursorResize);
 
                 if (width) {
-                    view.getModel().getColumnsModel().setColumnPropertyById(
+                    context.columnsModel.setColumnPropertyById(
                         column.id,
                         'width',
                         width
@@ -115,9 +109,8 @@
 
         $.extend(this, {
             "init": init,
-            "destroy": destroy,
+            "destroy": destroy
         });
 
     }
-
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

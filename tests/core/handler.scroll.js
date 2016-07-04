@@ -8,7 +8,7 @@ QUnit.test("Scroll", function (assert) {
 
     $wrapper.appendTo('#qunit-fixture');
 
-    var handler = new SmallGrid.Handler.Scroll.Create($wrapper, {
+    var handler = SmallGrid.Handler.Scroll.Create($wrapper, {
         "handleScrollStart": handleScrollStart,
         "handleScrollStop": handleScrollStop,
         "handleScroll": handleScroll,

@@ -1,6 +1,6 @@
 QUnit.module("SmallGrid");
 QUnit.test("Column", function (assert) {
-    var model = new SmallGrid.Column.Create([], SmallGrid.Settings.Create());
+    var model = SmallGrid.Column.Create([], SmallGrid.Settings.Create());
 
     assert.ok(model.items.getItems().length == 0, "Column.Create");
     assert.ok(model.isEmpty() == true, "isEmpty");
@@ -20,9 +20,6 @@ QUnit.test("Column", function (assert) {
     model.addColumns([]);
     assert.ok(model.items.getItems().length == 0, "items.addColumns");
 
-    model.updateColumns([]);
-    assert.ok(model.items.getItems().length == 0, "updateItems");
-
     model.deleteColumns();
     assert.ok(model.items.getItems().length == 0, "items.deleteItems");
 
@@ -36,14 +33,11 @@ QUnit.test("Column", function (assert) {
     assert.ok(model.getColumns().length == 0, "getColumns");
 
     var item = getItem();
-    var model = new SmallGrid.Column.Create([item], SmallGrid.Settings.Create());
+    var model = SmallGrid.Column.Create([item], SmallGrid.Settings.Create());
     assert.ok(model.items.getItems().length == 1, "Data.Create");
     assert.ok(model.getColumns().length == 1, "Data.Create");
     assert.deepEqual(model.getColumns()[0].item, item, "Data.Create");
 
-    model.items.updateItems([item]);
-    assert.ok(model.getColumns().length == 1, "items.updateItems");
-    assert.deepEqual(model.getColumns()[0].item, item, "items.updateItems");
 
     model.items.deleteItems();
     assert.ok(model.getColumns().length == 0, "items.deleteItems");
@@ -67,8 +61,6 @@ QUnit.test("Column", function (assert) {
     assert.ok(model.getColumns().length == 1, "items.setItems");
 
     var newItem = model.getColumns()[0];
-    model.items.updateItem(newItem);
-    assert.deepEqual(model.getColumns()[0], newItem, "items.updateItem");
 
     model.items.updateItemById(newItem.id, newItem.item);
     assert.deepEqual(model.getColumns()[0], newItem, "items.updateItemById");
@@ -78,10 +70,6 @@ QUnit.test("Column", function (assert) {
 
     model.updateColumnByIndex(0, newItem);
     assert.deepEqual(model.getColumns()[0], newItem, "updateColumnByIndex");
-
-    model.items.updateItems([newItem]);
-    assert.deepEqual(model.getColumns()[0], newItem, "items.updateItems");
-
 
     assert.ok(model.getColumnIdByIndex(0) == newItem.id, "getColumnIdByIndex");
     assert.ok(model.getColumnIndexById(newItem.id) == 0, "getColumnIndexById");

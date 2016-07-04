@@ -5,17 +5,15 @@ if (typeof SmallGrid === "undefined") {
     throw new Error("Small grid required to be loaded.");
 }
 
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
     var defaultSettings = {
         renderDelay: 0,
-        showLastColumn: false,//show last column
+        showLastColumn: true,//show last column
         uidPrefix: "smallgrid_",
-        resizeColumnsOnLoad: false,//resize columns when view loaded to fit canvas
         maxSupportedCssHeight: undefined,//internal
         scrollbarDimensions: undefined,//internal
         cellOuterSize: undefined,//internal
-        viewportDimensions:undefined,//internal
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
@@ -46,44 +44,48 @@ if (typeof SmallGrid === "undefined") {
             rowValignBottom: "grid-row-valign-bottom",
             rowValignBaseline: "grid-row-valign-baseline",
             cellAlignCenter: "grid-cell-align-center",
-            cellAlignRight: "grid-cell-align-right",
+            cellAlignRight: "grid-cell-align-right"
         },
         header: {
             height: 20,
-            disableTextSelection: true,
+            disableTextSelection: true
         },
 
         columns: {
             idProperty: undefined,
-            mapProperties: true,
+            newIdType: "",//number, guid
         },
         rows: {
             disableTextSelection: false,
             idProperty: undefined,//TODO: other fields mapping
-            mapProperties: true,
-            valign: "", //middle, top, bottom, baseline
+            newIdType: "",//number, guid
+            valign: "" //middle, top, bottom, baseline
         },
         formatter: {
             floatFormatter: {
-                decimals: 2,
+                decimals: 2
             },
             integerFormatter: {
-                decimals: 0,
+                decimals: 0
             },
             moneyFormatter: {
                 locales: 'en-US',
                 options: {
                     currency: 'EUR',
                     style: 'currency'
-                },
+                }
             },
             dateFormatter: {
                 locales: 'en-US',
-                options: {},
+                options: {}
             }
         },
 
         plugins: {
+            AutoResize: {
+                enabled: true,
+                resizeOnce: true//resize columns when view loaded to fit canvas
+            },
             ColumnSort: {},
             ColumnResize: {},
             RowSelection: {
@@ -94,43 +96,37 @@ if (typeof SmallGrid === "undefined") {
                 autoFocus: true//autofocus edited cell when scrolling
             },
             ColumnFilterMenu: {},
-            ColumnPickerMenu: {},
+            ColumnPickerMenu: {}
         }
     };
 
-    function CreateSettings(settings) {
+    function CreateSettings(opts) {
 
-        var settings = $.extend(true, {}, defaultSettings, settings || {});
+        var settings = $.extend(true, {}, defaultSettings, opts || {});
 
-        if (settings.viewportDimensions == undefined) {
-            defaultSettings.viewportDimensions = settings.viewportDimensions = SmallGrid.Utils.measureViewport();
-        }
-
-        if (settings.maxSupportedCssHeight == undefined) {
+        if (settings.maxSupportedCssHeight === undefined) {
             defaultSettings.maxSupportedCssHeight = settings.maxSupportedCssHeight = SmallGrid.Utils.measureMaxSupportedCssHeight();
         }
 
-        if (settings.scrollbarDimensions == undefined) {
+        if (settings.scrollbarDimensions === undefined) {
             defaultSettings.scrollbarDimensions = settings.scrollbarDimensions = SmallGrid.Utils.measureScrollbar();
         }
 
-        if (settings.cellOuterSize == undefined) {
+        if (settings.cellOuterSize === undefined) {
             settings.cellOuterSize = SmallGrid.Utils.measureCellDiff(settings.cssClass.cell);
         }
 
-        if (settings.uid == undefined) {
+        if (settings.uid === undefined) {
             settings.uid = SmallGrid.Utils.createGuid();
         }
 
         return settings;
     }
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Settings": {
-                "Create": CreateSettings,
-                "Default": defaultSettings,
-            }
+    $.extend(true, SmallGrid, {
+        "Settings": {
+            "Create": CreateSettings,
+            "Default": defaultSettings
         }
     });
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

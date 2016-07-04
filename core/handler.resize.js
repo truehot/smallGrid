@@ -1,58 +1,72 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Resize": {
-                    "Create": Create,
-                    "Handler": ResizeHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Resize": {
+                "Create": Create,
+                "Handler": ResizeHandler
             }
         }
     });
 
     function ResizeHandler($container, settings) {
+        var $cellElement, cellIndex, pageX, canBeMoved = false;
+
         $container.on("mousedown", settings.handlerIdentifier, handleMouseDown);
+        $(document).on("mousemove", handleMouseMove).on("mouseup", handleMouseUp);
 
         function handleMouseDown(evt) {
-            var $cellElement = $(this).closest(settings.cellIdentifier);
-
+            $cellElement = $(this).closest(settings.cellIdentifier);
             if ($cellElement.length) {
-                var cellIndex = $cellElement.index();
-
+                cellIndex = $cellElement.index();
+                pageX = evt.pageX;
                 settings.handleResizeStart({
                     cellElement: $cellElement,
                     cellIndex: cellIndex,
                     event: evt
                 });
 
-                $(document)
-                    .bind("mousemove", function (evt) {
-                        var newWidth = evt.pageX - $cellElement.offset().left;
-                        if (newWidth > 0) {
-                            settings.handleResize({
-                                cellElement: $cellElement,
-                                cellIndex: cellIndex,
-                                width: newWidth,
-                                event: evt
-                            });
-                        }
-                    })
-                    .bind("mouseup", function (evt) {
-                        $(this).unbind("mousemove mouseup");
+                canBeMoved = true;
+            }
+        }
 
-                        settings.handleResizeStop({
-                            cellElement: $cellElement,
-                            cellIndex: cellIndex,
-                            event: evt
-                        });
+        function handleMouseMove(evt) {
+            if (canBeMoved) {
+                var newWidth = evt.pageX - $cellElement.offset().left;
+                if (newWidth > 0) {
+                    settings.handleResize({
+                        cellElement: $cellElement,
+                        cellIndex: cellIndex,
+                        xDelta: evt.pageX - pageX,
+                        width: newWidth,
+                        event: evt
                     });
+                }
+            }
+        }
+
+        function handleMouseUp(evt) {
+            if (canBeMoved) {
+                canBeMoved = false;
+
+                settings.handleResizeStop({
+                    cellElement: $cellElement,
+                    cellIndex: cellIndex,
+                    event: evt
+                });
             }
         }
 
         function destroy() {
             $container.off('mousedown', handleMouseDown);
+            $(document).off("mousemove", handleMouseMove).off("mouseup", handleMouseUp);
+            $cellElement = undefined;
+
+            var settingsKeys = Object.keys(settings);
+            for (var i = 0; i < settingsKeys.length; i++) {
+                delete settings[settingsKeys[i]];
+            }
         }
 
         $.extend(this, {
@@ -60,18 +74,26 @@
         });
     }
 
-    function Create($container, settings) {
+    function Create($container, options) {
+        if (!$container.length) {
+            throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length !== 1) {
+            throw new TypeError("There should be only 1 container.");
+        }
+
         var defaultSettings = {
             "cellIdentifier": "TD",
             "handleResize": undefined,
             "handleResizeStart": undefined,
             "handleResizeStop": undefined,
-            "handlerIdentifier": undefined,
+            "handlerIdentifier": undefined
         };
 
-        settings = $.extend({}, defaultSettings, settings);
+        var settings = $.extend({}, defaultSettings, options);
 
         return new ResizeHandler($container, settings);
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

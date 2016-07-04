@@ -1,13 +1,11 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Shared": {
-                    "GetInstance": GetInstance,
-                    "Handler": SharedHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Shared": {
+                "GetInstance": GetInstance,
+                "Handler": SharedHandler
             }
         }
     });
@@ -46,10 +44,11 @@
         }
 
         function destroy() {
+            clearTimeout(resizeTimer);
             $(window)
                 .off("click", handleClick)
                 .off("contextmenu", handleContextMenu)
-                .off("resize", handleResize)
+                .off("resize", handleResize);
         }
 
         $.extend(this, {
@@ -71,4 +70,4 @@
         return handler;
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

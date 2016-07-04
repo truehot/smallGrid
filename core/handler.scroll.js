@@ -1,13 +1,11 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Handler": {
-                "Scroll": {
-                    "Create": Create,
-                    "Handler": ScrollHandler,
-                }
+    $.extend(true, SmallGrid, {
+        "Handler": {
+            "Scroll": {
+                "Create": Create,
+                "Handler": ScrollHandler
             }
         }
     });
@@ -16,24 +14,24 @@
     TODO: direction change
     https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html
     */
-    function ScrollHandler($element, settings) {
+    function ScrollHandler($container, settings) {
 
         if (settings.resetTop) {
-            $element[0].scrollTop = 0;
+            $container[0].scrollTop = 0;
         }
         if (settings.resetLeft) {
-            $element[0].scrollLeft = 0;
+            $container[0].scrollLeft = 0;
         }
 
         var scrollStopTimer, wheelStopTimer,
             isScrollMoved = false, isWheelMoved = false,
             lastScroll = {
-                scrollTop: $element[0].scrollTop,
-                scrollLeft: $element[0].scrollLeft,
+                scrollTop: $container[0].scrollTop,
+                scrollLeft: $container[0].scrollLeft
             };
 
-        $element.on('scroll', handleScroll);
-        $element.on('wheel', handleMouseWheel);
+        $container.on('scroll', handleScroll);
+        $container.on('wheel', handleMouseWheel);
 
         function handleMouseWheel(evt) {
             clearTimeout(wheelStopTimer);
@@ -54,11 +52,11 @@
 
         function handleScroll(evt) {
             var scroll = {
-                scrollTop: $element[0].scrollTop,
-                scrollLeft: $element[0].scrollLeft,
-                topDelta: $element[0].scrollTop - lastScroll.scrollTop,
-                leftDelta: $element[0].scrollLeft - lastScroll.scrollLeft,
-                event: evt,
+                scrollTop: $container[0].scrollTop,
+                scrollLeft: $container[0].scrollLeft,
+                topDelta: $container[0].scrollTop - lastScroll.scrollTop,
+                leftDelta: $container[0].scrollLeft - lastScroll.scrollLeft,
+                event: evt
             };
 
             clearTimeout(scrollStopTimer);
@@ -77,7 +75,7 @@
 
             lastScroll = {
                 scrollTop: scroll.scrollTop,
-                scrollLeft: scroll.scrollLeft,
+                scrollLeft: scroll.scrollLeft
             };
         }
 
@@ -85,8 +83,13 @@
             clearTimeout(scrollStopTimer);
             clearTimeout(wheelStopTimer);
 
-            $element.off('scroll', handleScroll);
-            $element.off('wheel', handleMouseWheel);
+            $container.off('scroll', handleScroll);
+            $container.off('wheel', handleMouseWheel);
+
+            var settingsKeys = Object.keys(settings);
+            for (var i = 0; i < settingsKeys.length; i++) {
+                delete settings[settingsKeys[i]];
+            }
         }
 
         $.extend(this, {
@@ -94,7 +97,14 @@
         });
     }
 
-    function Create($container, settings) {
+    function Create($container, options) {
+        if (!$container.length) {
+            throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length != 1) {
+            throw new TypeError("There should be only 1 container.");
+        }
 
         var defaultSettings = {
             "handleMouseWheel": undefined,
@@ -105,12 +115,12 @@
             "handlescrollStop": undefined,
             "latency": 300,
             "resetLeft": true,
-            "resetTop": true,
+            "resetTop": true
         };
 
-        settings = $.extend({}, defaultSettings, settings);
+        var settings = $.extend({}, defaultSettings, options);
 
         return new ScrollHandler($container, settings);
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

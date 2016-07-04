@@ -1,7 +1,7 @@
 QUnit.module("SmallGrid");
 QUnit.test("Row", function (assert) {
 
-    var model = new SmallGrid.Row.Create([], SmallGrid.Settings.Create());
+    var model = SmallGrid.Row.Create([], SmallGrid.Settings.Create());
 
 
     assert.ok(model.items.getItems().length == 0, "Row.Create");
@@ -24,9 +24,6 @@ QUnit.test("Row", function (assert) {
     model.addRows([]);
     assert.ok(model.items.getItems().length == 0, "items.addRows");
 
-    model.updateRows([]);
-    assert.ok(model.items.getItems().length == 0, "items.updateItems");
-
     model.deleteRows();
     assert.ok(model.items.getItems().length == 0, "items.deleteItems");
 
@@ -40,18 +37,15 @@ QUnit.test("Row", function (assert) {
     assert.ok(model.getRows().length == 0, "getRows");
 
     var item = getItem();
-    var model = new SmallGrid.Row.Create([item], SmallGrid.Settings.Create());
+    var model = SmallGrid.Row.Create([item], SmallGrid.Settings.Create());
     assert.ok(model.items.getItems().length == 1, "Data.Create");
     assert.ok(model.getRows().length == 1, "Data.Create");
     assert.deepEqual(model.getRows()[0].item, item, "Data.Create");
 
-    model.items.updateItems([item]);
-    assert.ok(model.getRows().length == 1, "items.updateItems");
-    assert.deepEqual(model.getRows()[0].item, item, "items.updateItems");
-
     model.items.deleteItems();
     assert.ok(model.getRows().length == 0, "items.deleteItems");
 
+    var newItem = model.getRows()[0];
     model.items.setItems([item]);
     assert.ok(model.getRows().length == 1, "items.setItems");
     assert.deepEqual(model.getRows()[0].item, item, "items.setItems");
@@ -71,8 +65,6 @@ QUnit.test("Row", function (assert) {
     assert.ok(model.getRows().length == 1, "items.setItems");
 
     var newItem = model.getRows()[0];
-    model.items.updateItem(newItem);
-    assert.deepEqual(model.getRows()[0], newItem, "items.updateItem");
 
     model.items.updateItemById(newItem.id, newItem.item);
     assert.deepEqual(model.getRows()[0], newItem, "items.updateItemById");
@@ -82,10 +74,6 @@ QUnit.test("Row", function (assert) {
 
     model.updateRowByIndex(0, newItem);
     assert.deepEqual(model.getRows()[0], newItem, "updateRowByIndex");
-
-    model.items.updateItems([newItem]);
-    assert.deepEqual(model.getRows()[0], newItem, "items.updateItems");
-
 
     assert.ok(model.getRowIdByIndex(0) == newItem.id, "getRowIdByIndex");
     assert.ok(model.getRowIndexById(newItem.id) == 0, "getRowIndexById");

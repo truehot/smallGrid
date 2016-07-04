@@ -1,11 +1,9 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Query": {
-                "Request": Request,
-            }
+    $.extend(true, SmallGrid, {
+        "Query": {
+            "Request": Request
         }
     });
 
@@ -37,17 +35,17 @@
 
         function getRowsInRange(top, height, outerHeight) {
             sortRows();
-            return dataModel.filter(new RowsRangeByHeight(top, height, outerHeight, getRowFilter()));
+            return dataModel.filter(RowsRangeByHeight(top, height, outerHeight, getRowFilter()));
         }
 
         function getColumnsInRange(left, width, outerWidth) {
-            return dataModel.filter(new ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
+            return dataModel.filter(ColumnsRangeByWidth(left, width, outerWidth, getColumnFilter()));
         }
 
         function getColumnsTotal(width) {
             var total = {
                 width: 0,
-                count: 0,
+                count: 0
             };
             var columns = dataModel.getColumns();
             var filter = getColumnFilter();
@@ -64,7 +62,7 @@
         function getRowsTotal(height) {
             var total = {
                 height: 0,
-                count: 0,
+                count: 0
             };
             var rows = dataModel.getRows();
             var filter = getRowFilter();
@@ -185,4 +183,4 @@
             "getRowsInRange": getRowsInRange
         });
     }
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

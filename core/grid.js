@@ -1,19 +1,17 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Grid": {
-                "Create": CreateModel,
-                "Model": GridModel,
-            }
+    $.extend(true, SmallGrid, {
+        "Grid": {
+            "Create": CreateModel,
+            "Model": GridModel
         }
     });
 
-    function GridModel($container, view, viewModel, windowManager, settings) {
+    function GridModel($container, context, settings) {
         var self = this,
             plugins = {},
-            version = "0.5",
+            version = "0.6 beta",
             id = SmallGrid.Utils.createGuid();
 
         /*
@@ -21,41 +19,52 @@
         */
         function init() {
             registerPlugins(settings.plugins);
+
+            var contextKeys = ["windowManager", "view", "viewModel"];
+            for (var i = 0; i < contextKeys.length; i++) {
+                context[contextKeys[i]].init();
+            }
+
+            self.onInitialize.notify({});
             return self;
         }
 
         function destroy() {
-            for (var i = 0; i < plugins.length; i++) {
-                unregisterPlugin(plugins[i]);
+            unregisterPlugins();
+
+            var contextKeys = ["windowManager", "view", "viewModel", "rowsModel", "columnsModel"];
+            for (var i = 0; i < contextKeys.length; i++) {
+                context[contextKeys[i]].destroy();
+                delete context[contextKeys[i]];
             }
-            windowManager.destroy();
-            view.destroy();
+
+            self.onDestroy.notify({});
         }
         /*
          WindowManager
          */
         function getWindowManager() {
-            return windowManager;
+            return context.windowManager;
         }
 
         /*
         View
         */
         function getView() {
-            return view;
+            return context.view;
         }
 
         /*View model*/
         function getViewModel() {
-            return viewModel;
+            return context.viewModel;
         }
 
         function getRowsModel() {
-            return viewModel.getRowsModel();
+            return context.rowsModel;
         }
 
         function getColumnsModel() {
-            return viewModel.getColumnsModel();
+            return context.columnsModel;
         }
 
         /*
@@ -87,10 +96,18 @@
                 unregisterPlugin(name);
             }
 
-            var plugin = SmallGrid.Plugins.Create(name, { view: view, viewModel: viewModel, windowManager: windowManager }, settings, pluginSettings);
-            if (plugin) {
-                plugins[name] = plugin;
+            var plugin = SmallGrid.Plugins.Create(
+                name,
+                context,
+                settings,
+                pluginSettings
+            );
+
+            if (!plugin) {
+                throw new Error("Plugin is not defined.");
             }
+
+            plugins[name] = plugin;
         }
 
         function registerPlugins(plugins) {
@@ -103,8 +120,6 @@
         function unregisterPlugin(name) {
             if (plugins[name]) {
                 plugins[name].destroy();
-            }
-            if (name in plugins) {
                 delete plugins[name];
             }
         }
@@ -146,30 +161,36 @@
             "registerPlugins": registerPlugins,
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
+
+            "onInitialize": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
     }
 
-    function CreateModel($container, rows, columns, options) {
+    function CreateModel($container, rows, columns, options, autoInit) {
         var settings = SmallGrid.Settings.Create(options || {});
-
-        var viewModel = SmallGrid.View.Model.Create(
-            new SmallGrid.Row.Create(rows || [], settings),
-            new SmallGrid.Column.Create(columns || [], settings),
-            settings
-        );
-
-        var view = SmallGrid.View.Create($container, viewModel, settings);
-        var windowManager = SmallGrid.View.Window.Create(view, settings);
+        var rowsModel = SmallGrid.Row.Create(rows || [], settings);
+        var columnsModel = SmallGrid.Column.Create(columns || [], settings);
+        var viewModel = SmallGrid.View.Model.Create(rowsModel, columnsModel, settings, false);
+        var view = SmallGrid.View.Create($container, viewModel, settings, false);
+        var windowManager = SmallGrid.View.Window.Create(view, settings, false);
 
         var grid = new GridModel(
             $container,
-            view,
-            viewModel,
-            windowManager,
+            {
+                "columnsModel": columnsModel,
+                "rowsModel": rowsModel,
+                "view": view,
+                "viewModel": viewModel,
+                "windowManager": windowManager
+            },
             settings
         );
 
-        return grid.init();
+        if (autoInit !== false) grid.init();
+
+        return grid;
+
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

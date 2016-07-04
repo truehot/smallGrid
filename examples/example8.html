@@ -13,27 +13,48 @@
 <body>
     <div>
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <button class="loadMore">Load 100000 items</button>
+        </div>
     </div>
 
     <script>
         $(document).ready(function () {
-			var columns = [
+            var columns = [
 				{ 'name': "Column 1", 'field': "property1", 'width': 200 },
 				{ 'name': "Column 2", 'field': "property2", 'width': 200 },
 				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
 				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
 				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
-			];
-			var items = [];
-			for (var i = 1; i <= 100000; i++) {
-				var item = {};
-				for (var ii = 1; ii < 6; ii++) {
-					item["property" + ii] = i + ' '+ii;
-				}
+            ];
 
-				items.push(item);
-			}
-			var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns, { "resizeColumnsOnLoad": true });
+            var items = [];
+            var limit = 100000;
+            for (var i = 1; i <= 100000; i++) {
+                var item = {};
+                for (var ii = 1; ii < 6; ii++) {
+                    item["property" + ii] = i + ' ' + ii;
+                }
+
+                items.push(item);
+            }
+
+            var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+
+            $('.loadMore').on('click', function () {
+                limit += 100000;
+                items = []
+                for (; i <= limit; i++) {
+                    var item = {};
+                    for (var ii = 1; ii < 6; ii++) {
+                        item["property" + ii] = i + ' ' + ii;
+                    }
+
+                    items.push(item);
+                }
+
+                grid.getRowsModel().items.addItems(items);
+            });
         });
     </script>
 </body>

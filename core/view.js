@@ -1,44 +1,45 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "View": {
-                "Create": CreateView,
-                "View": ViewData,
-            }
+    $.extend(true, SmallGrid, {
+        "View": {
+            "Create": CreateView,
+            "View": ViewData
         }
     });
 
-    function ViewData($container, viewModel, renderer, settings) {
+    function ViewData($container, viewModel, builder, settings) {
         var self = this,
             contentSize =
             {
                 width: 0,
-                height: 0,
+                height: 0
+            },
+            modelSize = {
+                rowsHeight: 0,
+                columnsWidth: 0
             },
             el = {},
             handlers = [],
-            heightRatio = 1,
-            requestDataTimer = null,
+            requestDataCounter = null,
             requestRenderTimer = null,
+            renderDelayTimer = null,
             scrollVisibility =
             {
                 horisontal: false,
-                vertical: false,
+                vertical: false
             },
             suspendRequests = [],
             suspendScrollEvent = false,
             suspendRenderRequests = 0;
 
+        el = builder.buildViewPortElements($container);
+        el.container.empty().addClass(settings.uid);
+        el.viewport.appendTo(el.container);
+
         /*Init and destroy*/
         function init() {
             var request = suspendRender();
-
-            el = renderer.buildViewPortElements($container);
-            el.container.empty().addClass(settings.uid);
-
-            el.viewport.appendTo(el.container);
 
             //bind events
             handlers.push(
@@ -46,18 +47,18 @@
                     "handleResize": handleHeaderResize,
                     "handleResizeStart": handleHeaderResizeStart,
                     "handleResizeStop": handleHeaderResizeStop,
-                    "handlerIdentifier": "." + settings.cssClass.headerResizeHandle,
+                    "handlerIdentifier": "." + settings.cssClass.headerResizeHandle
                 }),
                 SmallGrid.Handler.Click.Create(el.header, {
                     "handleClick": handleHeaderClick,
                     "handleDblClick": handleHeaderDblClick,
-                    "handleContextMenu": handleHeaderContextMenu,
+                    "handleContextMenu": handleHeaderContextMenu
                 }),
                 SmallGrid.Handler.Click.Create(el.content, {
                     "handleClick": handleCellClick,
                     "handleDblClick": handleCellDblClick,
                     "handleContextMenu": handleCellContextMenu,
-                    "handleKeyDown": handleCellKeyDown,
+                    "handleKeyDown": handleCellKeyDown
                 }),
                 SmallGrid.Handler.Scroll.Create(el.content, {
                     "handleScrollStart": handleScrollStart,
@@ -65,7 +66,7 @@
                     "handleScroll": handleScroll,
                     "handleMouseWheelStart": handleMouseWheelStart,
                     "handleMouseWheelStop": handleMouseWheelStop,
-                    "handleMouseWheel": handleMouseWheel,
+                    "handleMouseWheel": handleMouseWheel
                 })
             );
 
@@ -76,14 +77,9 @@
 
             viewModel.onRowsChange.subscribe(handleRowsChange);
             viewModel.onColumnsChange.subscribe(handleColumnsChange);
-
-            resize();
-            if (settings.resizeColumnsOnLoad === true) resizeColumns();
-            renderView();
+            viewModel.onInitialize.subscribe(handleModelInit);
 
             resumeRender(request);
-
-            self.onInitialize.notify({});
 
             return self;
         }
@@ -91,10 +87,12 @@
         function destroy() {
             suspendRender();
 
-            renderer = null;
+            clearTimeout(requestRenderTimer);
+            clearTimeout(renderDelayTimer);
 
             viewModel.onRowsChange.unsubscribe(handleRowsChange);
             viewModel.onColumnsChange.unsubscribe(handleColumnsChange);
+            viewModel.onInitialize.unsubscribe(handleModelInit);
 
             var sharedHandler = SmallGrid.Handler.Shared.GetInstance();
             sharedHandler.onClick.unsubscribe(handleDocumentClick);
@@ -104,13 +102,41 @@
             if (el.container.length) {
                 for (var i = 0; i < handlers.length; i++) {
                     handlers[i].destroy();
+                    handlers[i] = undefined;
                 }
-                el.container.empty().removeClass(settings.uid);
+
+                el.container.removeClass(settings.uid);
+                delete el.container;
             }
 
-            self.onDestroy.notify({});
+            var elKeys = Object.keys(el);
+            for (var idx = 0; idx < elKeys.length; idx++) {
+                el[elKeys[idx]].empty().remove();
+                delete el[elKeys[idx]];
+            }
+
+            $container.empty();
         }
 
+        function handleModelInit() {
+            var request = suspendRender();
+            resize();
+            renderView();
+            resumeRender(request);
+
+            self.onInitialize.notify({});
+        }
+
+        /*
+         Other
+         */
+        function getContentSize() {
+            return contentSize;
+        }
+
+        function getBuilder() {
+            return builder;
+        }
         /* 
         Scroll
         */
@@ -135,7 +161,7 @@
         function isRowVisible(rowId) {
             var row = viewModel.getRowById(rowId);
             if (row) {
-                return (row.calcHeight - row.height - settings.cellOuterSize.height >= el.content[0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el.content[0].scrollTop);
+                return row.calcHeight - row.height - settings.cellOuterSize.height >= el.content[0].scrollTop && row.calcHeight + row.height + settings.cellOuterSize.height < contentSize.height + el.content[0].scrollTop;
 
             }
             return false;
@@ -147,7 +173,7 @@
 
         function getRowNodeById(rowId) {
             var rowIndex = viewModel.getRowIndexById(rowId);
-            if (rowIndex != -1) {
+            if (rowIndex !== -1) {
                 return getRowNodeByIndex(rowIndex);
             }
         }
@@ -168,7 +194,7 @@
         function getCellNodeById(columnId, rowId) {
             var rowIndex = viewModel.getRowIndexById(rowId);
             var columnIndex = viewModel.getColumnIndexById(columnId);
-            if (rowIndex != -1 && columnIndex != -1) {
+            if (rowIndex !== -1 && columnIndex !== -1) {
                 return getCellNodeByIndex(columnIndex, rowIndex);
             }
         }
@@ -179,16 +205,9 @@
         function isColumnVisible(columnId) {
             var column = viewModel.getColumnById(columnId);
             if (column) {
-                return (column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft);
+                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
             }
             return false;
-        }
-
-        /*
-        Model
-        */
-        function getModel() {
-            return viewModel;
         }
 
         /*
@@ -202,19 +221,19 @@
 
         function renderRequests() {
             if (suspendRenderRequests > 0) {
-                if (requestDataTimer != null || isSuspended() === true) {
+                if (requestDataCounter !== null || isSuspended() === true) {
                     clearTimeout(requestRenderTimer);
                     requestRenderTimer = setTimeout(render, 187);
                 } else {
-                    requestDataTimer++;
+                    requestDataCounter++;
                     clearTimeout(requestRenderTimer);
                     renderView();
                     if (settings.renderDelay) {
-                        setTimeout(function () {
-                            requestDataTimer = null;
-                        }, settings.renderDelay)
+                        renderDelayTimer = setTimeout(function () {
+                            requestDataCounter = null;
+                        }, settings.renderDelay);
                     } else {
-                        requestDataTimer = null;
+                        requestDataCounter = null;
                     }
                 }
             }
@@ -224,7 +243,14 @@
         function renderView() {
 
             var request = suspendRender();
+
             suspendRenderRequests = 0;
+
+            var heightRatio = 1;
+            if (modelSize.rowsHeight >= settings.maxSupportedCssHeight) {
+                var contentSizeHeight = contentSize.height + (scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0);
+                heightRatio = (modelSize.rowsHeight - contentSizeHeight) / (settings.maxSupportedCssHeight - contentSizeHeight);
+            }
 
             var result = viewModel.requestDataFromRange(
                 {
@@ -235,9 +261,9 @@
                 settings.cellOuterSize,
                 {
                     width: scrollVisibility.vertical ? settings.scrollbarDimensions.width : 0,
-                    height: scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0,
+                    height: scrollVisibility.horisontal ? settings.scrollbarDimensions.height : 0
                 },
-                heightRatio == 1
+                heightRatio === 1
             );
 
             if (result.isCached === 0) {
@@ -248,7 +274,7 @@
 
                     if (result.rows.length > 0) {
                         el.contentTable.css({
-                            'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - (el.content[0].scrollTop * heightRatio) + el.content[0].scrollTop,
+                            'top': result.rows[0].calcHeight - result.rows[0].height - settings.cellOuterSize.height - el.content[0].scrollTop * heightRatio + el.content[0].scrollTop,
                             'left': result.columns[0].calcWidth - result.columns[0].width - settings.cellOuterSize.width
                         });
                     }
@@ -256,15 +282,15 @@
                     var lastColumn = result.columns[result.columns.length - 1];
 
                     var opts = {
-                        hideRowBorder: (scrollVisibility.horisontal === false && scrollVisibility.vertical == true),
-                        hideColumnBorder: (scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth),
-                        virtualColumnWidth: (settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth) ? contentSize.width - lastColumn.calcWidth : 0,
+                        hideRowBorder: scrollVisibility.horisontal === false && scrollVisibility.vertical === true,
+                        hideColumnBorder: scrollVisibility.vertical === false && contentSize.width <= lastColumn.calcWidth,
+                        virtualColumnWidth: settings.showLastColumn === true && contentSize.width >= lastColumn.calcWidth ? contentSize.width - lastColumn.calcWidth : 0
                     };
 
                     renderViewHtml(
-                        renderer.buildHeaderColumnsHtml(result.columns, opts),
-                        renderer.buildColsHtml(result.columns, opts),
-                        renderer.buildRowsHtml(result.columns, result.rows, opts)
+                        builder.buildHeaderColumnsHtml(result.columns, opts),
+                        builder.buildColsHtml(result.columns, opts),
+                        builder.buildRowsHtml(result.columns, result.rows, opts)
                     );
 
                 } else {
@@ -278,9 +304,34 @@
         function renderViewHtml(columnsHtml, colsHtml, rowsHtml) {
             self.onBeforeRowsRendered.notify({});
 
-            el.headerCol[0].innerHTML = el.contentCol[0].innerHTML = colsHtml;
-            el.headerTbody[0].innerHTML = columnsHtml;
-            el.contentTbody[0].innerHTML = rowsHtml;
+            var contentTbody = el.contentTbody[0].cloneNode(false);
+            var headerTbody = el.headerTbody[0].cloneNode(false);
+            var headerCol = el.headerCol[0].cloneNode(false);
+            var contentCol = el.contentCol[0].cloneNode(false);
+
+            headerCol.innerHTML = contentCol.innerHTML = colsHtml;
+            contentTbody.innerHTML = rowsHtml;
+            headerTbody.innerHTML = columnsHtml;
+
+            if (el.contentCol[0].innerHTML !== contentCol.innerHTML) {
+                el.contentTable[0].replaceChild(contentCol, el.contentCol[0]);
+                el.contentCol = $(contentCol);
+            }
+
+            if (el.contentTbody[0].innerHTML !== contentTbody.innerHTML) {
+                el.contentTable[0].replaceChild(contentTbody, el.contentTbody[0]);
+                el.contentTbody = $(contentTbody);
+            }
+
+            if (el.headerCol[0].innerHTML !== headerCol.innerHTML) {
+                el.headerTable[0].replaceChild(headerCol, el.headerCol[0]);
+                el.headerCol = $(headerCol);
+            }
+
+            if (el.headerTbody[0].innerHTML !== headerTbody.innerHTML) {
+                el.headerTable[0].replaceChild(headerTbody, el.headerTbody[0]);
+                el.headerTbody = $(headerTbody);
+            }
 
             self.onAfterRowsRendered.notify({});
         }
@@ -289,15 +340,19 @@
             return suspendRequests.length > 0;
         }
 
-        function suspendRender() {
+        function suspendRender(callback) {
             var id = SmallGrid.Utils.createGuid();
             suspendRequests.push(id);
+            if (callback) {
+                callback();
+                return resumeRender(id);
+            }
             return id;
         }
 
         function resumeRender(value) {
             for (var i = 0; i < suspendRequests.length; i++) {
-                if (suspendRequests[i] == value) {
+                if (suspendRequests[i] === value) {
                     suspendRequests.splice(i, 1);
                     return true;
                 }
@@ -305,15 +360,14 @@
             return false;
         }
 
-
         /*
         Calc private funcs
         */
         function getColumnEventType(targetClass, column) {
             var type = "";
-            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) != -1) {
+            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) !== -1) {
                 type = "resize";
-            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) != -1) {
+            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) !== -1) {
                 type = "filter";
             } else if (column.sortable) {
                 type = "sort";
@@ -359,79 +413,6 @@
         /*
         Resize 
         */
-        function resizeColumnsWidth(allColumns, scrollBarWidth, cellOuterWidth) {
-            var updateColumns = allColumns.slice();
-            var total =
-                {
-                    minWidth: 0,
-                    maxWidth: 0,
-                    width: 0
-                },
-                contentWidth = contentSize.width - updateColumns.length * cellOuterWidth - scrollBarWidth;
-
-            for (var i = updateColumns.length - 1; i >= 0; i--) {
-                var updateColumn = updateColumns[i];
-                if (updateColumn.resizeable === false) {
-                    contentWidth -= updateColumn.width;
-                    updateColumns.splice(i, 1);
-                    continue;
-                }
-                total.minWidth += updateColumn.minWidth;
-                total.maxWidth += updateColumn.maxWidth;
-                total.width += updateColumn.width;
-            }
-
-            if (total.minWidth <= contentWidth && contentWidth <= total.maxWidth) {
-                var columns = updateColumns.slice();
-                while (columns.length > 0) {
-                    var ratio = contentWidth / total.width;
-                    total.width = 0;
-
-                    for (i = columns.length - 1; i >= 0; i--) {
-                        var column = columns[i];
-                        var newColumnWidth = Math.max(
-                            Math.min(
-                                Math.floor(column.width * ratio),
-                                column.maxWidth
-                            ),
-                            column.minWidth
-                        );
-
-                        total.width += newColumnWidth;
-
-                        if (column.width == newColumnWidth) {
-                            if (columns.length == 1 && contentWidth != column.width) {
-                                column.width += contentWidth - column.width;
-                            }
-                            contentWidth -= column.width;
-                            columns.splice(i, 1);
-                            continue;
-                        }
-
-                        column.width = newColumnWidth;
-                    }
-                }
-            }
-            return updateColumns;
-        }
-
-        function resizeColumns() {
-
-            var updateColumns = resizeColumnsWidth(
-                viewModel.getColumnsModel().getColumns(),
-                (scrollVisibility.vertical === true) ? settings.scrollbarDimensions.width : 0,
-                settings.cellOuterSize.width
-            );
-
-            var request = suspendRender();
-
-            viewModel.getColumnsModel().updateColumns(updateColumns);
-
-            resumeRender(request);
-
-            return self;
-        }
-
         function resize() {
             contentSize.width = el.container.width();
             contentSize.height = Math.max(el.container.height() - settings.header.height - settings.cellOuterSize.height, 0);
@@ -441,6 +422,8 @@
             applyRowsChange();
             applyColumnsChange();
 
+            self.onViewResized.notify({});
+
             return self;
         }
 
@@ -448,57 +431,52 @@
         Data handlers
         */
         function applyRowsChange() {
-            var rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
-            scrollVisibility.vertical = scrollVisibility.horisontal ? (rowsHeight > (contentSize.height - settings.scrollbarDimensions.height)) : (rowsHeight > contentSize.height);
+            modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
 
-            if (settings.showLastColumn == true) {
-                el.headerWrap.css({
-                    'width': Math.max(el.headerWrap.width(), contentSize.width)
-                });
+            scrollVisibility.vertical = scrollVisibility.horisontal ? modelSize.rowsHeight > contentSize.height - settings.scrollbarDimensions.height : modelSize.rowsHeight > contentSize.height;
 
-                el.contentWrap.css({
-                    'width': Math.max(el.contentWrap.width(), contentSize.width),
-                });
-            }
-
-            if (rowsHeight > settings.maxSupportedCssHeight) {
-                heightRatio = (rowsHeight - contentSize.height + settings.scrollbarDimensions.height) / (settings.maxSupportedCssHeight - contentSize.height + settings.scrollbarDimensions.height);
-                rowsHeight = settings.maxSupportedCssHeight;
-            }
-
+            //for rigth corner in the header
             el.header.css({
                 'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
             });
 
             el.contentWrap.css({
-                'height': rowsHeight,
+                'height': getWrapHeight()
             });
-
-        }
-
-        function handleRowsChange() {
-            applyRowsChange();
-            render();
         }
 
         function applyColumnsChange() {
-            var columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
-            scrollVisibility.horisontal = scrollVisibility.vertical ? (columnsWidth > (contentSize.width - settings.scrollbarDimensions.width)) : (columnsWidth > contentSize.width);
+            modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
 
-            var width = Math.max(
-                columnsWidth,
-                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
-            );
+            scrollVisibility.horisontal = scrollVisibility.vertical ? modelSize.columnsWidth > contentSize.width - settings.scrollbarDimensions.width : modelSize.columnsWidth > contentSize.width;
+
+            var width = getWrapWidth();
 
             el.headerWrap.css({
                 'width': width
             });
 
             el.contentWrap.css({
-                'width': width,
+                'width': width
             });
+        }
+
+        function getWrapHeight() {
+            return Math.min(modelSize.rowsHeight, settings.maxSupportedCssHeight);
+        }
+
+        function getWrapWidth() {
+            return Math.max(
+                modelSize.columnsWidth,
+                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
+            );
+        }
+
+        function handleRowsChange() {
+            applyRowsChange();
+            render();
         }
 
         function handleColumnsChange() {
@@ -596,15 +574,13 @@
         Handle document events
         */
         function handleDocumentResize(evt) {
-            var request = suspendRender();
-            resize();
-
-            notifyEvent(evt, "onDocumentResize");
-
-            renderView();
-            resumeRender(request);
-
+            suspendRender(function () {
+                notifyEvent(evt, "onDocumentResize");
+                resize();
+                renderView();
+            });
         }
+
         function handleDocumentContextMenu(evt) {
             notifyEvent(evt, "onDocumentContextMenu");
         }
@@ -645,9 +621,11 @@
             "init": init,
             "destroy": destroy,
 
+            "getBuilder": getBuilder,
+            "getContentSize": getContentSize,
+
             "getCellNodeById": getCellNodeById,
             "getCellNodeByIndex": getCellNodeByIndex,
-            "getModel": getModel,
             "getNode": getNode,
             "getRowNodeById": getRowNodeById,
             "getRowNodeByIndex": getRowNodeByIndex,
@@ -659,9 +637,11 @@
             "isVerticalScrollVisible": isVerticalScrollVisible,
             "render": render,
             "resize": resize,
-            "resizeColumns": resizeColumns,
+
             "resumeRender": resumeRender,
             "suspendRender": suspendRender,
+
+            "onViewResized": new SmallGrid.Event.Handler(),
 
             "onScroll": new SmallGrid.Event.Handler(),
             "onScrollStart": new SmallGrid.Event.Handler(),
@@ -692,15 +672,19 @@
             "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
 
             "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
+            "onDestroy": new SmallGrid.Event.Handler()
         });
     }
 
 
-    function CreateView(container, viewModel, settings) {
+    function CreateView(container, viewModel, settings, autoInit) {
         var $container = $(container);
         if (!$container.length) {
             throw new TypeError("Container is not defined or does not exist in the DOM.");
+        }
+
+        if ($container.length !== 1) {
+            throw new TypeError("There should be only 1 container.");
         }
 
         if (viewModel instanceof SmallGrid.View.Model.Model === false) {
@@ -711,9 +695,11 @@
             throw new TypeError("Settings is not defined");
         }
 
-        var renderer = SmallGrid.View.Renderer.Create(settings);
+        var builder = SmallGrid.View.Builder.Create(settings);
 
-        return new ViewData($container, viewModel, renderer, settings).init();
+        var view = new ViewData($container, viewModel, builder, settings);
+        if (autoInit !== false) view.init();
+        return view;
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

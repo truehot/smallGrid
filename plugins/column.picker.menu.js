@@ -1,42 +1,38 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "ColumnPickerMenu": ColumnPickerMenu,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "ColumnPickerMenu": ColumnPickerMenu
         }
     });
 
     function ColumnPickerMenu(context, settings) {
         var self = this;
         var currentId = "column-picker";
-        var view = context.view;
-        var windowManager = context.windowManager;
 
         function handleHeaderContextMenu(evt) {
 
             if (evt) {
                 evt.preventDefault();
 
-                windowManager.hideWindows();
-                if (windowManager.isWindow(currentId) === false) {
-                    windowManager.createWindow(currentId, buildElements(currentId));
+                context.windowManager.hideWindows();
+                if (context.windowManager.isWindow(currentId) === false) {
+                    context.windowManager.createWindow(currentId, buildElements(currentId));
                 } else {
-                    var data = windowManager.getWindow(currentId);
+                    var data = context.windowManager.getWindow(currentId);
                     if (data) {
                         data.container.empty().append(buildElements(currentId));
                     }
                 }
 
-                windowManager.showWindowNearPosition(
+                context.windowManager.showWindowNearPosition(
                     currentId,
                     {
                         x: evt.event.pageX,
                         y: evt.event.pageY
                     },
-                    5
+                    10
                 );
             }
         }
@@ -54,20 +50,22 @@
 
         function buildContent() {
             var html = '';
-            var columns = view.getModel().getColumnsModel().getColumns();
-            for (var i = 0; i < columns.length; i++) {
-                html += '<div><label><input type="checkbox" name="" ' + ((columns[i].hidden) ? '' : ' checked ') + ' value="' + columns[i].id + '"/> ' + columns[i].name + '</label></div>';
+            var columns = context.columnsModel.getColumns();
+            var totalHidden = columns.length - totalHiddenColumns(columns);
+
+            for (var i = 0, length = columns.length; i < length; i++) {
+                html += '<div><label><input type="checkbox" name="" ' + (columns[i].hidden === true ? '' : ' checked ') + ' value="' + columns[i].id + '" ' + (totalHidden === 1 && columns[i].hidden === false ? ' disabled="disabled" ' : '') + '/> ' + columns[i].name + '</label></div>';
             }
+
             return html;
         }
 
-        function checkHiddenColumns(columns) {
+        function totalHiddenColumns(columns) {
             var counter = 0;
             for (var i = 0; i < columns.length; i++) {
-                if (columns[i].hidden === false) counter++;
-                if (counter > 1) return true;
+                if (columns[i].hidden === true) counter++;
             }
-            return false;
+            return counter;
         }
 
         /*
@@ -75,7 +73,7 @@
         */
         function handleMenuMouseEnter(evt) {
             $(this).off("mouseleave").on("mouseleave", function () {
-                windowManager.hideWindow(evt.data.id);
+                context.windowManager.hideWindow(evt.data.id);
             });
 
         }
@@ -85,10 +83,30 @@
             if (evt.target) {
                 var $checkbox = $(evt.target).closest('input');
                 if ($checkbox.length) {
-                    if (checkHiddenColumns(view.getModel().getColumns()) === false && $checkbox[0].checked == false) {
+                    var columns = context.viewModel.getColumns();
+                    var totalHidden = columns.length - totalHiddenColumns(columns);
+                    if (totalHidden === 1 && $checkbox[0].checked === false) {
                         return false;
                     }
-                    view.getModel().getColumnsModel().setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
+
+                    if (totalHidden === 1 && $checkbox[0].checked === true) {
+                        //enable disabled checkbox
+                        var data = context.windowManager.getWindow(currentId);
+                        if (data) {
+                            data.container.find('input:disabled').removeAttr('disabled');
+                        }
+                    } else if (totalHidden === 2 && $checkbox[0].checked === false) {
+                        //disable last checkbox
+                        var data = context.windowManager.getWindow(currentId);
+                        if (data) {
+                            var $checked = data.container.find('input:checked');
+                            if ($checked.length) {
+                                $checked.attr('disabled', 'disabled');
+                            }
+                        }
+                    }
+
+                    context.columnsModel.setColumnPropertyById($checkbox.val(), "hidden", !$checkbox[0].checked);
                 }
             }
         }
@@ -97,19 +115,39 @@
         Init && destroy
         */
         function init() {
-            view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
+            context.view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
             return self;
         }
 
         function destroy() {
-            view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
+            context.view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
         }
 
+        function hideColumnById(id) {
+            context.columnsModel.setColumnPropertyById(id, "hidden", true);
+        }
+
+        function hideColumnByIndex(idx) {
+            context.columnsModel.setColumnPropertyByIndex(idx, "hidden", true);
+        }
+
+        function showColumnById(id) {
+            context.columnsModel.setColumnPropertyById(id, "hidden", false);
+        }
+
+        function showColumnByIndex(idx) {
+            context.columnsModel.setColumnPropertyByIndex(idx, "hidden", false);
+        }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
+
+            "hideColumnById": hideColumnById,
+            "hideColumnByIndex": hideColumnByIndex,
+            "showColumnById": showColumnById,
+            "showColumnByIndex": showColumnByIndex
         });
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

@@ -1,15 +1,13 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Query": {
-                "SorterQuery": SorterQuery,
-            }
+    $.extend(true, SmallGrid, {
+        "Query": {
+            "SorterQuery": SorterQuery
         }
     });
 
-    function SorterQuery(field, sortOrder, sortComparer, settings) {
+    function SorterQuery(field, sortOrder, sortComparer) {
         var self = this;
 
         function getField() {
@@ -27,7 +25,7 @@
         $.extend(this, {
             "getField": getField,
             "getSortOrder": getSortOrder,
-            "getSortComparer": getSortComparer,
+            "getSortComparer": getSortComparer
         });
     }
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});

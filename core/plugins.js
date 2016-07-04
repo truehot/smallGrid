@@ -1,11 +1,9 @@
-(function ($) {
+(function ($, SmallGrid) {
     "use strict";
 
-    $.extend(true, window, {
-        "SmallGrid": {
-            "Plugins": {
-                "Create": Create,
-            }
+    $.extend(true, SmallGrid, {
+        "Plugins": {
+            "Create": Create
         }
     });
 
@@ -36,4 +34,4 @@
 
     }
 
-})(jQuery);
+})(jQuery, window.SmallGrid = window.SmallGrid || {});
