@@ -29,7 +29,7 @@ QUnit.test("Resize", function (assert) {
         "handleResize": handleResize,
         "handleResizeStart": handleResizeStart,
         "handleResizeStop": handleResizeStop,
-        "handlerIdentifier": ".resize-handler",
+        "handlerIdentifier": ".resize-handler"
     });
 
     $hd2.trigger("mousedown");

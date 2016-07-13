@@ -172,7 +172,9 @@
         }
 
         var windowManager = new SmallGrid.View.Window.Manager(view, settings);
+
         if (autoInit !== false) windowManager.init();
+
         return windowManager;
     }
 

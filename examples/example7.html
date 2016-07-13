@@ -81,14 +81,10 @@
             });
 
             $('.applyEditCell').click(function () {
-                var column = grid.getColumnsModel().getColumnByIndex(2);
-                var row = grid.getRowsModel().getRowByIndex(2);
                 grid.getPlugin('CellEdit').applyEdit();
             });
 
             $('.cancelEditCell').click(function () {
-                var column = grid.getColumnsModel().getColumnByIndex(2);
-                var row = grid.getRowsModel().getRowByIndex(2);
                 grid.getPlugin('CellEdit').cancelEdit();
             });
         });

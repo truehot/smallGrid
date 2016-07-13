@@ -2,7 +2,7 @@ QUnit.module("SmallGrid");
 QUnit.test("Settings", function (assert) {
 
     var settings = SmallGrid.Settings.Create({});
-    assert.ok(Object.keys(settings).length != 0, "Settings.Create");
+    assert.ok(Object.keys(settings).length !== 0, "Settings.Create");
 
     assert.ok(settings["uid"] !== undefined, "uid");
     assert.ok(settings["cellOuterSize"] !== undefined, "cellOuterSize");

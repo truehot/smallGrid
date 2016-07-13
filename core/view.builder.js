@@ -14,8 +14,8 @@
         var self = this;
 
         /*
-        Structure
-        */
+         * Structure
+         */
         function buildViewPortElements($container) {
             var el = {
                 'headerCol': null,
@@ -81,8 +81,8 @@
         }
 
         /*
-        Header columns
-        */
+         * Header columns
+         */
         function buildHeaderColumnsHtml(columns, opts) {
             var html = "<tr class='" + settings.cssClass.headerRow + "'>";
             for (var i = 0, length = columns.length - 1; i <= length; i++) {
@@ -152,8 +152,8 @@
         }
 
         /*
-        Cols
-        */
+         * Cols
+         */
         function buildColsHtml(columns, opts) {
             var html = '';
             for (var i = 0, length = columns.length; i < length; i++) {
@@ -185,8 +185,8 @@
         }
 
         /*
-        Rows
-        */
+         * Rows
+         */
         function buildRowsHtml(columns, rows, opts) {
             var html = '';
             for (var i = 0, length = rows.length - 1; i <= length; i++) {
@@ -275,8 +275,8 @@
         }
 
         /*
-        Cell content
-        */
+         * Cell content
+         */
         function buildCellContentHtml(column, row) {
             var value = "";
 

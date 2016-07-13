@@ -84,19 +84,32 @@ if (typeof SmallGrid === "undefined") {
         plugins: {
             AutoResize: {
                 enabled: true,
-                resizeOnce: true//resize columns when view loaded to fit canvas
             },
-            ColumnSort: {},
-            ColumnResize: {},
+            ColumnSort: {
+                enabled: true,
+            },
+            ColumnResize: {
+                enabled: true,
+            },
             RowSelection: {
+                enabled: true,
                 multipleRowSelection: false//allow multiplerow selection
             },
             CellEdit: {
+                enabled: true,
                 editOnClick: false,//when true, editor loaded after click
                 autoFocus: true//autofocus edited cell when scrolling
             },
-            ColumnFilterMenu: {},
-            ColumnPickerMenu: {}
+            ColumnFilterMenu: {
+                enabled: true,
+            },
+            ColumnPickerMenu: {
+                enabled: true,
+            },
+            Footer: {
+                enabled: false,
+            }
+
         }
     };
 

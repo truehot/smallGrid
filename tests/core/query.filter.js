@@ -2,14 +2,14 @@ QUnit.module("SmallGrid.Query");
 QUnit.test("Filter", function (assert) {
 
     var settings = SmallGrid.Settings.Create({});
-    var filter1 = new SmallGrid.Query.FilterQuery('test').and();
-    var filter2 = new SmallGrid.Query.FilterQuery('test').add("and", "");
+    var filter1 = new SmallGrid.Query.Filter('test').and();
+    var filter2 = new SmallGrid.Query.Filter('test').add("and", "");
 
     assert.deepEqual(filter1.get(), filter2.get(), "get");
     assert.deepEqual(filter1.get(), [{ action: "and" }], "get");
-    assert.ok(filter1.getField() == filter2.getField(), "getField");
-    assert.ok(filter1.getField() == 'test', "getField");
-    assert.ok(filter1.getId() != filter2.getId(), "getId");
+    assert.ok(filter1.getField() === filter2.getField(), "getField");
+    assert.ok(filter1.getField() === 'test', "getField");
+    assert.ok(filter1.getId() !== filter2.getId(), "getId");
 
     filter1.clear();
     filter2.clear();

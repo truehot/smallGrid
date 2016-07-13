@@ -11,7 +11,10 @@ QUnit.test("Window", function (assert) {
     $target.appendTo($div);
     $div.appendTo('#qunit-fixture');
 
-    var grid = new SmallGrid.Grid.Create($div, [], [], {});
+    var grid = new SmallGrid.Grid.Create($div, [], [], {}, false);
+    var settings = grid.getSettings();
+    settings.plugins = { };
+    grid.init();
     var windowManager = grid.getWindowManager();
 
     assert.ok(windowManager.createWindow(opts1.id).isWindow(opts1.id), "isWindow");
@@ -27,28 +30,28 @@ QUnit.test("Window", function (assert) {
     var getW2 = windowManager.getWindow(opts2.id);
     var getW3 = windowManager.getWindow(opts3.id);
 
-    assert.ok(getW1.id == opts1.id, "getWindow");
-    assert.ok(getW2.id == opts2.id && getW2.opts == opts2.opts, "getWindow");
-    assert.ok(getW3.id == opts3.id && getW3.opts == opts3.opts && getW3.container.hasClass('grid-window'), "getWindow");
+    assert.ok(getW1.id === opts1.id, "getWindow");
+    assert.ok(getW2.id === opts2.id && getW2.opts === opts2.opts, "getWindow");
+    assert.ok(getW3.id === opts3.id && getW3.opts === opts3.opts && getW3.container.hasClass('grid-window'), "getWindow");
 
-    assert.ok(windowManager.hideWindow(opts1.id).isVisible(opts1.id) == false, "hideWindow");
-    assert.ok(windowManager.hideWindow(opts2.id).isVisible(opts2.id) == false, "hideWindow");
+    assert.ok(windowManager.hideWindow(opts1.id).isVisible(opts1.id) === false, "hideWindow");
+    assert.ok(windowManager.hideWindow(opts2.id).isVisible(opts2.id) === false, "hideWindow");
 
-    assert.ok(windowManager.showWindow(opts2.id).isVisible(opts2.id) == true, "showWindow");
-    assert.ok(windowManager.showWindow(opts3.id).isVisible(opts3.id) == true, "showWindow");
+    assert.ok(windowManager.showWindow(opts2.id).isVisible(opts2.id) === true, "showWindow");
+    assert.ok(windowManager.showWindow(opts3.id).isVisible(opts3.id) === true, "showWindow");
 
-    assert.ok(windowManager.showWindowNearPosition(opts1.id, { x: 10, y: 10 }).isVisible(opts2.id) == true, "showWindowNearPosition");
+    assert.ok(windowManager.showWindowNearPosition(opts1.id, { x: 10, y: 10 }).isVisible(opts2.id) === true, "showWindowNearPosition");
 
     var offset1 = $div.find('.grid-window-' + opts1.id).offset();
-    assert.ok(offset1.top == 10 && offset1.left == -990, "showWindowNearPosition");
+    assert.ok(offset1.top === 10 && offset1.left === -990, "showWindowNearPosition");
 
-    assert.ok(windowManager.showWindowNearTarget(opts2.id, $target).isVisible(opts3.id) == true, "showWindowNearTarget");
+    assert.ok(windowManager.showWindowNearTarget(opts2.id, $target).isVisible(opts3.id) === true, "showWindowNearTarget");
     var offset2 = $div.find('.grid-window-' + opts2.id).offset();
-    assert.ok(offset2.top == 100 && offset2.left == 0, "showWindowNearTarget");
+    assert.ok(offset2.top === 100 && offset2.left === 0, "showWindowNearTarget");
 
-    assert.ok(windowManager.removeWindow(opts1.id).isWindow(opts1.id) == false, "removeWindow");
-    assert.ok(windowManager.removeWindow(opts2.id).isWindow(opts2.id) == false, "removeWindow");
-    assert.ok(windowManager.isWindow(opts3.id) == true, "removeWindow");
+    assert.ok(windowManager.removeWindow(opts1.id).isWindow(opts1.id) === false, "removeWindow");
+    assert.ok(windowManager.removeWindow(opts2.id).isWindow(opts2.id) === false, "removeWindow");
+    assert.ok(windowManager.isWindow(opts3.id) === true, "removeWindow");
 
     grid.destroy();
 });

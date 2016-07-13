@@ -37,7 +37,9 @@
         el.container.empty().addClass(settings.uid);
         el.viewport.appendTo(el.container);
 
-        /*Init and destroy*/
+        /*
+         * Init and destroy
+         */
         function init() {
             var request = suspendRender();
 
@@ -111,7 +113,7 @@
 
             var elKeys = Object.keys(el);
             for (var idx = 0; idx < elKeys.length; idx++) {
-                el[elKeys[idx]].empty().remove();
+                el[elKeys[idx]].remove();
                 delete el[elKeys[idx]];
             }
 
@@ -128,7 +130,7 @@
         }
 
         /*
-         Other
+         * Other
          */
         function getContentSize() {
             return contentSize;
@@ -138,8 +140,8 @@
             return builder;
         }
         /* 
-        Scroll
-        */
+         * Scroll
+         */
         function isHorisontalScrollVisible() {
             return scrollVisibility.horisontal;
         }
@@ -149,15 +151,15 @@
         }
 
         /*
-        Nodes
-        */
+         * Nodes
+         */
         function getNode(name) {
             if (el[name]) return el[name];
         }
 
         /*
-        Row func
-        */
+         * Row func
+         */
         function isRowVisible(rowId) {
             var row = viewModel.getRowById(rowId);
             if (row) {
@@ -179,8 +181,8 @@
         }
 
         /*
-        Cell func
-        */
+         * Cell func
+         */
         function isCellVisible(columnId, rowId) {
             return isColumnVisible(columnId) && isRowVisible(rowId);
         }
@@ -200,8 +202,8 @@
         }
 
         /*
-        Column func
-        */
+         * Column func
+         */
         function isColumnVisible(columnId) {
             var column = viewModel.getColumnById(columnId);
             if (column) {
@@ -211,8 +213,8 @@
         }
 
         /*
-        Render
-        */
+         * Render
+         */
         function render() {
             suspendRenderRequests++;
             renderRequests();
@@ -361,8 +363,8 @@
         }
 
         /*
-        Calc private funcs
-        */
+         * Calc private funcs
+         */
         function getColumnEventType(targetClass, column) {
             var type = "";
             if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) !== -1) {
@@ -411,16 +413,17 @@
         }
 
         /*
-        Resize 
-        */
+         * Resize 
+         */
         function resize() {
             contentSize.width = el.container.width();
             contentSize.height = Math.max(el.container.height() - settings.header.height - settings.cellOuterSize.height, 0);
 
             if (contentSize.height) el.content.height(contentSize.height);
 
-            applyRowsChange();
-            applyColumnsChange();
+            modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
+            modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
+            applyModelChange();
 
             self.onViewResized.notify({});
 
@@ -428,65 +431,75 @@
         }
 
         /*
-        Data handlers
-        */
-        function applyRowsChange() {
+         * Data handlers
+         */
+        function getScrollVisibility(modelSize, contentSize, scrollbarDimensions) {
+            var visibility = {
+                vertical: false,
+                horisontal: false
+            };
 
-            modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
+            if (modelSize.columnsWidth > contentSize.width) {
+                visibility.vertical = modelSize.rowsHeight + scrollbarDimensions.height > contentSize.height;
+                visibility.horisontal = true;
+            } else if (modelSize.rowsHeight > contentSize.height) {
+                visibility.horisontal = modelSize.columnsWidth + scrollbarDimensions.width > contentSize.width;
+                visibility.vertical = true;
+            }
 
-            scrollVisibility.vertical = scrollVisibility.horisontal ? modelSize.rowsHeight > contentSize.height - settings.scrollbarDimensions.height : modelSize.rowsHeight > contentSize.height;
-
-            //for rigth corner in the header
-            el.header.css({
-                'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
-            });
-
-            el.contentWrap.css({
-                'height': getWrapHeight()
-            });
+            return visibility;
         }
 
-        function applyColumnsChange() {
+        function applyModelChange() {
 
-            modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
+            var visibility = scrollVisibility;
+            scrollVisibility = getScrollVisibility(modelSize, contentSize, settings.scrollbarDimensions);
+            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal) {
+                //force chrome hide scrolls
+                el.content.css({ 'overflow': scrollVisibility.vertical || scrollVisibility.horisontal ? 'auto' : 'hidden' });
 
-            scrollVisibility.horisontal = scrollVisibility.vertical ? modelSize.columnsWidth > contentSize.width - settings.scrollbarDimensions.width : modelSize.columnsWidth > contentSize.width;
+                //for rigth corner in the header
+                el.header.css({
+                    'width': scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
+                });
 
-            var width = getWrapWidth();
+                self.onViewScrollChange.notify({});
+            }
+
+            var width = Math.max(
+                modelSize.columnsWidth,
+                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
+            );
+
+            var height = modelSize.columnsWidth ? Math.min(modelSize.rowsHeight, settings.maxSupportedCssHeight) : 0;
 
             el.headerWrap.css({
                 'width': width
             });
 
             el.contentWrap.css({
-                'width': width
+                'width': width,
+                'height': height
             });
         }
 
-        function getWrapHeight() {
-            return Math.min(modelSize.rowsHeight, settings.maxSupportedCssHeight);
-        }
-
-        function getWrapWidth() {
-            return Math.max(
-                modelSize.columnsWidth,
-                scrollVisibility.vertical ? contentSize.width - settings.scrollbarDimensions.width : contentSize.width
-            );
-        }
 
         function handleRowsChange() {
-            applyRowsChange();
+            modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
+            applyModelChange();
             render();
         }
 
         function handleColumnsChange() {
-            applyColumnsChange();
+            modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
+
+            applyModelChange();
             render();
         }
 
         /*
-        Handle cell events
-        */
+         * Handle cell events
+         */
         function handleCellClick(evt) {
             var cellEvent = getCellEvent(evt);
             if (cellEvent) {
@@ -516,8 +529,8 @@
         }
 
         /*
-        Handle resize events
-        */
+         * Handle resize events
+         */
         function handleHeaderResize(evt) {
             notifyEvent(evt, "onColumnResize");
         }
@@ -533,8 +546,8 @@
         }
 
         /*
-        Handle mouse wheel
-        */
+         * Handle mouse wheel
+         */
         function handleMouseWheelStart(evt) {
             notifyEvent(evt, "onMouseWheelStart");
         }
@@ -548,8 +561,8 @@
         }
 
         /*
-        Handle scroll
-        */
+         * Handle scroll
+         */
         function handleScrollStart(evt) {
             if (suspendScrollEvent === false) {
                 notifyEvent(evt, "onScrollStart");
@@ -571,8 +584,8 @@
         }
 
         /*
-        Handle document events
-        */
+         * Handle document events
+         */
         function handleDocumentResize(evt) {
             suspendRender(function () {
                 notifyEvent(evt, "onDocumentResize");
@@ -590,8 +603,8 @@
         }
 
         /*
-        Handle header events
-        */
+         * Handle header events
+         */
         function handleHeaderClick(evt) {
             var columnEvent = getColumnEvent(evt);
             if (columnEvent) {
@@ -642,6 +655,7 @@
             "suspendRender": suspendRender,
 
             "onViewResized": new SmallGrid.Event.Handler(),
+            "onViewScrollChange": new SmallGrid.Event.Handler(),
 
             "onScroll": new SmallGrid.Event.Handler(),
             "onScrollStart": new SmallGrid.Event.Handler(),
@@ -696,9 +710,10 @@
         }
 
         var builder = SmallGrid.View.Builder.Create(settings);
-
         var view = new ViewData($container, viewModel, builder, settings);
+
         if (autoInit !== false) view.init();
+
         return view;
     }
 

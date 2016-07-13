@@ -111,9 +111,7 @@
 
         function sort(comparer) {
             if (data.length) {
-                self.onChange.blockEvents();
                 data.sort(comparer);
-                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -128,8 +126,8 @@
 
 
         /*
-        Batch updates
-        */
+         * Batch updates
+         */
         function addRows(rows) {
             if (rows.length) {
                 self.onChange.blockEvents();
@@ -186,8 +184,8 @@
         }
 
         /*
-        Single updates
-        */
+         * Single updates
+         */
         function addRow(row) {
             if (row instanceof RowData) {
                 data.push(row);
@@ -364,10 +362,12 @@
             if (item instanceof Object) {
                 var row = new RowData();
 
-                if (settings.rows.newIdType === "number") {
-                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createId();
+                if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
+                    row.id = item[settings.rows.idProperty];
+                }else if (settings.rows.newIdType === "number") {
+                    row.id = SmallGrid.Utils.createId();
                 } else {
-                    row.id = SmallGrid.Utils.isProperty(settings.rows.idProperty, item) ? item[settings.rows.idProperty] : SmallGrid.Utils.createGuid();
+                    row.id = SmallGrid.Utils.createGuid();
                 }
 
                 row.item = item;
@@ -381,14 +381,6 @@
                 if ("maxHeight" in item) row.maxHeight = item.maxHeight;
                 if ("minHeight" in item) row.minHeight = item.minHeight;
                 if ("rowCssClass" in item) row.rowCssClass = item.rowCssClass;
-
-                //row.height = Math.max(
-                //    Math.min(
-                //        parseInt(row.height, 10),
-                //        row.maxHeight
-                //    ),
-                //    row.minHeight
-                //);
 
                 return row;
             }

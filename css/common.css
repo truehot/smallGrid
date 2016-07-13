@@ -24,12 +24,13 @@
 }
 
 .grid-content {
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: auto;
 }
 
 .grid-footer {
+    visibility: hidden;
     overflow: hidden;
+    outline: 1px solid #ffcccc;
 }
 
 .grid-content-wrap, .grid-header-wrap {

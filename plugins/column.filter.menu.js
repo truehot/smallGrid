@@ -3,7 +3,7 @@
 
     $.extend(true, SmallGrid, {
         "Plugins": {
-            "ColumnFilterMenu": ColumnFilterMenu,
+            "ColumnFilterMenu": ColumnFilterMenu
         }
     });
 
@@ -11,8 +11,31 @@
         var self = this,
             lastActiveColumnId = null;
 
+        /*
+         * Init && destroy
+         */
+        function init() {
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
+            context.view.onScrollStart.subscribe(handleScrollStart);
+            return self;
+        }
+
+        function destroy() {
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
+            context.view.onScrollStart.unsubscribe(handleScrollStart);
+        }
+
+        /*
+         * Handlers
+         */
+        function handleScrollStart() {
+            if (settings.plugins.ColumnFilterMenu.enabled === true) {
+                hideWindow();
+            }
+        }
+
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type === "filter") {
+            if (evt && evt.type && evt.type === "filter" && settings.plugins.ColumnFilterMenu.enabled === true) {
                 evt.stopPropagation();
                 lastActiveColumnId = evt.column.id;
 
@@ -25,7 +48,7 @@
                         evt.column.id,
                         buildElements(evt.column.id),
                         {
-                            filter: new SmallGrid.Query.FilterQuery(evt.column.field)
+                            filter: new SmallGrid.Query.Filter(evt.column.field)
                         }
                     );
 
@@ -66,8 +89,8 @@
         }
 
         /*
-        Handlers
-        */
+         * Menu handlers
+         */
         function handleMenuSubmit(evt) {
             evt.preventDefault();
 
@@ -101,10 +124,9 @@
                     column.headerCssClass = column.headerCssClass.replace(' ' + settings.cssClass.headerFilterActive, '');
                     context.columnsModel.updateColumn(column);
 
-                    context.viewModel.clearFilter(data.opts.filter);
+                    context.viewModel.clearFilterById(data.opts.filter.getId());
                     context.windowManager.hideWindow(evt.data.id);
                 }
-
             }
         }
 
@@ -118,32 +140,19 @@
                 lastActiveColumnId = null;
             }
         }
-
         /*
-        Init && destroy
-        */
-        function init() {
-            context.view.onHeaderClick.subscribe(handleHeaderClick);
-            context.view.onScrollStart.subscribe(hideWindow);
-            return self;
-        }
-
-        function destroy() {
-            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
-            context.view.onScrollStart.unsubscribe(hideWindow);
-        }
-
-        function filterColumnById(id, filter) {
-
-        }
-
-        function filterColumnByIndex(idx, filter) {
-
+         * Public Api
+         */
+        function filterRows(filter) {
+            var request = context.view.suspendRender();
+            context.viewModel.setFilter(filter);
+            context.view.resumeRender(request);
         }
 
         $.extend(this, {
             "init": init,
             "destroy": destroy,
+            "filterRows": filterRows
         });
     }
 

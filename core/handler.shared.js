@@ -10,7 +10,7 @@
         }
     });
 
-    function SharedHandler() {
+    function SharedHandler(settings) {
         var self = this,
             resizeTimer;
 
@@ -40,7 +40,11 @@
                 self.onResize.notify({
                     event: evt
                 });
-            }, 400);
+            }, settings.latency);
+        }
+
+        function getSettings() {
+            return settings;
         }
 
         function destroy() {
@@ -55,16 +59,22 @@
             "onClick": new SmallGrid.Event.Handler(),
             "onContextMenu": new SmallGrid.Event.Handler(),
             "onResize": new SmallGrid.Event.Handler(),
-
+            "getSettings": getSettings,
             "destroy": destroy
         });
     }
 
     var handler;
 
-    function GetInstance() {
+    function GetInstance(options) {
         if (!handler) {
-            handler = new SharedHandler();
+            var defaultSettings = {
+                "latency": 400
+            };
+
+            var settings = $.extend({}, defaultSettings, options);
+
+            handler = new SharedHandler(settings);
         }
 
         return handler;

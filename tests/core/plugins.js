@@ -13,7 +13,7 @@ QUnit.test("Plugins", function (assert) {
     assert.ok(plugin instanceof SmallGrid.Plugins.CellEdit, "Create");
 
     assert.throws(
-        function () { SmallGrid.Plugins.Create("CellEdit123", { view: view, windowManager: windowManager }, settings, {}) },
+        function () { SmallGrid.Plugins.Create("CellEdit123", { view: view, windowManager: windowManager }, settings, {}); },
         TypeError,
         "Create"
     );

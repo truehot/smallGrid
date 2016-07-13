@@ -11,12 +11,12 @@
     function GridModel($container, context, settings) {
         var self = this,
             plugins = {},
-            version = "0.6 beta",
+            version = "0.6.1 beta",
             id = SmallGrid.Utils.createGuid();
 
         /*
-        Init & Destroy
-        */
+         * Init & Destroy
+         */
         function init() {
             registerPlugins(settings.plugins);
 
@@ -41,20 +41,22 @@
             self.onDestroy.notify({});
         }
         /*
-         WindowManager
+         * WindowManager
          */
         function getWindowManager() {
             return context.windowManager;
         }
 
         /*
-        View
-        */
+         * View
+         */
         function getView() {
             return context.view;
         }
 
-        /*View model*/
+        /*
+         * View model
+         */
         function getViewModel() {
             return context.viewModel;
         }
@@ -68,15 +70,15 @@
         }
 
         /*
-        Settings
-        */
+         * Settings
+         */
         function getSettings() {
             return settings;
         }
 
         /*
-        Plugins
-        */
+         * Plugins
+         */
         function getPlugin(name) {
             if (plugins[name]) {
                 return plugins[name];
@@ -132,8 +134,8 @@
         }
 
         /*
-        Other
-        */
+         * Other
+         */
         function getVersion() {
             return version;
         }

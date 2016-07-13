@@ -36,10 +36,10 @@
         }
 
         /*
-         Handlers
+         * Handlers
          */
         function handleScrollStop(evt) {
-            if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true) {
+            if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true && settings.plugins.CellEdit.enabled === true) {
                 if (context.view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
                     editOptions.editor.focus();
                 }
@@ -47,13 +47,13 @@
         }
 
         function handleBeforeRowsRendered(evt) {
-            if (isEditMode() === true) {
+            if (isEditMode() === true && settings.plugins.CellEdit.enabled === true) {
                 editOptions.editor.remove();
             }
         }
 
         function handleAfterRowsRendered(evt) {
-            if (isEditMode() === true) {
+            if (isEditMode() === true && settings.plugins.CellEdit.enabled === true) {
                 var cellNode = context.view.getCellNodeById(editOptions.column.id, editOptions.row.id);
                 if (cellNode) {
                     editOptions.editor.append(cellNode);
@@ -66,6 +66,7 @@
         }
 
         function handleCellDblClick(evt) {
+            if (settings.plugins.CellEdit.enabled !== true) return;
             if (isEditMode() === true && evt.column.id === editOptions.column.id && evt.row.id === editOptions.row.id) {
                 editOptions.editor.focus();
             }
@@ -76,6 +77,7 @@
         }
 
         function handleCellClick(evt) {
+            if (settings.plugins.CellEdit.enabled !== true) return;
             if (isEditMode() === true && evt.column.id === editOptions.column.id && evt.row.id === editOptions.row.id) {
                 editOptions.editor.focus();
             }
@@ -86,7 +88,7 @@
         }
 
         function handleCellKeyDown(evt) {
-            if (evt && evt.event) {
+            if (evt && evt.event && settings.plugins.CellEdit.enabled === true) {
                 switch (evt.event.keyCode) {
                     case 13:
                         if (evt.event.target && evt.event.target.tagName !== "TEXTAREA") {
@@ -101,8 +103,8 @@
         }
 
         /*
-        Public api
-        */
+         * Public api
+         */
         function editCellById(columnId, rowId) {
             if (isEditMode() === true) {
                 if (editOptions.column.id !== columnId || editOptions.row.id !== rowId) {

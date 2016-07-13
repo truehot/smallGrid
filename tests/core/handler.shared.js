@@ -9,6 +9,8 @@ QUnit.test("Shared", function (assert) {
     var handleContextMenuExecuted = false;
 
     var handler = SmallGrid.Handler.Shared.GetInstance();
+    handler.getSettings().latency = 0;
+
     handler.onClick.subscribe(handleClick);
     handler.onResize.subscribe(handleResize);
     handler.onContextMenu.subscribe(handleContextMenu);
@@ -26,8 +28,7 @@ QUnit.test("Shared", function (assert) {
     setTimeout(function () {
         assert.equal(handleResizeExecuted, true, "handleResize");
         done2();
-        handler.destroy();
-    }, 1000);
+    });
 
     setTimeout(function () {
         assert.equal(handleContextMenuExecuted, true, "handleContextMenu");
@@ -45,7 +46,6 @@ QUnit.test("Shared", function (assert) {
     function handleContextMenu(e) {
         handleContextMenuExecuted = true;
     }
-
 
 });
 

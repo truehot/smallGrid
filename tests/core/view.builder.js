@@ -1,11 +1,12 @@
 QUnit.module("SmallGrid.View");
 QUnit.test("Builder", function (assert) {
     var settings = SmallGrid.Settings.Create();
+    settings.showLastColumn = true;
     var column = getColumn("test");
     var row = getRow();
     var opts = {
         hideColumnBorder: false,
-        virtualColumnWidth: 0,
+        virtualColumnWidth: 0
     };
     var rows = SmallGrid.Row.Create([row], settings);
     var columns = SmallGrid.Column.Create([column], settings);

@@ -98,7 +98,7 @@
                     self.onChange.notify({ "id": data[idx].id });
                 }
                 return self;
-            },
+            }
         };
 
         function destroy() {
@@ -120,9 +120,7 @@
 
         function sort(comparer) {
             if (data.length) {
-                self.onChange.blockEvents();
                 data.sort(comparer);
-                self.onChange.notifyBlocked();
             }
             return self;
         }
@@ -363,10 +361,12 @@
             if (item instanceof Object) {
                 var column = new ColumnData();
 
-                if (settings.columns.newIdType === "number") {
-                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createId();
+                if (SmallGrid.Utils.isProperty(settings.columns.idProperty, column)) {
+                    column.id = column[settings.columns.idProperty];
+                } else if (settings.columns.newIdType === "number") {
+                    column.id = SmallGrid.Utils.createId();
                 } else {
-                    column.id = SmallGrid.Utils.isProperty(settings.columns.idProperty, column) ? column[settings.columns.idProperty] : SmallGrid.Utils.createGuid();
+                    column.id = SmallGrid.Utils.createGuid();
                 }
 
                 column.name = item.name;
@@ -389,26 +389,6 @@
                 if ("sortOrder" in item) column.sortOrder = item.sortOrder;
                 if ("sortComparer" in item) column.sortComparer = item.sortComparer;
                 if ("width" in item) column.width = item.width;
-
-                //column.width = Math.max(
-                //    Math.min(
-                //        parseInt(column.width, 10),
-                //        column.maxWidth
-                //    ),
-                //    column.minWidth
-                //);
-
-                //if (column.sortComparer && SmallGrid.Utils.isFunction(column.sortComparer, SmallGrid.Column.Comparer) === false) {
-                //    delete column.sortComparer;
-                //}
-
-                //if (column.formatter && SmallGrid.Utils.isFunction(column.formatter, SmallGrid.Cell.Formatter) === false) {
-                //    delete column.formatter;
-                //}
-
-                //if (column.editor && SmallGrid.Utils.isFunction(column.editor, SmallGrid.Cell.Editor) === false) {
-                //    delete column.editor;
-                //}
 
                 return column;
             }

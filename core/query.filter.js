@@ -3,14 +3,14 @@
 
     $.extend(true, SmallGrid, {
         "Query": {
-            "FilterQuery": FilterQuery
+            "Filter": FilterQuery
         }
     });
 
     function FilterQuery(field) {
-        var self = this;
-        var query = [];
-        var id = SmallGrid.Utils.createGuid();
+        var self = this,
+            query = [],
+            id = SmallGrid.Utils.createGuid();
 
         function getId() {
             return id;
@@ -92,7 +92,7 @@
             "endswith": endswith,
             "eq": eq,
             "neq": neq,
-            "startswith": startswith,
+            "startswith": startswith
         });
     }
 })(jQuery, window.SmallGrid = window.SmallGrid || {});

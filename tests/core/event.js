@@ -6,17 +6,17 @@ QUnit.test("Event", function (assert) {
     var eventArgs = new SmallGrid.Event.Data(event);
     var handler = new SmallGrid.Event.Handler();
 
-    assert.ok(eventArgs.isPropagationStopped() == false, "isPropagationStopped");
+    assert.ok(eventArgs.isPropagationStopped() === false, "isPropagationStopped");
     eventArgs.stopPropagation();
-    assert.ok(eventArgs.isPropagationStopped() == true, "isPropagationStopped");
+    assert.ok(eventArgs.isPropagationStopped() === true, "isPropagationStopped");
 
-    assert.ok(eventArgs.isImmediatePropagationStopped() == false, "isImmediatePropagationStopped");
+    assert.ok(eventArgs.isImmediatePropagationStopped() === false, "isImmediatePropagationStopped");
     eventArgs.stopImmediatePropagation();
-    assert.ok(eventArgs.isImmediatePropagationStopped() == true, "isImmediatePropagationStopped");
+    assert.ok(eventArgs.isImmediatePropagationStopped() === true, "isImmediatePropagationStopped");
 
-    assert.ok(eventArgs.isDefaultPrevented() == false, "isDefaultPrevented");
+    assert.ok(eventArgs.isDefaultPrevented() === false, "isDefaultPrevented");
     eventArgs.preventDefault();
-    assert.ok(eventArgs.isDefaultPrevented() == true, "isDefaultPrevented");
+    assert.ok(eventArgs.isDefaultPrevented() === true, "isDefaultPrevented");
 
     handler.subscribe(function (e) {
         if (e.counter) {
@@ -26,13 +26,13 @@ QUnit.test("Event", function (assert) {
 
     handler.notify({ "counter": 1 });
 
-    assert.ok(counter == 1, "notify");
+    assert.ok(counter === 1, "notify");
 
     handler.unsubscribeLast();
 
     handler.notify({ "counter": 1 });
 
-    assert.ok(counter == 1, "unsubscribeLast");
+    assert.ok(counter === 1, "unsubscribeLast");
 
     counter = 0;
 
@@ -46,16 +46,16 @@ QUnit.test("Event", function (assert) {
     handler.notify({ "counter": 1 });
     handler.unsubscribeAll();
 
-    assert.ok(counter == 9, "unsubscribeAll");
+    assert.ok(counter === 9, "unsubscribeAll");
 
     counter = 0;
     handler.subscribe(first);
     handler.notify({ "counter": 1 });
-    assert.ok(counter == 1, "subscribe");
+    assert.ok(counter === 1, "subscribe");
 
     handler.unsubscribe(first);
     handler.notify({ "counter": 1 });
-    assert.ok(counter == 1, "unsubscribe");
+    assert.ok(counter === 1, "unsubscribe");
 
     counter = 0;
     handler.subscribe(first);
@@ -63,7 +63,7 @@ QUnit.test("Event", function (assert) {
     handler.notify({ "counter": 1 });
     handler.notify({ "counter": 1 });
     handler.notifyBlocked();
-    assert.ok(counter == 1, "unsubscribe");
+    assert.ok(counter === 1, "unsubscribe");
 
     function first(e) {
         counter++;
@@ -77,7 +77,7 @@ QUnit.test("Event", function (assert) {
                 "multi": true,
                 "enabled": 56
             }
-        }
+        };
     }
 });
 

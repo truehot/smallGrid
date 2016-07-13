@@ -11,7 +11,9 @@
         var self = this,
             selectedIds = [],
             lastFocusedId = null;
-
+        /*
+         * Init && destroy
+         */
         function init() {
             context.view.onCellClick.subscribe(handleCellClick);
             return self;
@@ -20,17 +22,24 @@
         function destroy() {
             context.view.onCellClick.unsubscribe(handleCellClick);
         }
-
+        /*
+         * Handlers
+         */
         function handleCellClick(evt) {
+            if (settings.plugins.RowSelection.enabled !== true) return;
+
             var request = context.view.suspendRender();
             if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedId && lastFocusedId !== evt.row.id) {
 
                 selectRowsRangeById(lastFocusedId, evt.row.id);
 
-            } else if (evt.event.ctrlKey === true && settings.plugins.RowSelection.multipleRowSelection === true) {
+            } else if (evt.event.ctrlKey === true) {
                 if (isRowSelected(evt.row.id) === true) {
                     deselectRowById(evt.row.id);
                 } else {
+                    if (settings.plugins.RowSelection.multipleRowSelection === false) {
+                        deselectAllRows();
+                    }
                     selectRowById(evt.row.id);
                 }
             } else {
@@ -82,7 +91,9 @@
             }
         }
 
-        /* Public */
+        /*
+         * Public API
+         */
         function selectRowById(id) {
             var request = context.view.suspendRender();
 

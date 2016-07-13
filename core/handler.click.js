@@ -93,7 +93,7 @@
             throw new TypeError("Container is not defined or does not exist in the DOM.");
         }
 
-        if ($container.length != 1) {
+        if ($container.length !== 1) {
             throw new TypeError("There should be only 1 container.");
         }
 

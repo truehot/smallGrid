@@ -27,7 +27,7 @@
 
             var elKeys = Object.keys(el);
             for (var i = 0; i < elKeys.length; i++) {
-                el[elKeys[i]].empty().remove();
+                el[elKeys[i]].remove();
                 delete el[elKeys[i]];
             }
 
@@ -35,7 +35,7 @@
         }
 
         function handleColumnResize(evt) {
-            if (column && el.lastHeaderCol.length) {
+            if (column && el.lastHeaderCol.length && settings.plugins.ColumnResize.enabled === true) {
                 width = Math.max(
                     Math.min(
                         parseInt(evt.width, 10),
@@ -50,6 +50,8 @@
         }
 
         function handleColumnResizeStart(evt) {
+            if (settings.plugins.ColumnResize.enabled !== true) return;
+
             column = context.viewModel.getColumnByIndex(evt.cellIndex);
 
             el = {
@@ -81,7 +83,7 @@
         }
 
         function handleColumnResizeStop() {
-            if (column) {
+            if (column && settings.plugins.ColumnResize.enabled === true) {
 
                 if (el.headerCell.length) toggleEnabled(el.headerCell, settings.cssClass.cellColumnLast);
                 if (el.contentCell.length) toggleEnabled(el.contentCell, settings.cssClass.cellColumnLast);

@@ -36,7 +36,7 @@ QUnit.test("Click", function (assert) {
         "handleClick": handleCellClick,
         "handleDblClick": handleCellDblClick,
         "handleContextMenu": handleCellContextMenu,
-        "handleKeyDown": handleCellKeyDown,
+        "handleKeyDown": handleCellKeyDown
     });
 
     $r3el2.trigger('click');
@@ -66,22 +66,22 @@ QUnit.test("Click", function (assert) {
 
 
     function handleCellClick(e) {
-        assert.ok(e.rowIndex == 2 && e.cellIndex == 1, "handleCellClick");
+        assert.ok(e.rowIndex === 2 && e.cellIndex === 1, "handleCellClick");
         handleCellClickExecuted = true;
     }
 
     function handleCellDblClick(e) {
-        assert.ok(e.rowIndex == 0 && e.cellIndex == 2, "handleCellDblClick");
+        assert.ok(e.rowIndex === 0 && e.cellIndex === 2, "handleCellDblClick");
         handleCellDblClickExecuted = true;
     }
 
     function handleCellKeyDown(e) {
-        assert.ok(e.rowIndex == 1 && e.cellIndex == 2, "handleCellKeyDown");
+        assert.ok(e.rowIndex === 1 && e.cellIndex === 2, "handleCellKeyDown");
         handleCellKeyDownExecuted = true;
     }
 
     function handleCellContextMenu(e) {
-        assert.ok(e.rowIndex == 1 && e.cellIndex == 0, "handleCellContextMenu");
+        assert.ok(e.rowIndex === 1 && e.cellIndex === 0, "handleCellContextMenu");
         handleCellContextMenuExecuted = true;
     }
 

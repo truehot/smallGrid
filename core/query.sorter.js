@@ -3,12 +3,17 @@
 
     $.extend(true, SmallGrid, {
         "Query": {
-            "SorterQuery": SorterQuery
+            "Sorter": SorterQuery
         }
     });
 
     function SorterQuery(field, sortOrder, sortComparer) {
-        var self = this;
+        var self = this,
+            id = SmallGrid.Utils.createGuid();
+
+        function getId() {
+            return id;
+        }
 
         function getField() {
             return field;
@@ -23,6 +28,7 @@
         }
 
         $.extend(this, {
+            "getId": getId,
             "getField": getField,
             "getSortOrder": getSortOrder,
             "getSortComparer": getSortComparer

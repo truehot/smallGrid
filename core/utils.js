@@ -62,7 +62,7 @@
 
 
     function measureTableCellDiff(cssClass) {
-        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'><tbody><tr><td class='" + cssClass + "' style='width:5px; height:5px;'>-</td></tr></tbody></table>").appendTo(document.body)
+        var $table = $("<table class='grid-content-table' style='position:absolute; top:-100px; left:-100px;'><tbody><tr><td class='" + cssClass + "' style='width:5px; height:5px;'>-</td></tr></tbody></table>").appendTo(document.body);
         var $cell = $table.find('TD');
 
         var cellDiff = {

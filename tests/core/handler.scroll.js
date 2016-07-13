@@ -14,7 +14,7 @@ QUnit.test("Scroll", function (assert) {
         "handleScroll": handleScroll,
         "handleMouseWheel": handleMouseWheel,
         "handleMouseWheelStart": handleMouseWheelStart,
-        "handleMouseWheelStop": handleMouseWheelStop,
+        "handleMouseWheelStop": handleMouseWheelStop
     });
 
     var done1 = assert.async();

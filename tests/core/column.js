@@ -2,11 +2,11 @@ QUnit.module("SmallGrid");
 QUnit.test("Column", function (assert) {
     var model = SmallGrid.Column.Create([], SmallGrid.Settings.Create());
 
-    assert.ok(model.items.getItems().length == 0, "Column.Create");
-    assert.ok(model.isEmpty() == true, "isEmpty");
-    assert.ok(model.total() == 0, "total");
+    assert.ok(model.items.getItems().length === 0, "Column.Create");
+    assert.ok(model.isEmpty() === true, "isEmpty");
+    assert.ok(model.total() === 0, "total");
 
-    assert.ok(model.items.getItems().length == 0, "init");
+    assert.ok(model.items.getItems().length === 0, "init");
 
     var item = getItem();
     model.items.addItems([item]);
@@ -15,35 +15,36 @@ QUnit.test("Column", function (assert) {
     model.deleteColumns();
 
     model.items.addItems([]);
-    assert.ok(model.items.getItems().length == 0, "items.addItems");
+    assert.ok(model.items.getItems().length === 0, "items.addItems");
 
     model.addColumns([]);
-    assert.ok(model.items.getItems().length == 0, "items.addColumns");
+    assert.ok(model.items.getItems().length === 0, "items.addColumns");
 
     model.deleteColumns();
-    assert.ok(model.items.getItems().length == 0, "items.deleteItems");
+    assert.ok(model.items.getItems().length === 0, "items.deleteItems");
 
     model.items.setItems([]);
-    assert.ok(model.items.getItems().length == 0, "items.setItems");
+    assert.ok(model.items.getItems().length === 0, "items.setItems");
 
     model.setColumns([]);
-    assert.ok(model.items.getItems().length == 0, "setColumns");
+    assert.ok(model.items.getItems().length === 0, "setColumns");
 
-    assert.ok(model.items.getItems().length == 0, "items.getItems");
-    assert.ok(model.getColumns().length == 0, "getColumns");
+    assert.ok(model.items.getItems().length === 0, "items.getItems");
+    assert.ok(model.getColumns().length === 0, "getColumns");
 
-    var item = getItem();
-    var model = SmallGrid.Column.Create([item], SmallGrid.Settings.Create());
-    assert.ok(model.items.getItems().length == 1, "Data.Create");
-    assert.ok(model.getColumns().length == 1, "Data.Create");
+    item = getItem();
+    model = SmallGrid.Column.Create([item], SmallGrid.Settings.Create());
+
+    assert.ok(model.items.getItems().length === 1, "Data.Create");
+    assert.ok(model.getColumns().length === 1, "Data.Create");
     assert.deepEqual(model.getColumns()[0].item, item, "Data.Create");
 
 
     model.items.deleteItems();
-    assert.ok(model.getColumns().length == 0, "items.deleteItems");
+    assert.ok(model.getColumns().length === 0, "items.deleteItems");
 
     model.items.setItems([item]);
-    assert.ok(model.getColumns().length == 1, "items.setItems");
+    assert.ok(model.getColumns().length === 1, "items.setItems");
     assert.deepEqual(model.getColumns()[0].item, item, "items.setItems");
 
     assert.deepEqual(model.getColumnById(model.getColumns()[0].id), model.getColumnByIndex(0), "getColumnById && getColumnByIndex");
@@ -55,10 +56,10 @@ QUnit.test("Column", function (assert) {
     assert.deepEqual(model.getColumnById(model.getColumns()[0].id).item, item, "getColumnById");
 
     model.items.deleteItemById(model.getColumns()[0].id);
-    assert.ok(model.getColumns().length == 0, "items.deleteItemById");
+    assert.ok(model.getColumns().length === 0, "items.deleteItemById");
 
     model.items.setItems([item]);
-    assert.ok(model.getColumns().length == 1, "items.setItems");
+    assert.ok(model.getColumns().length === 1, "items.setItems");
 
     var newItem = model.getColumns()[0];
 
@@ -71,11 +72,11 @@ QUnit.test("Column", function (assert) {
     model.updateColumnByIndex(0, newItem);
     assert.deepEqual(model.getColumns()[0], newItem, "updateColumnByIndex");
 
-    assert.ok(model.getColumnIdByIndex(0) == newItem.id, "getColumnIdByIndex");
-    assert.ok(model.getColumnIndexById(newItem.id) == 0, "getColumnIndexById");
+    assert.ok(model.getColumnIdByIndex(0) === newItem.id, "getColumnIdByIndex");
+    assert.ok(model.getColumnIndexById(newItem.id) === 0, "getColumnIndexById");
 
-    assert.ok(model.getColumnPropertyById(newItem.id, "editMode") == false, "getColumnPropertyById");
-    assert.ok(model.getColumnPropertyByIndex(0, "editMode") == false, "gettColumnPropertyByIndex");
+    assert.ok(model.getColumnPropertyById(newItem.id, "editMode") === false, "getColumnPropertyById");
+    assert.ok(model.getColumnPropertyByIndex(0, "editMode") === false, "gettColumnPropertyByIndex");
 
     model.setColumnPropertyById(newItem.id, "editMode", newItem["editMode"]);
     assert.deepEqual(model.getColumnById(newItem.id).item, item, "setColumnPropertyById");
@@ -85,45 +86,47 @@ QUnit.test("Column", function (assert) {
 
 
     model.deleteColumnByIndex(0);
-    assert.ok(model.getColumns().length == 0, "deleteColumnByIndex");
+    assert.ok(model.getColumns().length === 0, "deleteColumnByIndex");
 
     model.items.addItem(item);
-    assert.ok(model.getColumns().length == 1, "items.addItem");
+    assert.ok(model.getColumns().length === 1, "items.addItem");
     assert.deepEqual(model.getColumns()[0].item, item, "items.addItem");
 
     model.deleteColumn(model.getColumns()[0]);
-    assert.ok(model.getColumns().length == 0, "deleteColumn");
+    assert.ok(model.getColumns().length === 0, "deleteColumn");
 
     model.items.setItems([item, item]);
+
     var dataItem = model.getColumns()[0];
-    var newItem = getItem();
+    newItem = getItem();
 
     model.insertColumnBeforeId(dataItem.id, model.createColumn(newItem));
 
-    assert.ok(model.getColumns().length == 3, "insertColumnBeforeId");
+    assert.ok(model.getColumns().length === 3, "insertColumnBeforeId");
     assert.deepEqual(model.getColumns()[0].item, newItem, "insertColumnBeforeId");
 
     model.insertColumnBeforeIndex(0, model.createColumn(newItem));
-    assert.ok(model.getColumns().length == 4, "insertItemBeforeIndex");
+    assert.ok(model.getColumns().length === 4, "insertItemBeforeIndex");
     assert.deepEqual(model.getColumns()[0].item, newItem, "insertItemBeforeIndex");
 
-    var newItem = getItem();
+    newItem = getItem();
+
     model.insertColumnAfterId(dataItem.id, model.createColumn(newItem));
 
-    assert.ok(model.getColumns().length == 5, "insertColumnAfterId");
+    assert.ok(model.getColumns().length === 5, "insertColumnAfterId");
     assert.deepEqual(model.getColumns()[3].item, newItem, "insertColumnAfterId");
 
     model.insertColumnAfterIndex(0, model.createColumn(newItem));
-    assert.ok(model.getColumns().length == 6, "insertColumnAfterIndex");
+    assert.ok(model.getColumns().length === 6, "insertColumnAfterIndex");
     assert.deepEqual(model.getColumns()[1].item, newItem, "insertColumnAfterIndex");
 
 
     model.items.setItems([getItem(), getItem()]);
-    assert.ok(model.getColumns().length == 2, "items.setItems");
+    assert.ok(model.getColumns().length === 2, "items.setItems");
 
     model.setColumnsProperty("editMode", true);
-    assert.ok(model.getColumns()[0].editMode == true, "setColumnsProperty");
-    assert.ok(model.getColumns()[1].editMode == true, "setColumnsProperty");
+    assert.ok(model.getColumns()[0].editMode === true, "setColumnsProperty");
+    assert.ok(model.getColumns()[1].editMode === true, "setColumnsProperty");
 
 
     function getItem() {

@@ -9,7 +9,9 @@
 
     function AutoResizePlugin(context, settings) {
         var self = this;
-
+        /*
+         * Init && destroy
+         */
         function init() {
             context.view.onViewResized.subscribe(handleViewResized);
             return self;
@@ -19,25 +21,13 @@
             context.view.onViewResized.unsubscribe(handleViewResized);
         }
 
-
+        /*
+         * Handlers
+         */
         function handleViewResized() {
             if (settings.plugins.AutoResize.enabled === true) {
                 resizeColumns();
             }
-        }
-
-        function resizeColumns() {
-            var updateColumns = resizeColumnsWidth(
-                context.columnsModel.getColumns(),
-                context.view.isVerticalScrollVisible() === true ? settings.scrollbarDimensions.width : 0,
-                settings.cellOuterSize.width
-            );
-
-            context.view.suspendRender(function () {
-                context.columnsModel.updateColumns(updateColumns);
-            });
-
-            return self;
         }
 
         function resizeColumnsWidth(allColumns, scrollBarWidth, cellOuterWidth) {
@@ -97,10 +87,28 @@
             return updateColumns;
         }
 
+        /*
+         * Public API
+         */
+        function resizeColumns() {
+            var updateColumns = resizeColumnsWidth(
+                context.columnsModel.getColumns(),
+                context.view.isVerticalScrollVisible() === true ? settings.scrollbarDimensions.width : 0,
+                settings.cellOuterSize.width
+            );
+
+            context.view.suspendRender(function () {
+                context.columnsModel.updateColumns(updateColumns);
+            });
+
+            return self;
+        }
+
         $.extend(this, {
             "init": init,
-            "resizeColumns": resizeColumns,
-            "destroy": destroy
+            "destroy": destroy,
+
+            "resizeColumns": resizeColumns
         });
 
     }

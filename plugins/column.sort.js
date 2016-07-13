@@ -10,6 +10,9 @@
     function ColumnSortPlugin(context, settings) {
         var self = this;
 
+        /*
+         * Init && destroy
+         */
         function init() {
             context.view.onHeaderClick.subscribe(handleHeaderClick);
             return self;
@@ -19,8 +22,11 @@
             context.view.onHeaderClick.unsubscribe(handleHeaderClick);
         }
 
+        /*
+         * Handlers
+         */
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type === "sort") {
+            if (evt && evt.type && evt.type === "sort" && settings.plugins.ColumnSort.enabled === true) {
                 var request = context.view.suspendRender();
                 sortColumn(evt.column);
                 context.view.resumeRender(request);
@@ -32,9 +38,10 @@
                 var newSortOrder = sortOrder === undefined ? SmallGrid.Utils.changeSortOrder(column.sortOrder) : sortOrder;
                 context.columnsModel.setColumnsProperty("sortOrder", 0);//reset sorting
                 context.columnsModel.setColumnPropertyById(column.id, "sortOrder", newSortOrder);
-                context.viewModel.setSorter(new SmallGrid.Query.SorterQuery(column.field, newSortOrder, column.sortComparer));
+                context.viewModel.setSorter(new SmallGrid.Query.Sorter(column.field, newSortOrder, column.sortComparer));
             }
         }
+
         /*
          * Public API
          */

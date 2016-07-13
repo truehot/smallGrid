@@ -11,9 +11,24 @@
         var self = this;
         var currentId = "column-picker";
 
+        /*
+         * Init && destroy
+         */
+        function init() {
+            context.view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
+            return self;
+        }
+
+        function destroy() {
+            context.view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
+        }
+
+        /*
+         * Handlers
+         */
         function handleHeaderContextMenu(evt) {
 
-            if (evt) {
+            if (evt && settings.plugins.ColumnPickerMenu.enabled === true) {
                 evt.preventDefault();
 
                 context.windowManager.hideWindows();
@@ -69,8 +84,8 @@
         }
 
         /*
-        Handlers
-        */
+         * Handlers
+         */
         function handleMenuMouseEnter(evt) {
             $(this).off("mouseleave").on("mouseleave", function () {
                 context.windowManager.hideWindow(evt.data.id);
@@ -84,6 +99,7 @@
                 var $checkbox = $(evt.target).closest('input');
                 if ($checkbox.length) {
                     var columns = context.viewModel.getColumns();
+                    var data;
                     var totalHidden = columns.length - totalHiddenColumns(columns);
                     if (totalHidden === 1 && $checkbox[0].checked === false) {
                         return false;
@@ -91,13 +107,13 @@
 
                     if (totalHidden === 1 && $checkbox[0].checked === true) {
                         //enable disabled checkbox
-                        var data = context.windowManager.getWindow(currentId);
+                        data = context.windowManager.getWindow(currentId);
                         if (data) {
                             data.container.find('input:disabled').removeAttr('disabled');
                         }
                     } else if (totalHidden === 2 && $checkbox[0].checked === false) {
                         //disable last checkbox
-                        var data = context.windowManager.getWindow(currentId);
+                        data = context.windowManager.getWindow(currentId);
                         if (data) {
                             var $checked = data.container.find('input:checked');
                             if ($checked.length) {
@@ -112,17 +128,8 @@
         }
 
         /*
-        Init && destroy
-        */
-        function init() {
-            context.view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
-            return self;
-        }
-
-        function destroy() {
-            context.view.onHeaderContextMenu.unsubscribe(handleHeaderContextMenu);
-        }
-
+         * Public API
+         */
         function hideColumnById(id) {
             context.columnsModel.setColumnPropertyById(id, "hidden", true);
         }
