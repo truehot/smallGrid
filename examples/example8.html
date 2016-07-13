@@ -21,11 +21,11 @@
     <script>
         $(document).ready(function () {
             var columns = [
-				{ 'name': "Column 1", 'field': "property1", 'width': 200 },
-				{ 'name': "Column 2", 'field': "property2", 'width': 200 },
-				{ 'name': "Column 3", 'field': "property3", 'width': 200 },
-				{ 'name': "Column 4", 'field': "property4", 'width': 200 },
-				{ 'name': "Column 5", 'field': "property5", 'width': 200 },
+				{ 'name': "Column 1", 'field': "property1", 'width': 200},
+				{ 'name': "Column 2", 'field': "property2", 'width': 200},
+				{ 'name': "Column 3", 'field': "property3", 'width': 200},
+				{ 'name': "Column 4", 'field': "property4", 'width': 200},
+				{ 'name': "Column 5", 'field': "property5", 'width': 200},
             ];
 
             var items = [];
@@ -33,7 +33,7 @@
             for (var i = 1; i <= 100000; i++) {
                 var item = {};
                 for (var ii = 1; ii < 6; ii++) {
-                    item["property" + ii] = i + ' ' + ii;
+                    item["property" + ii] = i + '.' + ii;
                 }
 
                 items.push(item);
@@ -47,7 +47,7 @@
                 for (; i <= limit; i++) {
                     var item = {};
                     for (var ii = 1; ii < 6; ii++) {
-                        item["property" + ii] = i + ' ' + ii;
+                        item["property" + ii] = i + '.' + ii;
                     }
 
                     items.push(item);
