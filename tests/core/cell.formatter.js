@@ -7,7 +7,7 @@ QUnit.test("Formatter", function (assert) {
     settings.formatter.floatFormatter.decimals = 2;
 
     assert.equal(SmallGrid.Cell.Formatter.Default("<div>test</div>", {}, {}, settings), "&lt;div&gt;test&lt;/div&gt;", "Default");
-    assert.equal(SmallGrid.Cell.Formatter.Text(undefined, {}, {}, settings), "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>", "Text");
+    assert.equal(SmallGrid.Cell.Formatter.Text(undefined, {}, {}, settings), "", "Text");
 
     assert.ok(SmallGrid.Cell.Formatter.Checkbox(true, {}, {}, settings) === "<i class='fa fa-check-square-o'></i>", "Checkbox");
     assert.ok(SmallGrid.Cell.Formatter.Checkbox(false, {}, {}, settings) === "<i class='fa fa-square-o'></i>", "Checkbox");
@@ -33,21 +33,21 @@ QUnit.test("Formatter", function (assert) {
                 style: 'currency'
             }
         };
-        assert.equal(SmallGrid.Cell.Formatter.Money("12345.12345", {}, {}, settings), "$12,345.12<i class='fa fa fa-pencil grid-text-icon-formatter'></i>", "Money");
-        assert.equal(SmallGrid.Cell.Formatter.Money(-123, {}, {}, settings), "-$123.00<i class='fa fa fa-pencil grid-text-icon-formatter'></i>", "Money");
+        assert.equal(SmallGrid.Cell.Formatter.Money("12345.12345", {}, {}, settings), "$12,345.12", "Money");
+        assert.equal(SmallGrid.Cell.Formatter.Money(-123, {}, {}, settings), "-$123.00", "Money");
 
         settings.formatter.dateFormatter = {
             locales: 'en-US',
             options: {}
         };
-        assert.equal(SmallGrid.Cell.Formatter.Date("Wed, 09 Aug 1995 00:00:00", {}, {}, settings), "8/9/1995<i class='fa fa-calendar grid-date-icon-formatter'></i>", "Date");
-        assert.equal(SmallGrid.Cell.Formatter.Date("2015-01-17T16:42:24.598Z", {}, {}, settings), "1/17/2015<i class='fa fa-calendar grid-date-icon-formatter'></i>", "Date");
+        assert.equal(SmallGrid.Cell.Formatter.Date("Wed, 09 Aug 1995 00:00:00", {}, {}, settings), "8/9/1995", "Date");
+        assert.equal(SmallGrid.Cell.Formatter.Date("2015-01-17T16:42:24.598Z", {}, {}, settings), "1/17/2015", "Date");
 
-        assert.equal(SmallGrid.Cell.Formatter.Select("123", {}, {}, settings), "123<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>", "Select");
-        assert.equal(SmallGrid.Cell.Formatter.Select("567", {}, {}, settings), "567<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>", "Select");
+        assert.equal(SmallGrid.Cell.Formatter.Select("123", {}, {}, settings), "123", "Select");
+        assert.equal(SmallGrid.Cell.Formatter.Select("567", {}, {}, settings), "567", "Select");
 
-        assert.equal(SmallGrid.Cell.Formatter.Text("123", {}, {}, settings), "123<i class='fa fa fa-pencil grid-text-icon-formatter'></i>", "Text");
-        assert.equal(SmallGrid.Cell.Formatter.Text("567", {}, {}, settings), "567<i class='fa fa fa-pencil grid-text-icon-formatter'></i>", "Text");
+        assert.equal(SmallGrid.Cell.Formatter.Text("123", {}, {}, settings), "123", "Text");
+        assert.equal(SmallGrid.Cell.Formatter.Text("567", {}, {}, settings), "567", "Text");
     }
 });
 

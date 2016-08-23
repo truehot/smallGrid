@@ -11,7 +11,7 @@
     function GridModel($container, context, settings) {
         var self = this,
             plugins = {},
-            version = "0.6.1 beta",
+            version = "0.6.2 beta",
             id = SmallGrid.Utils.createGuid();
 
         /*
@@ -164,8 +164,8 @@
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
 
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
     }
 

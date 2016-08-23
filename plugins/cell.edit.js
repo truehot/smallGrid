@@ -15,12 +15,24 @@
         };
 
         function init() {
+            //register plugin settings
+            if (!settings.plugins.CellEdit) {
+                settings.plugins.CellEdit = {
+                    enabled: false,
+                    editOnClick: false,//when true, editor loaded after click
+                    autoFocus: true//autofocus edited cell when scrolling
+                };
+            }
+
             context.view.onAfterRowsRendered.subscribe(handleAfterRowsRendered);
             context.view.onBeforeRowsRendered.subscribe(handleBeforeRowsRendered);
             context.view.onCellClick.subscribe(handleCellClick);
             context.view.onCellDblClick.subscribe(handleCellDblClick);
             context.view.onCellKeyDown.subscribe(handleCellKeyDown);
             context.view.onScrollStop.subscribe(handleScrollStop);
+
+            context.view.getBuilder().onCellCss.subscribe(buildCellCss);
+
             return self;
         }
 
@@ -32,12 +44,39 @@
             context.view.onCellKeyDown.unsubscribe(handleCellKeyDown);
             context.view.onScrollStop.unsubscribe(handleScrollStop);
 
+            context.view.getBuilder().onCellCss.unsubscribe(buildCellCss);
+
             cancelEdit();
         }
 
         /*
          * Handlers
          */
+
+        function buildCellCss(cellCssClass, args) {
+            if (args.row.editMode === true && args.column.editMode === true) {
+                cellCssClass.push(settings.cssClass.cellEdit);
+            } else {
+                switch (args.column.editor) {
+                    case "Date":
+                        cellCssClass.push("grid-date-icon-formatter");
+                        break;
+                    case "Checkbox":
+                        break;
+                    case "Float":
+                    case "Integer":
+                    case "Text":
+                        cellCssClass.push("grid-text-icon-formatter");
+                        break;
+                    case "Select":
+                        cellCssClass.push("grid-select-icon-formatter");
+                        break;
+                }
+            }
+
+            return cellCssClass;
+        }
+
         function handleScrollStop(evt) {
             if (isEditMode() === true && settings.plugins.CellEdit.autoFocus === true && settings.plugins.CellEdit.enabled === true) {
                 if (context.view.isCellVisible(editOptions.column.id, editOptions.row.id)) {
@@ -249,7 +288,7 @@
             "getEditor": getEditor,
             "isEditMode": isEditMode,
 
-            "onCellEdited": new SmallGrid.Event.Handler()
+            "onCellEdited": SmallGrid.Callback.Create()
 
         });
     }

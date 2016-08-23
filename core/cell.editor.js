@@ -28,9 +28,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -85,9 +85,9 @@
         }
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -142,9 +142,9 @@
         }
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -196,9 +196,9 @@
 
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -260,9 +260,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({

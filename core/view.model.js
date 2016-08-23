@@ -262,11 +262,13 @@
                 rowsCache = rowsRequest.getRowsInRange(point.top, size.height, outerSize.height, newRowSorters, rowFilters);
                 newRowSorters = [];
                 updateCacheHeight(rowsCache, size, outerSize);
+                self.onCacheRowsChange.notify({});
             }
 
             if (columnsCached === 0) {
                 columnsCache = columnsRequest.getColumnsInRange(point.left, size.width, outerSize.width);
                 updateCacheWidth(columnsCache, size, outerSize);
+                self.onCacheColumnsChange.notify({});
             }
 
             return {
@@ -331,10 +333,13 @@
             "getRows": getRows,
             "getRowsHeight": getRowsHeight,
 
-            "onColumnsChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onRowsChange": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create(),
+
+            "onColumnsChange": SmallGrid.Callback.Create(),
+            "onRowsChange": SmallGrid.Callback.Create(),
+            "onCacheColumnsChange": SmallGrid.Callback.Create(),
+            "onCacheRowsChange": SmallGrid.Callback.Create()
         });
     }
 

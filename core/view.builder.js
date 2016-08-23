@@ -97,31 +97,21 @@
         }
 
         function buildHeaderColumnCss(column, opts, isLastColumn) {
-            var cellCssClass = settings.cssClass.headerCell;
+            var cellCssClass = [settings.cssClass.headerCell];
 
             if (column.headerCssClass) {
-                cellCssClass += " " + column.headerCssClass;
+                cellCssClass.push(column.headerCssClass);
             }
 
             if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
+                cellCssClass.push(settings.cssClass.cellColumnLast);
             }
-
-            switch (column.align) {
-                case "center":
-                    cellCssClass += " " + settings.cssClass.cellAlignCenter;
-                    break;
-                case "right":
-                    cellCssClass += " " + settings.cssClass.cellAlignRight;
-                    break;
-            }
-
 
             if (column.sortable || column.filterable) {
-                cellCssClass += " " + settings.cssClass.cursorPointer;
+                cellCssClass.push(settings.cssClass.cursorPointer);
             }
 
-            return cellCssClass;
+            return self.onHeaderColumnCss.notify(cellCssClass, { column: column, opts: opts, isLastColumn: isLastColumn }).join(" ");
         }
 
         function buildHeaderColumnHtml(column, opts, isLastColumn) {
@@ -131,17 +121,17 @@
 
 
             if (column.sortable && column.sortOrder !== 0) {
-                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
+                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "' data-click-type='sort'></span>";
             }
 
             if (column.filterable) {
-                html += "<span class='" + settings.cssClass.headerFilter + "'></span>";
+                html += "<span class='" + settings.cssClass.headerFilter + "' data-click-type='menu'></span>";
             }
 
             html += "</div>";
 
             if (column.resizeable) {
-                html += "<span class='" + settings.cssClass.headerResizeHandle + "'></span>";
+                html += "<span class='" + settings.cssClass.headerResizeHandle + "' data-click-type='resize'></span>";
             }
 
             return html + "</td>";
@@ -196,26 +186,11 @@
         }
 
         function buildRowCss(columns, row, opts, isLastRow) {
-            var rowCssClass = settings.cssClass.row + (row.calcIndex & 1 === 1 ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = [settings.cssClass.row, row.calcIndex & 1 === 1 ? settings.cssClass.rowEven : settings.cssClass.rowOdd];
 
-            if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
+            if (row.rowCssClass) rowCssClass.push(row.rowCssClass);
 
-            switch (row.valign || settings.rows.valign) {
-                case "middle":
-                    rowCssClass += " " + settings.cssClass.rowValignMiddle;
-                    break;
-                case "top":
-                    rowCssClass += " " + settings.cssClass.rowValignTop;
-                    break;
-                case "bottom":
-                    rowCssClass += " " + settings.cssClass.rowValignBottom;
-                    break;
-                case "baseline":
-                    rowCssClass += " " + settings.cssClass.rowValignBaseline;
-                    break;
-            }
-
-            return rowCssClass;
+            return self.onRowCss.notify(rowCssClass, { columns: columns, row: row, opts: opts, isLastRow: isLastRow }).join(" ");
         }
 
         function buildRowHtml(columns, row, opts, isLastRow) {
@@ -232,36 +207,24 @@
         }
 
         function buildCellCss(column, row, opts, isLastColumn, isLastRow) {
-            var cellCssClass = settings.cssClass.cell;
+            var cellCssClass = [settings.cssClass.cell];
             if (column.cellCssClass) {
-                cellCssClass += " " + column.cellCssClass;
+                cellCssClass.push(column.cellCssClass);
             }
 
             if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
+                cellCssClass.push(settings.cssClass.cellColumnLast);
             }
 
             if (isLastRow && opts.hideRowBorder) {
-                cellCssClass += " " + settings.cssClass.cellRowLast;
-            }
-
-            if (column.align === "center") {
-                cellCssClass += " " + settings.cssClass.cellAlignCenter;
-            }
-
-            if (column.align === "right") {
-                cellCssClass += " " + settings.cssClass.cellAlignRight;
+                cellCssClass.push(settings.cssClass.cellRowLast);
             }
 
             if (row.cellCssClass && column.field in row.cellCssClass) {
-                cellCssClass += " " + row.cellCssClass[column.field];
+                cellCssClass.push(row.cellCssClass[column.field]);
             }
 
-            if (row.editMode === true && column.editMode === true) {
-                cellCssClass += " " + settings.cssClass.cellEdit;
-            }
-
-            return cellCssClass;
+            return self.onCellCss.notify(cellCssClass, { column: column, row: row, opts: opts, isLastColumn: isLastColumn, isLastRow: isLastRow }).join(" ");
         }
 
         function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
@@ -300,7 +263,11 @@
             "buildColsHtml": buildColsHtml,
             "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
-            "buildViewPortElements": buildViewPortElements
+            "buildViewPortElements": buildViewPortElements,
+
+            "onHeaderColumnCss": SmallGrid.Callback.Create(),
+            "onRowCss": SmallGrid.Callback.Create(),
+            "onCellCss": SmallGrid.Callback.Create()
         });
     }
 

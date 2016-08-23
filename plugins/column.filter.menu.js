@@ -15,6 +15,13 @@
          * Init && destroy
          */
         function init() {
+            //register plugin settings
+            if (!settings.plugins.ColumnFilterMenu) {
+                settings.plugins.ColumnFilterMenu = {
+                    enabled: false
+                };
+            }
+
             context.view.onHeaderClick.subscribe(handleHeaderClick);
             context.view.onScrollStart.subscribe(handleScrollStart);
             return self;
@@ -35,7 +42,7 @@
         }
 
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type === "filter" && settings.plugins.ColumnFilterMenu.enabled === true) {
+            if (evt && evt.type && evt.type === "menu" && settings.plugins.ColumnFilterMenu.enabled === true) {
                 evt.stopPropagation();
                 lastActiveColumnId = evt.column.id;
 
@@ -62,7 +69,7 @@
         function buildElements(id) {
             var $element = $("<div class='grid-header-menu'></div>");
             var $form = $('<form>');
-            var $content = $('<div class="grid-header-menucontent"></div>')
+            var $content = $('<div class="grid-header-menu-content"></div>')
                 .append('<select name="type1"><option value="contains">Contains</option><option value="doesnotcontain">Does not contains</option><option value="eq">Is equal to</option><option value="neq">Is not equal to</option><option value="startswith">Starts with</option><option value="endswith">Ends with</option></select>')
                 .append('<input type="text" name="value1" value=""/>')
                 .append('<select name="operator"><option value="and">And</option><option value="or">Or</option></select>')

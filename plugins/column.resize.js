@@ -14,6 +14,12 @@
             width;
 
         function init() {
+            //register plugin settings
+            if (!settings.plugins.ColumnResize) {
+                settings.plugins.ColumnResize = {
+                    enabled: false
+                };
+            }
             context.view.onColumnResize.subscribe(handleColumnResize);
             context.view.onColumnResizeStart.subscribe(handleColumnResizeStart);
             context.view.onColumnResizeStop.subscribe(handleColumnResizeStop);

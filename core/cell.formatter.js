@@ -13,7 +13,7 @@
                 "Select": selectFormatter,
                 "None": defaultFormatter,
                 "Radio": radioFormatter,
-                "Text": textFormatter
+                "Text": defaultFormatter
             }
         }
     });
@@ -41,8 +41,7 @@
     function moneyFormatter(value, column, row, settings) {
         value = +value;
         if (!isNaN(value)) {
-            value = new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
-            return value + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
+            return new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
         }
         return defaultFormatter(value, column, row, settings);
     }
@@ -53,8 +52,7 @@
         }
 
         if (!isNaN(value)) {
-            value = new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
-            return value + "<i class='fa fa-calendar grid-date-icon-formatter'></i>";
+            return new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
         }
 
         return defaultFormatter(value, column, row, settings);
@@ -62,15 +60,9 @@
 
     function selectFormatter(value, column, row, settings) {
         if (value instanceof Object) {
-            return value.text + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
-        } else {
-            return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
-        }
-    }
-
-    function textFormatter(value, column, row, settings) {
-        var html = defaultFormatter(value, column, row, settings);
-        return html + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
+            return value.text;
+        } 
+        return value;
     }
 
 })(jQuery, window.SmallGrid = window.SmallGrid || {});

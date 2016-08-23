@@ -9,32 +9,30 @@
 
     function FooterPlugin(context, settings) {
         var self = this;
-        var totalColumns = {
-            height: 0,
-            count: 0
-        };
-        var totalRows = {
-            width: 665,
-            count: 5
-        };
-        var rowsRange = {
-            from: 0,
-            to: 0
-        };
+
+        var totalRows = 0;
 
         /*
          * Init && destroy
          */
         function init() {
-            context.viewModel.onColumnsChange.subscribe(handleColumnsChange);
-            context.viewModel.onRowsChange.subscribe(handleRowsChange);
+            //register plugin settings
+            if (!settings.plugins.Footer) {
+                settings.plugins.Footer = {
+                    enabled: false
+                };
+            }
+
+            context.viewModel.onCacheRowsChange.subscribe(handleDataChange);
+            context.viewModel.onCacheColumnsChange.subscribe(handleDataChange);
             context.view.onInitialize.subscribe(handleModelInit);
+
             return self;
         }
 
         function destroy() {
-            context.viewModel.onColumnsChange.unsubscribe(handleColumnsChange);
-            context.viewModel.onRowsChange.unsubscribe(handleRowsChange);
+            context.viewModel.onRowsChange.unsubscribe(handleDataChange);
+            context.viewModel.onCacheColumnsChange.unsubscribe(handleDataChange);
             context.view.onInitialize.unsubscribe(handleModelInit);
         }
 
@@ -42,46 +40,38 @@
          * Handlers
          */
         function handleModelInit() {
-            if (settings.plugins.Footer.enabled !== true) return;
-
-            getInfo();
-            updateFooter();
+            if (settings.plugins.Footer.enabled === true) {
+                context.view.getNode('footer').css({ display: 'block' });
+                updateFooter(context.viewModel.getRowsTotal().count, context.viewModel.getColumnsTotal().count);
+            }
         }
-
-        function handleColumnsChange() {
-            if (settings.plugins.Footer.enabled !== true) return;
-
-            getInfo();
-            updateFooter();
-        }
-
-        function handleRowsChange() {
-            if (settings.plugins.Footer.enabled !== true) return;
-
-            getInfo();
-            updateFooter();
+        function handleDataChange() {
+            if (settings.plugins.Footer.enabled === true) {
+                updateFooter(context.viewModel.getRowsTotal().count, context.viewModel.getColumnsTotal().count);
+            }
         }
 
         /*
          * Other
          */
-
-        function getInfo() {
-            totalColumns = context.viewModel.getColumnsTotal();
-            totalRows = context.viewModel.getRowsTotal();
-
-            var rows = context.viewModel.getRows();
-            if (rows.length) {
-                rowsRange.from = rows[0].calcIndex;
-                rowsRange.to = rows[rows.length - 1].calcIndex;
+        function updateFooter(newTotalRows, newTotalColumns) {
+            if (newTotalColumns == 0) {
+                updateNode(0, 0, 0);
+            } else if (totalRows != newTotalRows) {
+                var rows = context.viewModel.getRows();
+                if (rows.length) {
+                    totalRows = newTotalRows;
+                    updateNode(newTotalRows, rows[0].calcIndex, rows[rows.length - 1].calcIndex);
+                }
             }
         }
 
-        function updateFooter() {
-            if (totalColumns.count > 0 && totalRows.count) {
-                context.view.getNode('footer').html("Showing " + rowsRange.from + " to " + rowsRange.to + " of  " + totalRows.count);
+        function updateNode(totalRows, fromRow, toRow) {
+            var el = context.view.getNode('footer')
+            if (totalRows) {
+                el.html("Showing " + fromRow + " to " + toRow + " of  " + totalRows);
             } else {
-                context.view.getNode('footer').html();
+                el.html("No data available");
             }
         }
 

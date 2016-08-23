@@ -35,11 +35,11 @@
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -62,12 +62,12 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -130,11 +130,11 @@
          */
         function addRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -142,43 +142,43 @@
 
         function updateRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < rows.length; i++) {
                     updateRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setRowsProperty(propertyName, propertyValue) {
-            self.onChange.blockEvents();
+            self.onChange.lock();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChange.notifyBlocked();
+            self.onChange.notifyLocked();
             return self;
         }
 
 
         function deleteRows() {
             if (data.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -389,7 +389,7 @@
         $.extend(this, {
             "destroy": destroy,
 
-            "onChange": new SmallGrid.Event.Handler(),
+            "onChange": SmallGrid.Callback.Create(),
 
             "filter": filter,
             "reduce": reduce,

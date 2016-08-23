@@ -3,7 +3,7 @@
 
 
 /* Header menu */
-.grid-header-menucontent {
+.grid-header-menu-content {
     display: inline-block;
     padding: 10px;
     vertical-align: middle;
@@ -111,12 +111,31 @@
     margin-right: 16px;
 }
 
-.grid-select-icon-formatter, .grid-text-icon-formatter, .grid-date-icon-formatter {
+.grid-select-icon-formatter:before{
     color:#99CCCC;
     position: absolute;
-    right: 0;
-    padding: 0 4px 0 0;
+    right: 2px;
     top: 20%;
+    content: "";
+    font-family: FontAwesome;
+    cursor:default;
 }
-
+.grid-text-icon-formatter:before {
+    color:#99CCCC;
+    position: absolute;
+    right: 2px;
+    top: 20%;
+    content: "";
+    font-family: FontAwesome;
+    cursor:default;
+}
+.grid-date-icon-formatter:before {
+    color:#99CCCC;
+    position: absolute;
+    right: 2px;
+    top: 15%;
+    content: "";
+    font-family: FontAwesome;
+    cursor:default;
+}
 

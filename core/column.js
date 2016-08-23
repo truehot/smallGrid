@@ -44,11 +44,11 @@
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -71,12 +71,12 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -143,12 +143,12 @@
 
         function addColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
 
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -182,9 +182,9 @@
 
         function deleteColumns() {
             if (data.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -295,24 +295,24 @@
 
         function setColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
 
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setColumnsProperty(propertyName, propertyValue) {
-            self.onChange.blockEvents();
+            self.onChange.lock();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChange.notifyBlocked();
+            self.onChange.notifyLocked();
             return self;
         }
 
@@ -348,11 +348,11 @@
 
         function updateColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < columns.length; i++) {
                     updateColumn(columns[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -397,7 +397,7 @@
         $.extend(this, {
             "destroy": destroy,
 
-            "onChange": new SmallGrid.Event.Handler(),
+            "onChange": SmallGrid.Callback.Create(),
 
             "filter": filter,
             "reduce": reduce,

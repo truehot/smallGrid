@@ -56,9 +56,9 @@
         }
 
         $.extend(this, {
-            "onClick": new SmallGrid.Event.Handler(),
-            "onContextMenu": new SmallGrid.Event.Handler(),
-            "onResize": new SmallGrid.Event.Handler(),
+            "onClick": SmallGrid.Event.Create(),
+            "onContextMenu": SmallGrid.Event.Create(),
+            "onResize": SmallGrid.Event.Create(),
             "getSettings": getSettings,
             "destroy": destroy
         });

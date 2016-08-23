@@ -158,6 +158,17 @@
         }
 
         /*
+         * Column func
+         */
+        function isColumnVisible(columnId) {
+            var column = viewModel.getColumnById(columnId);
+            if (column) {
+                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
+            }
+            return false;
+        }
+
+        /*
          * Row func
          */
         function isRowVisible(rowId) {
@@ -199,17 +210,6 @@
             if (rowIndex !== -1 && columnIndex !== -1) {
                 return getCellNodeByIndex(columnIndex, rowIndex);
             }
-        }
-
-        /*
-         * Column func
-         */
-        function isColumnVisible(columnId) {
-            var column = viewModel.getColumnById(columnId);
-            if (column) {
-                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
-            }
-            return false;
         }
 
         /*
@@ -363,36 +363,12 @@
         }
 
         /*
-         * Calc private funcs
+         * Event funcs
          */
-        function getColumnEventType(targetClass, column) {
-            var type = "";
-            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) !== -1) {
-                type = "resize";
-            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) !== -1) {
-                type = "filter";
-            } else if (column.sortable) {
-                type = "sort";
-            }
-            return type;
-        }
-
-        //todo: fix multiple types, edit && select, remove, add type registration
-        function getCellEventType(targetClass, column, row) {
-            var type = "";
-            if (row.editable === true && column.editable === true) {
-                type = "edit";
-            } else if (row.disabled === true) {
-                type = "disabled";
-            }
-            return type;
-        }
-
         function getColumnEvent(evt) {
             var column = viewModel.getColumnByIndex(evt.cellIndex);
             if (column) {
-                evt.type = getColumnEventType($(evt.event.target).attr("class"), column);
-                evt.targetClass = $(evt.event.target).attr("class");
+                evt.type = $(evt.event.target).attr("data-click-type") || "";
                 evt.column = column;
                 return evt;
             }
@@ -401,15 +377,15 @@
         function getCellEvent(evt) {
             var column = viewModel.getColumnByIndex(evt.cellIndex);
             var row = viewModel.getRowByIndex(evt.rowIndex);
-
             if (column && column.field.length > 0 && row && column.field in row.item) {
-
-                evt.type = getCellEventType($(evt.event.target).attr("class"), column, row);
                 evt.row = row;
                 evt.column = column;
-
                 return evt;
             }
+        }
+
+        function notifyEvent(evt, handlerName) {
+            self[handlerName].notify(evt);
         }
 
         /*
@@ -492,7 +468,6 @@
 
         function handleColumnsChange() {
             modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
-
             applyModelChange();
             render();
         }
@@ -626,9 +601,7 @@
             }
         }
 
-        function notifyEvent(evt, handlerName) {
-            self[handlerName].notify(evt);
-        }
+
 
         $.extend(this, {
             "init": init,
@@ -654,39 +627,39 @@
             "resumeRender": resumeRender,
             "suspendRender": suspendRender,
 
-            "onViewResized": new SmallGrid.Event.Handler(),
-            "onViewScrollChange": new SmallGrid.Event.Handler(),
+            "onViewResized": SmallGrid.Event.Create(),
+            "onViewScrollChange": SmallGrid.Event.Create(),
 
-            "onScroll": new SmallGrid.Event.Handler(),
-            "onScrollStart": new SmallGrid.Event.Handler(),
-            "onScrollStop": new SmallGrid.Event.Handler(),
+            "onScroll": SmallGrid.Event.Create(),
+            "onScrollStart": SmallGrid.Event.Create(),
+            "onScrollStop": SmallGrid.Event.Create(),
 
-            "onMouseWheel": new SmallGrid.Event.Handler(),
-            "onMouseWheelStart": new SmallGrid.Event.Handler(),
-            "onMouseWheelStop": new SmallGrid.Event.Handler(),
+            "onMouseWheel": SmallGrid.Event.Create(),
+            "onMouseWheelStart": SmallGrid.Event.Create(),
+            "onMouseWheelStop": SmallGrid.Event.Create(),
 
-            "onDocumentClick": new SmallGrid.Event.Handler(),
-            "onDocumentResize": new SmallGrid.Event.Handler(),
-            "onDocumentContextMenu": new SmallGrid.Event.Handler(),
+            "onDocumentClick": SmallGrid.Event.Create(),
+            "onDocumentResize": SmallGrid.Event.Create(),
+            "onDocumentContextMenu": SmallGrid.Event.Create(),
 
-            "onHeaderClick": new SmallGrid.Event.Handler(),
-            "onHeaderContextMenu": new SmallGrid.Event.Handler(),
-            "onHeaderDblClick": new SmallGrid.Event.Handler(),
+            "onHeaderClick": SmallGrid.Event.Create(),
+            "onHeaderContextMenu": SmallGrid.Event.Create(),
+            "onHeaderDblClick": SmallGrid.Event.Create(),
 
-            "onCellClick": new SmallGrid.Event.Handler(),
-            "onCellContextMenu": new SmallGrid.Event.Handler(),
-            "onCellDblClick": new SmallGrid.Event.Handler(),
-            "onCellKeyDown": new SmallGrid.Event.Handler(),
+            "onCellClick": SmallGrid.Event.Create(),
+            "onCellContextMenu": SmallGrid.Event.Create(),
+            "onCellDblClick": SmallGrid.Event.Create(),
+            "onCellKeyDown": SmallGrid.Event.Create(),
 
-            "onColumnResize": new SmallGrid.Event.Handler(),
-            "onColumnResizeStart": new SmallGrid.Event.Handler(),
-            "onColumnResizeStop": new SmallGrid.Event.Handler(),
+            "onColumnResize": SmallGrid.Event.Create(),
+            "onColumnResizeStart": SmallGrid.Event.Create(),
+            "onColumnResizeStop": SmallGrid.Event.Create(),
 
-            "onAfterRowsRendered": new SmallGrid.Event.Handler(),
-            "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
+            "onAfterRowsRendered": SmallGrid.Event.Create(),
+            "onBeforeRowsRendered": SmallGrid.Event.Create(),
 
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
     }
 

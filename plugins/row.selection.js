@@ -15,6 +15,14 @@
          * Init && destroy
          */
         function init() {
+            //register plugin settings
+            if (!settings.plugins.RowSelection) {
+                settings.plugins.RowSelection = {
+                    enabled: false,
+                    multipleRowSelection: false//allow multiplerow selection
+                };
+            }
+
             context.view.onCellClick.subscribe(handleCellClick);
             return self;
         }

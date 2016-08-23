@@ -15,6 +15,12 @@
          * Init && destroy
          */
         function init() {
+            //register plugin settings
+            if (!settings.plugins.ColumnPickerMenu) {
+                settings.plugins.ColumnPickerMenu = {
+                    enabled: false
+                };
+            }
             context.view.onHeaderContextMenu.subscribe(handleHeaderContextMenu);
             return self;
         }

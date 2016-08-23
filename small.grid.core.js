@@ -2,6 +2,72 @@
     "use strict";
 
     $.extend(true, SmallGrid, {
+        "Callback": {
+            "Handler": CallbackHandler,
+            "Create": Create,
+        }
+    });
+
+    function CallbackHandler() {
+        this.handlers = [];
+        this.isLocked = false;
+        this.lockedData = [];
+    }
+
+    CallbackHandler.prototype.subscribe = function (func) {
+        if ($.isFunction(func)) {
+            this.handlers.push(func);
+        }
+        return this;
+    };
+
+    CallbackHandler.prototype.unsubscribe = function (func) {
+        for (var i = this.handlers.length - 1; i >= 0; i--) {
+            if (this.handlers[i] === func) {
+                this.handlers.splice(i, 1);
+            }
+        }
+        return this;
+    };
+
+    CallbackHandler.prototype.unsubscribeAll = function () {
+        this.handlers = [];
+        return this;
+    };
+
+    CallbackHandler.prototype.notify = function () {
+        var result = arguments[0];
+
+        if (this.isLocked === true) {
+            this.lockedData.push(result);
+            return result;
+        }
+
+        for (var i = 0; i < this.handlers.length; i++) {
+            result = this.handlers[i].apply(null, arguments);
+        }
+        return result;
+    };
+
+    CallbackHandler.prototype.lock = function () {
+        this.isLocked = true;
+        this.lockedData = [];
+    };
+
+    CallbackHandler.prototype.notifyLocked = function () {
+        this.isLocked = false;
+        return this.notify({ data: this.lockedData });
+    };
+
+
+    function Create() {
+        return new CallbackHandler();
+    }
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
         "Cell": {
             "Editor": {
                 "Create": CreateEditor,
@@ -28,9 +94,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -85,9 +151,9 @@
         }
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -142,9 +208,9 @@
         }
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -196,9 +262,9 @@
 
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -260,9 +326,9 @@
         };
 
         $.extend(this, {
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onChange": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
 
         self.onInitialize.notify({
@@ -301,7 +367,7 @@
                 "Select": selectFormatter,
                 "None": defaultFormatter,
                 "Radio": radioFormatter,
-                "Text": textFormatter
+                "Text": defaultFormatter
             }
         }
     });
@@ -329,8 +395,7 @@
     function moneyFormatter(value, column, row, settings) {
         value = +value;
         if (!isNaN(value)) {
-            value = new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
-            return value + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
+            return new Intl.NumberFormat(settings.formatter.moneyFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
         }
         return defaultFormatter(value, column, row, settings);
     }
@@ -341,8 +406,7 @@
         }
 
         if (!isNaN(value)) {
-            value = new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
-            return value + "<i class='fa fa-calendar grid-date-icon-formatter'></i>";
+            return new Intl.DateTimeFormat(settings.formatter.dateFormatter.locales, settings.formatter.moneyFormatter.options).format(value);
         }
 
         return defaultFormatter(value, column, row, settings);
@@ -350,15 +414,9 @@
 
     function selectFormatter(value, column, row, settings) {
         if (value instanceof Object) {
-            return value.text + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
-        } else {
-            return value + "<i class='fa fa-caret-square-o-down grid-select-icon-formatter'></i>";
-        }
-    }
-
-    function textFormatter(value, column, row, settings) {
-        var html = defaultFormatter(value, column, row, settings);
-        return html + "<i class='fa fa fa-pencil grid-text-icon-formatter'></i>";
+            return value.text;
+        } 
+        return value;
     }
 
 })(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
@@ -476,11 +534,11 @@
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -503,12 +561,12 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -575,12 +633,12 @@
 
         function addColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
 
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -614,9 +672,9 @@
 
         function deleteColumns() {
             if (data.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -727,24 +785,24 @@
 
         function setColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
                 for (var i = 0; i < columns.length; i++) {
                     addColumn(columns[i]);
                 }
 
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setColumnsProperty(propertyName, propertyValue) {
-            self.onChange.blockEvents();
+            self.onChange.lock();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChange.notifyBlocked();
+            self.onChange.notifyLocked();
             return self;
         }
 
@@ -780,11 +838,11 @@
 
         function updateColumns(columns) {
             if (columns.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < columns.length; i++) {
                     updateColumn(columns[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -829,7 +887,7 @@
         $.extend(this, {
             "destroy": destroy,
 
-            "onChange": new SmallGrid.Event.Handler(),
+            "onChange": SmallGrid.Callback.Create(),
 
             "filter": filter,
             "reduce": reduce,
@@ -884,7 +942,8 @@
     $.extend(true, SmallGrid, {
         "Event": {
             "Data": EventData,
-            "Handler": EventHandler
+            "Handler": EventHandler,
+            "Create": Create
         }
     });
 
@@ -921,7 +980,6 @@
             return isPropagationStopped;
         };
 
-        //Keeps the rest of the handlers from being executed
         this.stopImmediatePropagation = function () {
             if (data && "event" in data && typeof data.event.stopImmediatePropagation === "function") {
                 data.event.stopImmediatePropagation();
@@ -935,71 +993,46 @@
     }
 
     function EventHandler() {
-        var self = this,
-            handlers = [],
-            blockEvents = false,
-            blockedEventData = [];
+        this.handlers = [];
+    }
 
+    EventHandler.prototype.subscribe = function (func) {
+        if ($.isFunction(func)) {
+            this.handlers.push(func);
+        }
+        return this;
+    };
 
-        self.subscribe = function (func) {
-            if ($.isFunction(func)) {
-                handlers.push(func);
+    EventHandler.prototype.unsubscribe = function (func) {
+        for (var i = this.handlers.length - 1; i >= 0; i--) {
+            if (this.handlers[i] === func) {
+                this.handlers.splice(i, 1);
             }
-            return self;
-        };
+        }
+        return this;
+    };
 
-        self.unsubscribe = function (func) {
-            for (var i = handlers.length - 1; i >= 0; i--) {
-                if (handlers[i] === func) {
-                    handlers.splice(i, 1);
-                }
+    EventHandler.prototype.unsubscribeAll = function () {
+        this.handlers = [];
+        return this;
+    };
+
+    EventHandler.prototype.notify = function (eventData) {
+        if (typeof eventData !== EventData) {
+            eventData = new EventData(eventData);
+        }
+
+        for (var i = 0; i < this.handlers.length && eventData.isImmediatePropagationStopped() === false; i++) {
+            if (this.handlers[i].call(null, eventData) === false) {
+                this.stopImmediatePropagation();
+                break;
             }
-            return self;
-        };
+        }
+    };
 
-        self.unsubscribeLast = function () {
-            if (handlers.length) {
-                handlers.pop();
-            }
-            return self;
-        };
 
-        self.unsubscribeAll = function () {
-            handlers = [];
-            return self;
-        };
-
-        self.blockEvents = function () {
-            blockEvents = true;
-        };
-
-        self.notifyBlocked = function (opts) {
-            blockEvents = false;
-
-            self.notify(new EventData({
-                opts: opts || {},
-                data: blockedEventData
-            }));
-
-            blockedEventData = [];
-        };
-
-        self.notify = function (eventData) {
-            if (blockEvents === true) {
-                return blockedEventData.push(eventData);
-            }
-
-            if (typeof eventData !== EventData) {
-                eventData = new EventData(eventData);
-            }
-
-            for (var i = 0; i < handlers.length && !eventData.isImmediatePropagationStopped(); i++) {
-                if (handlers[i].call(self, eventData) === false) {
-                    self.stopImmediatePropagation();
-                    break;
-                }
-            }
-        };
+    function Create() {
+        return new EventHandler();
     }
 
 })(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
@@ -1015,7 +1048,7 @@
     function GridModel($container, context, settings) {
         var self = this,
             plugins = {},
-            version = "0.6.1 beta",
+            version = "0.6.2 beta",
             id = SmallGrid.Utils.createGuid();
 
         /*
@@ -1168,8 +1201,8 @@
             "unregisterPlugin": unregisterPlugin,
             "unregisterPlugins": unregisterPlugins,
 
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
     }
 
@@ -1589,9 +1622,9 @@
         }
 
         $.extend(this, {
-            "onClick": new SmallGrid.Event.Handler(),
-            "onContextMenu": new SmallGrid.Event.Handler(),
-            "onResize": new SmallGrid.Event.Handler(),
+            "onClick": SmallGrid.Event.Create(),
+            "onContextMenu": SmallGrid.Event.Create(),
+            "onResize": SmallGrid.Event.Create(),
             "getSettings": getSettings,
             "destroy": destroy
         });
@@ -2030,11 +2063,11 @@
 
             addItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -2057,12 +2090,12 @@
 
             setItems: function (items) {
                 if (items.length) {
-                    self.onChange.blockEvents();
+                    self.onChange.lock();
                     data = [];
                     for (var i = 0; i < items.length; i++) {
                         self.items.addItem(items[i]);
                     }
-                    self.onChange.notifyBlocked();
+                    self.onChange.notifyLocked();
                 }
                 return self;
             },
@@ -2125,11 +2158,11 @@
          */
         function addRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -2137,43 +2170,43 @@
 
         function updateRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 for (var i = 0; i < rows.length; i++) {
                     updateRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setRows(rows) {
             if (rows.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
                 for (var i = 0; i < rows.length; i++) {
                     addRow(rows[i]);
                 }
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
 
         function setRowsProperty(propertyName, propertyValue) {
-            self.onChange.blockEvents();
+            self.onChange.lock();
             for (var i = 0; i < data.length; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
-            self.onChange.notifyBlocked();
+            self.onChange.notifyLocked();
             return self;
         }
 
 
         function deleteRows() {
             if (data.length) {
-                self.onChange.blockEvents();
+                self.onChange.lock();
                 data = [];
-                self.onChange.notifyBlocked();
+                self.onChange.notifyLocked();
             }
             return self;
         }
@@ -2384,7 +2417,7 @@
         $.extend(this, {
             "destroy": destroy,
 
-            "onChange": new SmallGrid.Event.Handler(),
+            "onChange": SmallGrid.Callback.Create(),
 
             "filter": filter,
             "reduce": reduce,
@@ -2627,31 +2660,21 @@
         }
 
         function buildHeaderColumnCss(column, opts, isLastColumn) {
-            var cellCssClass = settings.cssClass.headerCell;
+            var cellCssClass = [settings.cssClass.headerCell];
 
             if (column.headerCssClass) {
-                cellCssClass += " " + column.headerCssClass;
+                cellCssClass.push(column.headerCssClass);
             }
 
             if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
+                cellCssClass.push(settings.cssClass.cellColumnLast);
             }
-
-            switch (column.align) {
-                case "center":
-                    cellCssClass += " " + settings.cssClass.cellAlignCenter;
-                    break;
-                case "right":
-                    cellCssClass += " " + settings.cssClass.cellAlignRight;
-                    break;
-            }
-
 
             if (column.sortable || column.filterable) {
-                cellCssClass += " " + settings.cssClass.cursorPointer;
+                cellCssClass.push(settings.cssClass.cursorPointer);
             }
 
-            return cellCssClass;
+            return self.onHeaderColumnCss.notify(cellCssClass, { column: column, opts: opts, isLastColumn: isLastColumn }).join(" ");
         }
 
         function buildHeaderColumnHtml(column, opts, isLastColumn) {
@@ -2661,17 +2684,17 @@
 
 
             if (column.sortable && column.sortOrder !== 0) {
-                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "'></span>";
+                html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "' data-click-type='sort'></span>";
             }
 
             if (column.filterable) {
-                html += "<span class='" + settings.cssClass.headerFilter + "'></span>";
+                html += "<span class='" + settings.cssClass.headerFilter + "' data-click-type='menu'></span>";
             }
 
             html += "</div>";
 
             if (column.resizeable) {
-                html += "<span class='" + settings.cssClass.headerResizeHandle + "'></span>";
+                html += "<span class='" + settings.cssClass.headerResizeHandle + "' data-click-type='resize'></span>";
             }
 
             return html + "</td>";
@@ -2726,26 +2749,11 @@
         }
 
         function buildRowCss(columns, row, opts, isLastRow) {
-            var rowCssClass = settings.cssClass.row + (row.calcIndex & 1 === 1 ? " " + settings.cssClass.rowEven : " " + settings.cssClass.rowOdd);
+            var rowCssClass = [settings.cssClass.row, row.calcIndex & 1 === 1 ? settings.cssClass.rowEven : settings.cssClass.rowOdd];
 
-            if (row.rowCssClass) rowCssClass += " " + row.rowCssClass;
+            if (row.rowCssClass) rowCssClass.push(row.rowCssClass);
 
-            switch (row.valign || settings.rows.valign) {
-                case "middle":
-                    rowCssClass += " " + settings.cssClass.rowValignMiddle;
-                    break;
-                case "top":
-                    rowCssClass += " " + settings.cssClass.rowValignTop;
-                    break;
-                case "bottom":
-                    rowCssClass += " " + settings.cssClass.rowValignBottom;
-                    break;
-                case "baseline":
-                    rowCssClass += " " + settings.cssClass.rowValignBaseline;
-                    break;
-            }
-
-            return rowCssClass;
+            return self.onRowCss.notify(rowCssClass, { columns: columns, row: row, opts: opts, isLastRow: isLastRow }).join(" ");
         }
 
         function buildRowHtml(columns, row, opts, isLastRow) {
@@ -2762,36 +2770,24 @@
         }
 
         function buildCellCss(column, row, opts, isLastColumn, isLastRow) {
-            var cellCssClass = settings.cssClass.cell;
+            var cellCssClass = [settings.cssClass.cell];
             if (column.cellCssClass) {
-                cellCssClass += " " + column.cellCssClass;
+                cellCssClass.push(column.cellCssClass);
             }
 
             if (isLastColumn && opts.hideColumnBorder) {
-                cellCssClass += " " + settings.cssClass.cellColumnLast;
+                cellCssClass.push(settings.cssClass.cellColumnLast);
             }
 
             if (isLastRow && opts.hideRowBorder) {
-                cellCssClass += " " + settings.cssClass.cellRowLast;
-            }
-
-            if (column.align === "center") {
-                cellCssClass += " " + settings.cssClass.cellAlignCenter;
-            }
-
-            if (column.align === "right") {
-                cellCssClass += " " + settings.cssClass.cellAlignRight;
+                cellCssClass.push(settings.cssClass.cellRowLast);
             }
 
             if (row.cellCssClass && column.field in row.cellCssClass) {
-                cellCssClass += " " + row.cellCssClass[column.field];
+                cellCssClass.push(row.cellCssClass[column.field]);
             }
 
-            if (row.editMode === true && column.editMode === true) {
-                cellCssClass += " " + settings.cssClass.cellEdit;
-            }
-
-            return cellCssClass;
+            return self.onCellCss.notify(cellCssClass, { column: column, row: row, opts: opts, isLastColumn: isLastColumn, isLastRow: isLastRow }).join(" ");
         }
 
         function buildCellHtml(column, row, opts, isLastColumn, isLastRow) {
@@ -2830,7 +2826,11 @@
             "buildColsHtml": buildColsHtml,
             "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
-            "buildViewPortElements": buildViewPortElements
+            "buildViewPortElements": buildViewPortElements,
+
+            "onHeaderColumnCss": SmallGrid.Callback.Create(),
+            "onRowCss": SmallGrid.Callback.Create(),
+            "onCellCss": SmallGrid.Callback.Create()
         });
     }
 
@@ -3002,6 +3002,17 @@
         }
 
         /*
+         * Column func
+         */
+        function isColumnVisible(columnId) {
+            var column = viewModel.getColumnById(columnId);
+            if (column) {
+                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
+            }
+            return false;
+        }
+
+        /*
          * Row func
          */
         function isRowVisible(rowId) {
@@ -3043,17 +3054,6 @@
             if (rowIndex !== -1 && columnIndex !== -1) {
                 return getCellNodeByIndex(columnIndex, rowIndex);
             }
-        }
-
-        /*
-         * Column func
-         */
-        function isColumnVisible(columnId) {
-            var column = viewModel.getColumnById(columnId);
-            if (column) {
-                return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
-            }
-            return false;
         }
 
         /*
@@ -3207,36 +3207,12 @@
         }
 
         /*
-         * Calc private funcs
+         * Event funcs
          */
-        function getColumnEventType(targetClass, column) {
-            var type = "";
-            if (column.resizeable && targetClass.indexOf(settings.cssClass.headerResizeHandle) !== -1) {
-                type = "resize";
-            } else if (column.filterable && targetClass.indexOf(settings.cssClass.headerFilter) !== -1) {
-                type = "filter";
-            } else if (column.sortable) {
-                type = "sort";
-            }
-            return type;
-        }
-
-        //todo: fix multiple types, edit && select, remove, add type registration
-        function getCellEventType(targetClass, column, row) {
-            var type = "";
-            if (row.editable === true && column.editable === true) {
-                type = "edit";
-            } else if (row.disabled === true) {
-                type = "disabled";
-            }
-            return type;
-        }
-
         function getColumnEvent(evt) {
             var column = viewModel.getColumnByIndex(evt.cellIndex);
             if (column) {
-                evt.type = getColumnEventType($(evt.event.target).attr("class"), column);
-                evt.targetClass = $(evt.event.target).attr("class");
+                evt.type = $(evt.event.target).attr("data-click-type") || "";
                 evt.column = column;
                 return evt;
             }
@@ -3245,15 +3221,15 @@
         function getCellEvent(evt) {
             var column = viewModel.getColumnByIndex(evt.cellIndex);
             var row = viewModel.getRowByIndex(evt.rowIndex);
-
             if (column && column.field.length > 0 && row && column.field in row.item) {
-
-                evt.type = getCellEventType($(evt.event.target).attr("class"), column, row);
                 evt.row = row;
                 evt.column = column;
-
                 return evt;
             }
+        }
+
+        function notifyEvent(evt, handlerName) {
+            self[handlerName].notify(evt);
         }
 
         /*
@@ -3336,7 +3312,6 @@
 
         function handleColumnsChange() {
             modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
-
             applyModelChange();
             render();
         }
@@ -3470,9 +3445,7 @@
             }
         }
 
-        function notifyEvent(evt, handlerName) {
-            self[handlerName].notify(evt);
-        }
+
 
         $.extend(this, {
             "init": init,
@@ -3498,39 +3471,39 @@
             "resumeRender": resumeRender,
             "suspendRender": suspendRender,
 
-            "onViewResized": new SmallGrid.Event.Handler(),
-            "onViewScrollChange": new SmallGrid.Event.Handler(),
+            "onViewResized": SmallGrid.Event.Create(),
+            "onViewScrollChange": SmallGrid.Event.Create(),
 
-            "onScroll": new SmallGrid.Event.Handler(),
-            "onScrollStart": new SmallGrid.Event.Handler(),
-            "onScrollStop": new SmallGrid.Event.Handler(),
+            "onScroll": SmallGrid.Event.Create(),
+            "onScrollStart": SmallGrid.Event.Create(),
+            "onScrollStop": SmallGrid.Event.Create(),
 
-            "onMouseWheel": new SmallGrid.Event.Handler(),
-            "onMouseWheelStart": new SmallGrid.Event.Handler(),
-            "onMouseWheelStop": new SmallGrid.Event.Handler(),
+            "onMouseWheel": SmallGrid.Event.Create(),
+            "onMouseWheelStart": SmallGrid.Event.Create(),
+            "onMouseWheelStop": SmallGrid.Event.Create(),
 
-            "onDocumentClick": new SmallGrid.Event.Handler(),
-            "onDocumentResize": new SmallGrid.Event.Handler(),
-            "onDocumentContextMenu": new SmallGrid.Event.Handler(),
+            "onDocumentClick": SmallGrid.Event.Create(),
+            "onDocumentResize": SmallGrid.Event.Create(),
+            "onDocumentContextMenu": SmallGrid.Event.Create(),
 
-            "onHeaderClick": new SmallGrid.Event.Handler(),
-            "onHeaderContextMenu": new SmallGrid.Event.Handler(),
-            "onHeaderDblClick": new SmallGrid.Event.Handler(),
+            "onHeaderClick": SmallGrid.Event.Create(),
+            "onHeaderContextMenu": SmallGrid.Event.Create(),
+            "onHeaderDblClick": SmallGrid.Event.Create(),
 
-            "onCellClick": new SmallGrid.Event.Handler(),
-            "onCellContextMenu": new SmallGrid.Event.Handler(),
-            "onCellDblClick": new SmallGrid.Event.Handler(),
-            "onCellKeyDown": new SmallGrid.Event.Handler(),
+            "onCellClick": SmallGrid.Event.Create(),
+            "onCellContextMenu": SmallGrid.Event.Create(),
+            "onCellDblClick": SmallGrid.Event.Create(),
+            "onCellKeyDown": SmallGrid.Event.Create(),
 
-            "onColumnResize": new SmallGrid.Event.Handler(),
-            "onColumnResizeStart": new SmallGrid.Event.Handler(),
-            "onColumnResizeStop": new SmallGrid.Event.Handler(),
+            "onColumnResize": SmallGrid.Event.Create(),
+            "onColumnResizeStart": SmallGrid.Event.Create(),
+            "onColumnResizeStop": SmallGrid.Event.Create(),
 
-            "onAfterRowsRendered": new SmallGrid.Event.Handler(),
-            "onBeforeRowsRendered": new SmallGrid.Event.Handler(),
+            "onAfterRowsRendered": SmallGrid.Event.Create(),
+            "onBeforeRowsRendered": SmallGrid.Event.Create(),
 
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create()
         });
     }
 
@@ -3825,11 +3798,13 @@
                 rowsCache = rowsRequest.getRowsInRange(point.top, size.height, outerSize.height, newRowSorters, rowFilters);
                 newRowSorters = [];
                 updateCacheHeight(rowsCache, size, outerSize);
+                self.onCacheRowsChange.notify({});
             }
 
             if (columnsCached === 0) {
                 columnsCache = columnsRequest.getColumnsInRange(point.left, size.width, outerSize.width);
                 updateCacheWidth(columnsCache, size, outerSize);
+                self.onCacheColumnsChange.notify({});
             }
 
             return {
@@ -3894,10 +3869,13 @@
             "getRows": getRows,
             "getRowsHeight": getRowsHeight,
 
-            "onColumnsChange": new SmallGrid.Event.Handler(),
-            "onDestroy": new SmallGrid.Event.Handler(),
-            "onInitialize": new SmallGrid.Event.Handler(),
-            "onRowsChange": new SmallGrid.Event.Handler()
+            "onInitialize": SmallGrid.Callback.Create(),
+            "onDestroy": SmallGrid.Callback.Create(),
+
+            "onColumnsChange": SmallGrid.Callback.Create(),
+            "onRowsChange": SmallGrid.Callback.Create(),
+            "onCacheColumnsChange": SmallGrid.Callback.Create(),
+            "onCacheRowsChange": SmallGrid.Callback.Create()
         });
     }
 
@@ -4213,8 +4191,10 @@ if (typeof SmallGrid === "undefined") {
             },
             Footer: {
                 enabled: false,
+            },
+            CellAlign: {
+                enabled: false,
             }
-
         }
     };
 

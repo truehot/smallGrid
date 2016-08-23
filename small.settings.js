@@ -108,8 +108,10 @@ if (typeof SmallGrid === "undefined") {
             },
             Footer: {
                 enabled: false,
+            },
+            CellAlign: {
+                enabled: false,
             }
-
         }
     };
 

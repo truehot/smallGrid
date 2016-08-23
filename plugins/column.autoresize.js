@@ -13,6 +13,13 @@
          * Init && destroy
          */
         function init() {
+            //register plugin settings
+            if (!settings.plugins.AutoResize) {
+                settings.plugins.AutoResize = {
+                    enabled: false
+                };
+            }
+
             context.view.onViewResized.subscribe(handleViewResized);
             return self;
         }

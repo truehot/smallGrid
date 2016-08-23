@@ -14,6 +14,13 @@
          * Init && destroy
          */
         function init() {
+            //register plugin settings
+            if (!settings.plugins.ColumnSort) {
+                settings.plugins.ColumnSort = {
+                    enabled: false
+                };
+            }
+
             context.view.onHeaderClick.subscribe(handleHeaderClick);
             return self;
         }
@@ -26,7 +33,7 @@
          * Handlers
          */
         function handleHeaderClick(evt) {
-            if (evt && evt.type && evt.type === "sort" && settings.plugins.ColumnSort.enabled === true) {
+            if (evt && (evt.type === "" || evt.type === "sort") && settings.plugins.ColumnSort.enabled === true) {
                 var request = context.view.suspendRender();
                 sortColumn(evt.column);
                 context.view.resumeRender(request);

@@ -1,6 +1,6 @@
-﻿/* Common styles, Please change styles only in custom.css */
+/* Common styles, Please change styles only in custom.css */
 
-.grid-table, .grid-header-table, .grid-col, .grid-cell {
+.grid-table, .grid-header-table, .grid-col, .grid-cell, .grid-footer {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 16px;
@@ -28,9 +28,12 @@
 }
 
 .grid-footer {
-    visibility: hidden;
+    height:18px;
+    margin-top: 1px;
+    display: none;
     overflow: hidden;
     outline: 1px solid #ffcccc;
+    padding: 4px;
 }
 
 .grid-content-wrap, .grid-header-wrap {

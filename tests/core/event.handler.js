@@ -1,10 +1,10 @@
 QUnit.module("SmallGrid");
-QUnit.test("Event", function (assert) {
+QUnit.test("Event.Hanlder", function (assert) {
 
     var counter = 0;
     var event = getEvent();
     var eventArgs = new SmallGrid.Event.Data(event);
-    var handler = new SmallGrid.Event.Handler();
+    var handler = new SmallGrid.Event.Create();
 
     assert.ok(eventArgs.isPropagationStopped() === false, "isPropagationStopped");
     eventArgs.stopPropagation();
@@ -28,11 +28,7 @@ QUnit.test("Event", function (assert) {
 
     assert.ok(counter === 1, "notify");
 
-    handler.unsubscribeLast();
-
-    handler.notify({ "counter": 1 });
-
-    assert.ok(counter === 1, "unsubscribeLast");
+    handler = new SmallGrid.Event.Handler();
 
     counter = 0;
 
@@ -41,12 +37,11 @@ QUnit.test("Event", function (assert) {
             counter++;
         });
     }
-    handler.unsubscribeLast();
 
     handler.notify({ "counter": 1 });
     handler.unsubscribeAll();
 
-    assert.ok(counter === 9, "unsubscribeAll");
+    assert.equal(counter, 10, "unsubscribeAll");
 
     counter = 0;
     handler.subscribe(first);
@@ -55,14 +50,6 @@ QUnit.test("Event", function (assert) {
 
     handler.unsubscribe(first);
     handler.notify({ "counter": 1 });
-    assert.ok(counter === 1, "unsubscribe");
-
-    counter = 0;
-    handler.subscribe(first);
-    handler.blockEvents();
-    handler.notify({ "counter": 1 });
-    handler.notify({ "counter": 1 });
-    handler.notifyBlocked();
     assert.ok(counter === 1, "unsubscribe");
 
     function first(e) {
