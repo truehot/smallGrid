@@ -5,6 +5,29 @@ SmallGrid is javascript component for displaying tabular data.
 
 > [Demo link](http://truehot.github.io/smallGrid/examples/example1.html).
 
+## What is done
+- [x] Sorting
+- [x] Filtering
+- [x] Column resizing
+- [x] Rows virtualization
+- [x] Columns virtualization
+- [x] Cell formatters
+- [x] Cell editors
+- [x] View events
+- [x] Support for different row height
+- [x] Css styles for rows/cells
+- [x] Plugins
+
+## Planning
+- [ ] Editor validators
+- [ ] Keyboard support (navigation)
+- [ ] Row details 
+- [ ] Frozen columns
+- [ ] Column types
+- [ ] Fullscreen support
+- [ ] Cell templates
+- [ ] Grouping
+
 ## Requires
 
 - jQuery >= 2.1.4
