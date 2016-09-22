@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Basic configuration</title>
@@ -20,11 +20,10 @@
             var columns = [
                 { 'name': "Name", 'field': "name", 'width': 100 },
                 { 'name': "Surname", 'field': "surname", 'width': 100 },
-                { 'name': "Age", 'field': "age", 'width': 80, align:'center' },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
                 { 'name': "Phone", 'field': "phone", 'width': 150 },
                 { 'name': "Email", 'field': "email", 'width': 200 },
             ];
-
 
             var grid;
             $.getJSON("generated50.json", function (items) {

@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Column checkbox example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.all.css" type="text/css" />
+    <script src="../libs/jquery-2.1.4.min.js"></script>
+    <script src="../small.grid.all.min.js"></script>
+    <link rel="stylesheet" href="example.css" type="text/css" />
+    <script src="example.js"></script>
+</head>
+<body>
+    <div>
+        <div class="small-grid" style="width: 600px; height: 500px;"></div>
+        <div class="additional-actions">
+            <button class="one">Toggle every 2nd</button>
+            <button class="two">Toggle every 3rd</button>
+            <button class="three">Check all</button>
+            <button class="four">Uncheck all</button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var columns = [
+                { 'name': "Checkbox", 'field': "isActive", 'width': 30, editor: 'Checkbox', headerFormatter: 'Checkbox', formatter: 'Checkbox', align: 'center', sortable: false, 'filterable': false },
+                { 'name': "Name", 'field': "name", 'width': 100 },
+                { 'name': "Surname", 'field': "surname", 'width': 100 },
+                { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
+                { 'name': "Phone", 'field': "phone", 'width': 150 },
+                { 'name': "Email", 'field': "email", 'width': 200 },
+            ];
+
+            var grid;
+            $.getJSON("generated50.json", function (items) {
+                grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
+                var settings = grid.getSettings();
+                settings.plugins.CellEdit.editOnClick = true;
+            });
+
+            $('.one').on('click', function () {
+                var plugin = grid.getPlugin("ColumnCheckbox");
+                plugin.toggleColumnByIndex(0, function (column, row) {
+                    row.item[column.field] = !(row.calcIndex % 2 ? !row.item[column.field] : row.item[column.field]);
+                });
+            });
+
+            $('.two').on('click', function () {
+                var plugin = grid.getPlugin("ColumnCheckbox");
+                plugin.toggleColumnByIndex(0, function (column, row) {
+                    row.item[column.field] = !(row.calcIndex % 3 ? !row.item[column.field] : row.item[column.field]);
+                });
+            });
+
+            $('.three').on('click', function () {
+                var plugin = grid.getPlugin("ColumnCheckbox");
+                plugin.checkColumnByIndex(0);
+            });
+
+            $('.four').on('click', function () {
+                var plugin = grid.getPlugin("ColumnCheckbox");
+                plugin.uncheckColumnByIndex(0);
+            });
+        });
+    </script>
+</body>
+</html>

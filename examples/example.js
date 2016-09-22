@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var menus = ["Basic configuration", "Sortable columns", "Filterable columns", "Background of columns/rows/cells", "Resizeable columns", "Random rows height and columns width", "Cell editors", "100 000 rows", "Columns alignment", "Row selection", "Few on the same page", "Add/update/delete rows", "Column picker plugin"];
+    var menus = ["Basic configuration", "Sortable columns plugin", "Filterable columns plugin", "Background of columns/rows/cells", "Resizeable columns plugin", "Random rows height and columns width", "Cell editors plugin", "100 000 rows", "Columns alignment plugin", "Row selection plugin", "Few on the same page", "Add/update/delete rows", "Column picker plugin", "Column checkbox plugin"];
     var ul = $('<ul class="menu"/>');
     var activeFile = document.location.href.match(/[^\/]+$/)[0];
 
