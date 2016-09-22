@@ -21,6 +21,8 @@ QUnit.test("View", function (assert) {
         "width": 500
     }, "getContentSize");
 
+    assert.deepEqual(view.getColumnNodeById(0), undefined, "getColumnNodeById");
+    assert.deepEqual(view.getColumnNodeByIndex(0), undefined, "getColumnNodeByIndex");
     assert.deepEqual(view.getCellNodeById(0, 0), undefined, "getCellNodeById");
     assert.deepEqual(view.getCellNodeByIndex(0, 0), undefined, "getCellNodeByIndex");
     assert.deepEqual(view.getNode('content').html(), $wrapper.find('.grid-content').html(), "getNode");
@@ -48,6 +50,12 @@ QUnit.test("View", function (assert) {
     var rows = rowsModel.getRows();
     var columns = columnsModel.getColumns();
 
+
+    assert.deepEqual(view.getColumnNodeById(columns[0].id).tagName, 'TD', "getColumnNodeById");
+    assert.deepEqual(view.getColumnNodeById(columns[0].id).innerHTML, "<div class=\"grid-header-cell-div\"><span class=\"grid-column-name\">" + columns[0].name + "</span></div><span class=\"grid-resizable-handle\" data-click-type=\"resize\"></span>", "getColumnNodeById");
+
+    assert.deepEqual(view.getColumnNodeByIndex(0).tagName, 'TD', "getColumnNodeByIndex");
+    assert.deepEqual(view.getColumnNodeByIndex(0).innerHTML, "<div class=\"grid-header-cell-div\"><span class=\"grid-column-name\">" + columns[0].name + "</span></div><span class=\"grid-resizable-handle\" data-click-type=\"resize\"></span>", "getColumnNodeByIndex");
 
     assert.equal(view.getCellNodeById(columns[0].id, rows[0].id).tagName, 'TD', "getCellNodeById");
     assert.equal(view.getCellNodeById(columns[0].id, rows[0].id).innerHTML, rows[0].item.test, "getCellNodeById");

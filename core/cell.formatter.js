@@ -19,7 +19,7 @@
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return value != null ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return value !== null && value!==undefined ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {

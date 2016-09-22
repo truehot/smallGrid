@@ -7,7 +7,7 @@
                 "Default": mixedComparer,
                 "Date": dateComparer,
                 "Number": numberComparer,
-                "String": stringComparer,
+                "String": stringComparer
             }
         }
     });

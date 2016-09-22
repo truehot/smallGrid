@@ -4,7 +4,7 @@
     $.extend(true, SmallGrid, {
         "Callback": {
             "Handler": CallbackHandler,
-            "Create": Create,
+            "Create": Create
         }
     });
 
@@ -43,7 +43,7 @@
             return result;
         }
 
-        for (var i = 0; i < this.handlers.length; i++) {
+        for (var i = 0, len = this.handlers.length; i < len; i++) {
             result = this.handlers[i].apply(null, arguments);
         }
         return result;

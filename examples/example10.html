@@ -15,21 +15,24 @@
         <div class="small-grid" style="width: 600px; height: 500px;"></div>
         <div class="additional-actions">
             <label><input type="checkbox" class="multiselect" /> Enable multiple row selection</label>
-            <button class="selectFirstRow">Select first row</button>
-            <button class="selectFewRows">Select 5 rows</button>
-            <button class="deselectRows">Clear row selection</button>
+            <button class="selectFirstRow">Select first</button>
+            <button class="selectFewRows">Select first 5</button>
+            <button class="deselectRows">Clear selection</button>
+            <button class="showColumn">Show column</button>
         </div>
     </div>
 
     <script>
         $(document).ready(function () {
             var columns = [
+                { 'field': "isActive", 'width': 100, sortable: false, 'filterable': false, editor: 'Checkbox', headerFormatter: 'SelectionCheckbox', align: 'center', formatter: 'Checkbox', 'hidden': true },
                 { 'name': "Name", 'field': "name", 'width': 100 },
                 { 'name': "Surname", 'field': "surname", 'width': 100 },
                 { 'name': "Age", 'field': "age", 'width': 80, align: 'center' },
                 { 'name': "Phone", 'field': "phone", 'width': 100 },
                 { 'name': "Email", 'field': "email", 'width': 100 },
             ];
+
 
             var grid;
             $.getJSON("generated50.json", function (items) {
@@ -55,6 +58,12 @@
                 var plugin = grid.getPlugin("RowSelection");
                 plugin.deselectAllRows();
             });
+
+            $('.showColumn').on('click', function () {
+                grid.getColumnsModel().setColumnPropertyByIndex(0, "hidden", false);
+            });
+
+
         });
     </script>
 

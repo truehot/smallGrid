@@ -17,6 +17,7 @@ QUnit.test("Builder", function (assert) {
     var colsHtml = builder.buildColsHtml(columns.getColumns(), opts);
     var rowsHtml = builder.buildRowsHtml(columns.getColumns(), rows.getRows(), opts);
     var cellHtml = builder.buildCellContentHtml(columns.getColumnByIndex(0), rows.getRowByIndex(0));
+    var headerCellHtml = builder.buildHeaderCellContentHtml(columns.getColumnByIndex(0));
 
     assert.equal(Object.keys(el).length, 14, "buildViewPortElements");
 
@@ -30,6 +31,10 @@ QUnit.test("Builder", function (assert) {
     assert.equal(rowsHtml, "<tr class='grid-row grid-row-odd'><td height='20' class='grid-cell'>" + row.test + "</td><td class='grid-cell grid-cell-column-last'></td></tr>", "buildRowsHtml");
 
     assert.equal(cellHtml, row.test, "buildCellContentHtml");
+
+    assert.equal(headerCellHtml, "<div class='grid-header-cell-div'><span class='grid-column-name'>" + columns.getColumnByIndex(0).name + "</span></div><span class='grid-resizable-handle' data-click-type='resize'></span>", "buildHeaderCellContentHtml");
+
+
 
     function getColumn(field) {
         return {

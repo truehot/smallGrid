@@ -168,6 +168,22 @@
             return false;
         }
 
+        /* 
+         * Column func
+         */
+        function getColumnNodeByIndex(columnIndex) {
+            if (el.headerTbody[0].rows[0]) {
+                return el.headerTbody[0].rows[0].cells[columnIndex];
+            }
+        }
+
+        function getColumnNodeById(columnId) {
+            var columnIndex = viewModel.getColumnIndexById(columnId);
+            if (columnIndex !== -1) {
+                return getColumnNodeByIndex(columnIndex);
+            }
+        }
+
         /*
          * Row func
          */
@@ -399,7 +415,7 @@
 
             modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
             modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
-            applyModelChange();
+            applyModelChange(true);
 
             self.onViewResized.notify({});
 
@@ -426,11 +442,11 @@
             return visibility;
         }
 
-        function applyModelChange() {
+        function applyModelChange(isResized) {
 
             var visibility = scrollVisibility;
             scrollVisibility = getScrollVisibility(modelSize, contentSize, settings.scrollbarDimensions);
-            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal) {
+            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal || isResized) {
                 //force chrome hide scrolls
                 el.content.css({ 'overflow': scrollVisibility.vertical || scrollVisibility.horisontal ? 'auto' : 'hidden' });
 
@@ -615,6 +631,8 @@
             "getNode": getNode,
             "getRowNodeById": getRowNodeById,
             "getRowNodeByIndex": getRowNodeByIndex,
+            "getColumnNodeById": getColumnNodeById,
+            "getColumnNodeByIndex": getColumnNodeByIndex,
             "isCellVisible": isCellVisible,
             "isColumnVisible": isColumnVisible,
             "isHorisontalScrollVisible": isHorisontalScrollVisible,

@@ -9,8 +9,8 @@ QUnit.test("Formatter", function (assert) {
     assert.equal(SmallGrid.Cell.Formatter.Default("<div>test</div>", {}, {}, settings), "&lt;div&gt;test&lt;/div&gt;", "Default");
     assert.equal(SmallGrid.Cell.Formatter.Text(undefined, {}, {}, settings), "", "Text");
 
-    assert.ok(SmallGrid.Cell.Formatter.Checkbox(true, {}, {}, settings) === "<i class='fa fa-check-square-o'></i>", "Checkbox");
-    assert.ok(SmallGrid.Cell.Formatter.Checkbox(false, {}, {}, settings) === "<i class='fa fa-square-o'></i>", "Checkbox");
+    assert.equal(SmallGrid.Cell.Formatter.Checkbox(true, {}, {}, settings),"<i class='fa fa-check-square-o'></i>", "Checkbox");
+    assert.equal(SmallGrid.Cell.Formatter.Checkbox(false, {}, {}, settings),"<i class='fa fa-square-o'></i>", "Checkbox");
 
     assert.ok(SmallGrid.Cell.Formatter.Float(6.666, {}, {}, settings) === "6.67", "Float");
     assert.ok(SmallGrid.Cell.Formatter.Float(1000.66, {}, {}, settings) === "1,000.66", "Float");

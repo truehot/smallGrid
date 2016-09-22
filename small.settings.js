@@ -17,6 +17,7 @@ if (typeof SmallGrid === "undefined") {
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
+            disabledColor: "disabled-color",
             cell: "grid-cell",
             cellEdit: "grid-cell-edit",
             cellColumnLast: "grid-cell-column-last",
@@ -76,20 +77,20 @@ if (typeof SmallGrid === "undefined") {
                 }
             },
             dateFormatter: {
-                locales: 'en-US',
+                locales: 'en-GB',
                 options: {}
             }
         },
 
         plugins: {
             AutoResize: {
-                enabled: true,
+                enabled: true
             },
             ColumnSort: {
-                enabled: true,
+                enabled: true
             },
             ColumnResize: {
-                enabled: true,
+                enabled: true
             },
             RowSelection: {
                 enabled: true,
@@ -100,17 +101,20 @@ if (typeof SmallGrid === "undefined") {
                 editOnClick: false,//when true, editor loaded after click
                 autoFocus: true//autofocus edited cell when scrolling
             },
+            ColumnCheckbox: {
+                enabled: true
+            },
             ColumnFilterMenu: {
-                enabled: true,
+                enabled: true
             },
             ColumnPickerMenu: {
-                enabled: true,
+                enabled: true
             },
             Footer: {
-                enabled: false,
+                enabled: false
             },
             CellAlign: {
-                enabled: false,
+                enabled: false
             }
         }
     };

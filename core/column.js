@@ -18,6 +18,7 @@
     ColumnData.prototype.field = ""; //cell content will be taken from value of this property in row
     ColumnData.prototype.filterable = false;//true when column is filterable
     ColumnData.prototype.formatter = "Default";//default cell content formatter
+    ColumnData.prototype.headerFormatter = "Default";//default header cell content formatter
     ColumnData.prototype.headerCssClass = "";//css class for column header cell
     ColumnData.prototype.hidden = false;//true when column is visible
     ColumnData.prototype.id = undefined;//column unique indicator
@@ -45,7 +46,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -63,7 +64,7 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
@@ -73,7 +74,7 @@
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -82,7 +83,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -144,7 +145,7 @@
         function addColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -161,7 +162,7 @@
         }
 
         function deleteColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -190,7 +191,7 @@
         }
 
         function getColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -206,7 +207,7 @@
         }
 
         function getColumnIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -273,9 +274,9 @@
         }
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -286,7 +287,7 @@
         }
 
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
@@ -297,7 +298,7 @@
             if (columns.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -308,7 +309,7 @@
 
         function setColumnsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
@@ -325,7 +326,7 @@
 
         function updateColumnById(id, column) {
             if (column instanceof ColumnData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = column;
                         self.onChange.notify({ "id": id });
@@ -349,7 +350,7 @@
         function updateColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     updateColumn(columns[i]);
                 }
                 self.onChange.notifyLocked();
@@ -380,6 +381,7 @@
                 if ("editMode" in item) column.editMode = item.editMode;
                 if ("filterable" in item) column.filterable = item.filterable;
                 if ("formatter" in item) column.formatter = item.formatter;
+                if ("headerFormatter" in item) column.headerFormatter = item.headerFormatter;
                 if ("headerCssClass" in item) column.headerCssClass = item.headerCssClass;
                 if ("hidden" in item) column.hidden = item.hidden;
                 if ("maxWidth" in item) column.maxWidth = item.maxWidth;

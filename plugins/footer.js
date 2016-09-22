@@ -55,9 +55,9 @@
          * Other
          */
         function updateFooter(newTotalRows, newTotalColumns) {
-            if (newTotalColumns == 0) {
+            if (newTotalColumns === 0) {
                 updateNode(0, 0, 0);
-            } else if (totalRows != newTotalRows) {
+            } else if (totalRows !== newTotalRows) {
                 var rows = context.viewModel.getRows();
                 if (rows.length) {
                     totalRows = newTotalRows;
@@ -67,7 +67,7 @@
         }
 
         function updateNode(totalRows, fromRow, toRow) {
-            var el = context.view.getNode('footer')
+            var el = context.view.getNode('footer');
             if (totalRows) {
                 el.html("Showing " + fromRow + " to " + toRow + " of  " + totalRows);
             } else {

@@ -244,6 +244,10 @@
         /*
          * Data calculations
          */
+        function requestRowsCallback(callback) {
+            return rowsRequest.getRowsCallback(callback, rowFilters);
+        }
+
         function getRowsHeight(cellOuterSize) {
             rowsTotal = rowsRequest.getRowsTotal(cellOuterSize.height, rowFilters);
             return rowsTotal.height;
@@ -309,6 +313,7 @@
             "getRowsTotal": getRowsTotal,
             "getColumnsTotal": getColumnsTotal,
 
+            "requestRowsCallback": requestRowsCallback,
             "requestDataFromRange": requestDataFromRange,
 
             "clearFilterByField": clearFilterByField,

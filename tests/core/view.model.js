@@ -16,6 +16,10 @@ QUnit.test("Model", function (assert) {
 
     assert.deepEqual(viewModel.requestDataFromRange({ top: 0, left: 0 }, { width: 0, height: 0 }, 0, 0, 0), { "columns": [], "isCached": 0, "rows": [] }, "requestDataFromRange");
 
+    var counter = 0;
+    viewModel.requestRowsCallback(function () { counter++; });
+    assert.equal(counter, 0, "requestRowsCallback");
+
     //sorters
     viewModel.setSorter(sorter);
     assert.ok(viewModel.getSorters()[0].getField() === sorter.getField(), "setSorter && getSorters");
@@ -88,6 +92,10 @@ QUnit.test("Model", function (assert) {
         { "columns": columns, "isCached": 0, "rows": rows },
         "requestDataFromRange"
     );
+
+    counter = 0;
+    viewModel.requestRowsCallback(function () { counter++; });
+    assert.equal(counter, 1, "requestRowsCallback");
 
     assert.deepEqual(viewModel.getColumns(), columns, "getColumns");
     assert.deepEqual(viewModel.getColumnById(columns[0].id), columns[0], "getColumnById");

@@ -84,7 +84,7 @@
             eventData = new EventData(eventData);
         }
 
-        for (var i = 0; i < this.handlers.length && eventData.isImmediatePropagationStopped() === false; i++) {
+        for (var i = 0, len = this.handlers.length; i < len && eventData.isImmediatePropagationStopped() === false; i++) {
             if (this.handlers[i].call(null, eventData) === false) {
                 this.stopImmediatePropagation();
                 break;

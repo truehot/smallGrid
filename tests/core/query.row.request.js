@@ -19,11 +19,13 @@ QUnit.test("Row.Request", function (assert) {
     assert.ok(rowsRequest.getRowsTotal(2, []).height === 1320, "getRowsTotal");
     assert.deepEqual(rowsRequest.getRowsTotal(20, []), { count: 60, height: 2400 }, "getRowsTotal");
     assert.deepEqual(rowsRequest.getRowsTotal(20, [filter1]), { count: 7, height: 280 }, "getRowsTotal (filtered)");
-
+    assert.deepEqual(rowsRequest.getRowsTotal(20, [filter1]), { count: 7, height: 280 }, "getRowsTotal (filtered)");
     assert.equal(rowsRequest.getRowsInRange(1, 5, 2, [], [])[0].item.property1, 11, "getRowsInRange");
     assert.equal(rowsRequest.getRowsInRange(1, 5, 2, [sorter], [filter1])[0].item.property1, 61, "getRowsInRange (sorted and filtered)");
     assert.equal(rowsRequest.getRowsInRange(2000, 500, 20, [], [])[0].item.property1, 371, "getRowsInRange");
 
+    rowsRequest.getRowsCallback(function (item) { item.item.property1 = 10000; }, [filter1]);
+    assert.equal(rowsModel.getRows()[5].item.property1, 10000, "getRowsCallback");
 });
 
 

@@ -4,7 +4,7 @@
     $.extend(true, SmallGrid, {
         "Callback": {
             "Handler": CallbackHandler,
-            "Create": Create,
+            "Create": Create
         }
     });
 
@@ -43,7 +43,7 @@
             return result;
         }
 
-        for (var i = 0; i < this.handlers.length; i++) {
+        for (var i = 0, len = this.handlers.length; i < len; i++) {
             result = this.handlers[i].apply(null, arguments);
         }
         return result;
@@ -373,7 +373,7 @@
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return value != null ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return value !== null && value!==undefined ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {
@@ -423,12 +423,43 @@
     "use strict";
 
     $.extend(true, SmallGrid, {
+        "Cell": {
+            "HeaderFormatter": {
+                "Default": defaultFormatter,
+                "Checkbox": checkboxFormatter,
+                "SelectionCheckbox": selectionCheckboxFormatter,
+                "Star": starFormatter
+            }
+        }
+    });
+
+    function defaultFormatter(column, settings) {
+        return column.name !== null && column.name !== undefined ? column.name.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+    }
+
+    function checkboxFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-check-square-o' data-click-type='checkbox'></i>" : "<i class='fa fa-square-o' data-click-type='checkbox'></i>";
+    }
+
+    function selectionCheckboxFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-check-square-o' data-click-type='selection-checkbox'></i>" : "<i class='fa fa-square-o' data-click-type='selection-checkbox'></i>";
+    }
+
+    function starFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-star' data-click-type='star'></i>" : "<i class='fa fa-star-o' data-click-type='star'></i>";
+    }
+
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
         "Column": {
             "Comparer": {
                 "Default": mixedComparer,
                 "Date": dateComparer,
                 "Number": numberComparer,
-                "String": stringComparer,
+                "String": stringComparer
             }
         }
     });
@@ -508,6 +539,7 @@
     ColumnData.prototype.field = ""; //cell content will be taken from value of this property in row
     ColumnData.prototype.filterable = false;//true when column is filterable
     ColumnData.prototype.formatter = "Default";//default cell content formatter
+    ColumnData.prototype.headerFormatter = "Default";//default header cell content formatter
     ColumnData.prototype.headerCssClass = "";//css class for column header cell
     ColumnData.prototype.hidden = false;//true when column is visible
     ColumnData.prototype.id = undefined;//column unique indicator
@@ -535,7 +567,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -553,7 +585,7 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
@@ -563,7 +595,7 @@
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -572,7 +604,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -634,7 +666,7 @@
         function addColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -651,7 +683,7 @@
         }
 
         function deleteColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -680,7 +712,7 @@
         }
 
         function getColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -696,7 +728,7 @@
         }
 
         function getColumnIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -763,9 +795,9 @@
         }
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -776,7 +808,7 @@
         }
 
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
@@ -787,7 +819,7 @@
             if (columns.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -798,7 +830,7 @@
 
         function setColumnsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
@@ -815,7 +847,7 @@
 
         function updateColumnById(id, column) {
             if (column instanceof ColumnData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = column;
                         self.onChange.notify({ "id": id });
@@ -839,7 +871,7 @@
         function updateColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     updateColumn(columns[i]);
                 }
                 self.onChange.notifyLocked();
@@ -870,6 +902,7 @@
                 if ("editMode" in item) column.editMode = item.editMode;
                 if ("filterable" in item) column.filterable = item.filterable;
                 if ("formatter" in item) column.formatter = item.formatter;
+                if ("headerFormatter" in item) column.headerFormatter = item.headerFormatter;
                 if ("headerCssClass" in item) column.headerCssClass = item.headerCssClass;
                 if ("hidden" in item) column.hidden = item.hidden;
                 if ("maxWidth" in item) column.maxWidth = item.maxWidth;
@@ -1022,7 +1055,7 @@
             eventData = new EventData(eventData);
         }
 
-        for (var i = 0; i < this.handlers.length && eventData.isImmediatePropagationStopped() === false; i++) {
+        for (var i = 0, len = this.handlers.length; i < len && eventData.isImmediatePropagationStopped() === false; i++) {
             if (this.handlers[i].call(null, eventData) === false) {
                 this.stopImmediatePropagation();
                 break;
@@ -1947,6 +1980,16 @@
         /* 
          * Public API
          */
+        function getRowsCallback(callback, filters) {
+            if (callback && typeof callback === "function") {
+                var filter = getFilterFunc(filters);
+                dataModel.foreach(function (item, index, array) {
+                    if (filter && (filter(item) === false) || (item.hidden === true)) return false;
+                    return callback(item, index, array);
+                });
+            }
+        }
+
         function getRowsInRange(top, height, outerHeight, sorters, filters) {
             for (var i = 0; i < sorters.length; i++) {
                 dataModel.sort(
@@ -1978,6 +2021,7 @@
 
         $.extend(this, {
             "getRowsInRange": getRowsInRange,
+            "getRowsCallback": getRowsCallback,
             "getRowsTotal": getRowsTotal
         });
     }
@@ -2064,7 +2108,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -2082,17 +2126,48 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
+            },
+
+            setItemsProperty: function (propertyName, propertyValue) {
+                self.onChange.lock();
+                for (var i = 0, len = data.length; i < len; i++) {
+                    data[i].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[i].id });
+                }
+                self.onChange.notifyLocked();
+                return self;
+            },
+
+            setItemPropertyById: function (id, propertyName, propertyValue) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    if (data[i].id === id) {
+                        if (propertyName) {
+                            data[i].item[propertyName] = propertyValue;
+                            self.onChange.notify({ "id": id });
+                        }
+                        break;
+                    }
+                }
+                return self;
+            },
+
+            setItemPropertyByIndex: function (idx, propertyName, propertyValue) {
+                if (propertyName && data[idx]) {
+                    data[idx].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[idx].id });
+                }
+                return self;
             },
 
             setItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -2101,7 +2176,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -2122,6 +2197,16 @@
 
         function destroy() {
             data = [];
+        }
+
+        function foreach(callback) {
+            self.onChange.lock();
+            for (var i = 0, len = data.length; i < len; ++i) {
+                if (callback(data[i], i, data) !== false) {
+                    self.onChange.notify({ "id": data[i].id });
+                }
+            }
+            self.onChange.notifyLocked();
         }
 
         function filter(callback) {
@@ -2152,14 +2237,13 @@
             return data.length;
         }
 
-
         /*
          * Batch updates
          */
         function addRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.legth; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2167,11 +2251,10 @@
             return self;
         }
 
-
         function updateRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     updateRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2183,7 +2266,7 @@
             if (rows.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2193,14 +2276,13 @@
 
         function setRowsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
             self.onChange.notifyLocked();
             return self;
         }
-
 
         function deleteRows() {
             if (data.length) {
@@ -2222,7 +2304,6 @@
             return self;
         }
 
-
         function deleteRow(row) {
             if (row instanceof RowData) {
                 deleteRowById(row.id);
@@ -2231,7 +2312,7 @@
         }
 
         function deleteRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -2251,7 +2332,7 @@
         }
 
         function getRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -2267,7 +2348,7 @@
         }
 
         function getRowIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -2334,9 +2415,9 @@
         }
 
         function setRowPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -2347,14 +2428,12 @@
         }
 
         function setRowPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
-
-
 
         function updateRow(row) {
             if (row instanceof RowData) {
@@ -2365,7 +2444,7 @@
 
         function updateRowById(id, row) {
             if (row instanceof RowData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = row;
                         self.onChange.notify({ "id": id });
@@ -2392,7 +2471,7 @@
 
                 if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
                     row.id = item[settings.rows.idProperty];
-                }else if (settings.rows.newIdType === "number") {
+                } else if (settings.rows.newIdType === "number") {
                     row.id = SmallGrid.Utils.createId();
                 } else {
                     row.id = SmallGrid.Utils.createGuid();
@@ -2419,6 +2498,7 @@
 
             "onChange": SmallGrid.Callback.Create(),
 
+            "foreach": foreach,
             "filter": filter,
             "reduce": reduce,
             "sort": sort,
@@ -2678,10 +2758,11 @@
         }
 
         function buildHeaderColumnHtml(column, opts, isLastColumn) {
-            var html;
+            return "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'>" + buildHeaderCellContentHtml(column) + "</td>";
+        }
 
-            html = "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.name || "") + "</span>";
-
+        function buildHeaderCellContentHtml(column) {
+            var html = "<div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.headerFormatter ? SmallGrid.Cell.HeaderFormatter[column.headerFormatter](column, settings) : (column.name || "")) + "</span>";
 
             if (column.sortable && column.sortOrder !== 0) {
                 html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "' data-click-type='sort'></span>";
@@ -2697,7 +2778,7 @@
                 html += "<span class='" + settings.cssClass.headerResizeHandle + "' data-click-type='resize'></span>";
             }
 
-            return html + "</td>";
+            return html;
         }
 
         function buildLastHeaderColumn(column, opts) {
@@ -2807,22 +2888,18 @@
             var value = "";
 
             if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
-                value = getCellFormatter(column, row);
+                if (column.formatter) {
+                    value = SmallGrid.Cell.Formatter[column.formatter](row.item[column.field], column, row, settings);
+                } else {
+                    value = row.item[column.field];
+                }
             }
             return value;
         }
 
-        function getCellFormatter(column, row) {
-            return column.formatter ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
-        }
-
-        function getCellValue(column, row) {
-            return row.item[column.field];
-        }
-
-
         $.extend(this, {
             "buildCellContentHtml": buildCellContentHtml,
+            "buildHeaderCellContentHtml": buildHeaderCellContentHtml,
             "buildColsHtml": buildColsHtml,
             "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
@@ -3010,6 +3087,22 @@
                 return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
             }
             return false;
+        }
+
+        /* 
+         * Column func
+         */
+        function getColumnNodeByIndex(columnIndex) {
+            if (el.headerTbody[0].rows[0]) {
+                return el.headerTbody[0].rows[0].cells[columnIndex];
+            }
+        }
+
+        function getColumnNodeById(columnId) {
+            var columnIndex = viewModel.getColumnIndexById(columnId);
+            if (columnIndex !== -1) {
+                return getColumnNodeByIndex(columnIndex);
+            }
         }
 
         /*
@@ -3243,7 +3336,7 @@
 
             modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
             modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
-            applyModelChange();
+            applyModelChange(true);
 
             self.onViewResized.notify({});
 
@@ -3270,11 +3363,11 @@
             return visibility;
         }
 
-        function applyModelChange() {
+        function applyModelChange(isResized) {
 
             var visibility = scrollVisibility;
             scrollVisibility = getScrollVisibility(modelSize, contentSize, settings.scrollbarDimensions);
-            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal) {
+            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal || isResized) {
                 //force chrome hide scrolls
                 el.content.css({ 'overflow': scrollVisibility.vertical || scrollVisibility.horisontal ? 'auto' : 'hidden' });
 
@@ -3459,6 +3552,8 @@
             "getNode": getNode,
             "getRowNodeById": getRowNodeById,
             "getRowNodeByIndex": getRowNodeByIndex,
+            "getColumnNodeById": getColumnNodeById,
+            "getColumnNodeByIndex": getColumnNodeByIndex,
             "isCellVisible": isCellVisible,
             "isColumnVisible": isColumnVisible,
             "isHorisontalScrollVisible": isHorisontalScrollVisible,
@@ -3780,6 +3875,10 @@
         /*
          * Data calculations
          */
+        function requestRowsCallback(callback) {
+            return rowsRequest.getRowsCallback(callback, rowFilters);
+        }
+
         function getRowsHeight(cellOuterSize) {
             rowsTotal = rowsRequest.getRowsTotal(cellOuterSize.height, rowFilters);
             return rowsTotal.height;
@@ -3845,6 +3944,7 @@
             "getRowsTotal": getRowsTotal,
             "getColumnsTotal": getColumnsTotal,
 
+            "requestRowsCallback": requestRowsCallback,
             "requestDataFromRange": requestDataFromRange,
 
             "clearFilterByField": clearFilterByField,
@@ -4100,6 +4200,7 @@ if (typeof SmallGrid === "undefined") {
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
+            disabledColor: "disabled-color",
             cell: "grid-cell",
             cellEdit: "grid-cell-edit",
             cellColumnLast: "grid-cell-column-last",
@@ -4159,20 +4260,20 @@ if (typeof SmallGrid === "undefined") {
                 }
             },
             dateFormatter: {
-                locales: 'en-US',
+                locales: 'en-GB',
                 options: {}
             }
         },
 
         plugins: {
             AutoResize: {
-                enabled: true,
+                enabled: true
             },
             ColumnSort: {
-                enabled: true,
+                enabled: true
             },
             ColumnResize: {
-                enabled: true,
+                enabled: true
             },
             RowSelection: {
                 enabled: true,
@@ -4183,17 +4284,20 @@ if (typeof SmallGrid === "undefined") {
                 editOnClick: false,//when true, editor loaded after click
                 autoFocus: true//autofocus edited cell when scrolling
             },
+            ColumnCheckbox: {
+                enabled: true
+            },
             ColumnFilterMenu: {
-                enabled: true,
+                enabled: true
             },
             ColumnPickerMenu: {
-                enabled: true,
+                enabled: true
             },
             Footer: {
-                enabled: false,
+                enabled: false
             },
             CellAlign: {
-                enabled: false,
+                enabled: false
             }
         }
     };

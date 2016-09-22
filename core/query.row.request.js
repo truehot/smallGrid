@@ -99,6 +99,16 @@
         /* 
          * Public API
          */
+        function getRowsCallback(callback, filters) {
+            if (callback && typeof callback === "function") {
+                var filter = getFilterFunc(filters);
+                dataModel.foreach(function (item, index, array) {
+                    if (filter && (filter(item) === false) || (item.hidden === true)) return false;
+                    return callback(item, index, array);
+                });
+            }
+        }
+
         function getRowsInRange(top, height, outerHeight, sorters, filters) {
             for (var i = 0; i < sorters.length; i++) {
                 dataModel.sort(
@@ -130,6 +140,7 @@
 
         $.extend(this, {
             "getRowsInRange": getRowsInRange,
+            "getRowsCallback": getRowsCallback,
             "getRowsTotal": getRowsTotal
         });
     }

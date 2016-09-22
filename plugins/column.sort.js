@@ -8,7 +8,8 @@
     });
 
     function ColumnSortPlugin(context, settings) {
-        var self = this;
+        var self = this,
+            suspended = false;
 
         /*
          * Init && destroy
@@ -33,7 +34,7 @@
          * Handlers
          */
         function handleHeaderClick(evt) {
-            if (evt && (evt.type === "" || evt.type === "sort") && settings.plugins.ColumnSort.enabled === true) {
+            if (isSuspended()===false && evt && (evt.type === "" || evt.type === "sort") && settings.plugins.ColumnSort.enabled === true && evt.column.sortable === true) {
                 var request = context.view.suspendRender();
                 sortColumn(evt.column);
                 context.view.resumeRender(request);
@@ -48,25 +49,40 @@
                 context.viewModel.setSorter(new SmallGrid.Query.Sorter(column.field, newSortOrder, column.sortComparer));
             }
         }
+        /*
+         * Internal
+         */
+        function isSuspended() {
+            return suspended;
+        }
 
+        function suspend() {
+            suspended = true;
+            return context.view.suspendRender();
+        }
+
+        function resume(request) {
+            suspended = false;
+            context.view.resumeRender(request);
+        }
         /*
          * Public API
          */
         function sortColumnById(id, sortOrder) {
             var column = context.columnsModel.getColumnById(id);
             if (column) {
-                var request = context.view.suspendRender();
+                var request = suspend();
                 sortColumn(column, sortOrder);
-                context.view.resumeRender(request);
+                resume(request);
             }
         }
 
         function sortColumnByIndex(idx, sortOrder) {
             var column = context.columnsModel.getColumnByIndex(idx);
             if (column) {
-                var request = context.view.suspendRender();
+                var request = suspend();
                 sortColumn(column, sortOrder);
-                context.view.resumeRender(request);
+                resume(request);
             }
         }
 

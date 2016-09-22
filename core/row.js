@@ -36,7 +36,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -54,17 +54,48 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
+            },
+
+            setItemsProperty: function (propertyName, propertyValue) {
+                self.onChange.lock();
+                for (var i = 0, len = data.length; i < len; i++) {
+                    data[i].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[i].id });
+                }
+                self.onChange.notifyLocked();
+                return self;
+            },
+
+            setItemPropertyById: function (id, propertyName, propertyValue) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    if (data[i].id === id) {
+                        if (propertyName) {
+                            data[i].item[propertyName] = propertyValue;
+                            self.onChange.notify({ "id": id });
+                        }
+                        break;
+                    }
+                }
+                return self;
+            },
+
+            setItemPropertyByIndex: function (idx, propertyName, propertyValue) {
+                if (propertyName && data[idx]) {
+                    data[idx].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[idx].id });
+                }
+                return self;
             },
 
             setItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -73,7 +104,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -94,6 +125,16 @@
 
         function destroy() {
             data = [];
+        }
+
+        function foreach(callback) {
+            self.onChange.lock();
+            for (var i = 0, len = data.length; i < len; ++i) {
+                if (callback(data[i], i, data) !== false) {
+                    self.onChange.notify({ "id": data[i].id });
+                }
+            }
+            self.onChange.notifyLocked();
         }
 
         function filter(callback) {
@@ -124,14 +165,13 @@
             return data.length;
         }
 
-
         /*
          * Batch updates
          */
         function addRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.legth; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -139,11 +179,10 @@
             return self;
         }
 
-
         function updateRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     updateRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -155,7 +194,7 @@
             if (rows.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -165,14 +204,13 @@
 
         function setRowsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
             self.onChange.notifyLocked();
             return self;
         }
-
 
         function deleteRows() {
             if (data.length) {
@@ -194,7 +232,6 @@
             return self;
         }
 
-
         function deleteRow(row) {
             if (row instanceof RowData) {
                 deleteRowById(row.id);
@@ -203,7 +240,7 @@
         }
 
         function deleteRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -223,7 +260,7 @@
         }
 
         function getRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -239,7 +276,7 @@
         }
 
         function getRowIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -306,9 +343,9 @@
         }
 
         function setRowPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -319,14 +356,12 @@
         }
 
         function setRowPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
-
-
 
         function updateRow(row) {
             if (row instanceof RowData) {
@@ -337,7 +372,7 @@
 
         function updateRowById(id, row) {
             if (row instanceof RowData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = row;
                         self.onChange.notify({ "id": id });
@@ -364,7 +399,7 @@
 
                 if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
                     row.id = item[settings.rows.idProperty];
-                }else if (settings.rows.newIdType === "number") {
+                } else if (settings.rows.newIdType === "number") {
                     row.id = SmallGrid.Utils.createId();
                 } else {
                     row.id = SmallGrid.Utils.createGuid();
@@ -391,6 +426,7 @@
 
             "onChange": SmallGrid.Callback.Create(),
 
+            "foreach": foreach,
             "filter": filter,
             "reduce": reduce,
             "sort": sort,

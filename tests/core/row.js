@@ -131,7 +131,22 @@ QUnit.test("Row", function (assert) {
     assert.ok(model.getRows()[0].editMode === true, "setRowsProperty");
     assert.ok(model.getRows()[1].editMode === true, "setRowsProperty");
 
+    model.items.setItemsProperty('nice', true);
+    assert.ok(model.getRows()[0].item.nice === true, "setItemsProperty");
+    assert.ok(model.getRows()[1].item.nice === true, "setItemsProperty");
 
+    model.items.setItemPropertyByIndex(0, 'nice', false);
+    assert.ok(model.getRows()[0].item.nice === false, "setItemsProperty");
+
+    model.items.setItemPropertyById(model.getRows()[1].id, 'nice', false);
+    assert.ok(model.getRows()[1].item.nice === false, "setItemsProperty");
+
+    var rows = [];
+    model.foreach(function (item) {
+        rows.push(item);
+        
+    });
+    assert.deepEqual(model.getRows(), rows, "foreach");
 
     function getItem() {
         return { "test": Math.random(), "test2": Math.random() };

@@ -4,7 +4,7 @@
     $.extend(true, SmallGrid, {
         "Callback": {
             "Handler": CallbackHandler,
-            "Create": Create,
+            "Create": Create
         }
     });
 
@@ -43,7 +43,7 @@
             return result;
         }
 
-        for (var i = 0; i < this.handlers.length; i++) {
+        for (var i = 0, len = this.handlers.length; i < len; i++) {
             result = this.handlers[i].apply(null, arguments);
         }
         return result;
@@ -373,7 +373,7 @@
     });
 
     function defaultFormatter(value, column, row, settings) {
-        return value != null ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+        return value !== null && value!==undefined ? value.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
     }
 
     function checkboxFormatter(value, column, row, settings) {
@@ -423,12 +423,43 @@
     "use strict";
 
     $.extend(true, SmallGrid, {
+        "Cell": {
+            "HeaderFormatter": {
+                "Default": defaultFormatter,
+                "Checkbox": checkboxFormatter,
+                "SelectionCheckbox": selectionCheckboxFormatter,
+                "Star": starFormatter
+            }
+        }
+    });
+
+    function defaultFormatter(column, settings) {
+        return column.name !== null && column.name !== undefined ? column.name.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#039;").replace(/"/g, "&quot;") : "";
+    }
+
+    function checkboxFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-check-square-o' data-click-type='checkbox'></i>" : "<i class='fa fa-square-o' data-click-type='checkbox'></i>";
+    }
+
+    function selectionCheckboxFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-check-square-o' data-click-type='selection-checkbox'></i>" : "<i class='fa fa-square-o' data-click-type='selection-checkbox'></i>";
+    }
+
+    function starFormatter(column, settings) {
+        return column[column.field] ? "<i class='fa fa-star' data-click-type='star'></i>" : "<i class='fa fa-star-o' data-click-type='star'></i>";
+    }
+
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
         "Column": {
             "Comparer": {
                 "Default": mixedComparer,
                 "Date": dateComparer,
                 "Number": numberComparer,
-                "String": stringComparer,
+                "String": stringComparer
             }
         }
     });
@@ -508,6 +539,7 @@
     ColumnData.prototype.field = ""; //cell content will be taken from value of this property in row
     ColumnData.prototype.filterable = false;//true when column is filterable
     ColumnData.prototype.formatter = "Default";//default cell content formatter
+    ColumnData.prototype.headerFormatter = "Default";//default header cell content formatter
     ColumnData.prototype.headerCssClass = "";//css class for column header cell
     ColumnData.prototype.hidden = false;//true when column is visible
     ColumnData.prototype.id = undefined;//column unique indicator
@@ -535,7 +567,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -553,7 +585,7 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
@@ -563,7 +595,7 @@
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -572,7 +604,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -634,7 +666,7 @@
         function addColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -651,7 +683,7 @@
         }
 
         function deleteColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -680,7 +712,7 @@
         }
 
         function getColumnById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -696,7 +728,7 @@
         }
 
         function getColumnIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -763,9 +795,9 @@
         }
 
         function setColumnPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -776,7 +808,7 @@
         }
 
         function setColumnPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
@@ -787,7 +819,7 @@
             if (columns.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     addColumn(columns[i]);
                 }
 
@@ -798,7 +830,7 @@
 
         function setColumnsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
@@ -815,7 +847,7 @@
 
         function updateColumnById(id, column) {
             if (column instanceof ColumnData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = column;
                         self.onChange.notify({ "id": id });
@@ -839,7 +871,7 @@
         function updateColumns(columns) {
             if (columns.length) {
                 self.onChange.lock();
-                for (var i = 0; i < columns.length; i++) {
+                for (var i = 0, len = columns.length; i < len; i++) {
                     updateColumn(columns[i]);
                 }
                 self.onChange.notifyLocked();
@@ -870,6 +902,7 @@
                 if ("editMode" in item) column.editMode = item.editMode;
                 if ("filterable" in item) column.filterable = item.filterable;
                 if ("formatter" in item) column.formatter = item.formatter;
+                if ("headerFormatter" in item) column.headerFormatter = item.headerFormatter;
                 if ("headerCssClass" in item) column.headerCssClass = item.headerCssClass;
                 if ("hidden" in item) column.hidden = item.hidden;
                 if ("maxWidth" in item) column.maxWidth = item.maxWidth;
@@ -1022,7 +1055,7 @@
             eventData = new EventData(eventData);
         }
 
-        for (var i = 0; i < this.handlers.length && eventData.isImmediatePropagationStopped() === false; i++) {
+        for (var i = 0, len = this.handlers.length; i < len && eventData.isImmediatePropagationStopped() === false; i++) {
             if (this.handlers[i].call(null, eventData) === false) {
                 this.stopImmediatePropagation();
                 break;
@@ -1947,6 +1980,16 @@
         /* 
          * Public API
          */
+        function getRowsCallback(callback, filters) {
+            if (callback && typeof callback === "function") {
+                var filter = getFilterFunc(filters);
+                dataModel.foreach(function (item, index, array) {
+                    if (filter && (filter(item) === false) || (item.hidden === true)) return false;
+                    return callback(item, index, array);
+                });
+            }
+        }
+
         function getRowsInRange(top, height, outerHeight, sorters, filters) {
             for (var i = 0; i < sorters.length; i++) {
                 dataModel.sort(
@@ -1978,6 +2021,7 @@
 
         $.extend(this, {
             "getRowsInRange": getRowsInRange,
+            "getRowsCallback": getRowsCallback,
             "getRowsTotal": getRowsTotal
         });
     }
@@ -2064,7 +2108,7 @@
             addItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -2082,17 +2126,48 @@
 
             getItems: function () {
                 var result = [];
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     result.push(data[i].item);
                 }
                 return result;
+            },
+
+            setItemsProperty: function (propertyName, propertyValue) {
+                self.onChange.lock();
+                for (var i = 0, len = data.length; i < len; i++) {
+                    data[i].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[i].id });
+                }
+                self.onChange.notifyLocked();
+                return self;
+            },
+
+            setItemPropertyById: function (id, propertyName, propertyValue) {
+                for (var i = 0, len = data.length; i < len; i++) {
+                    if (data[i].id === id) {
+                        if (propertyName) {
+                            data[i].item[propertyName] = propertyValue;
+                            self.onChange.notify({ "id": id });
+                        }
+                        break;
+                    }
+                }
+                return self;
+            },
+
+            setItemPropertyByIndex: function (idx, propertyName, propertyValue) {
+                if (propertyName && data[idx]) {
+                    data[idx].item[propertyName] = propertyValue;
+                    self.onChange.notify({ "id": data[idx].id });
+                }
+                return self;
             },
 
             setItems: function (items) {
                 if (items.length) {
                     self.onChange.lock();
                     data = [];
-                    for (var i = 0; i < items.length; i++) {
+                    for (var i = 0, len = items.length; i < len; i++) {
                         self.items.addItem(items[i]);
                     }
                     self.onChange.notifyLocked();
@@ -2101,7 +2176,7 @@
             },
 
             updateItemById: function (id, item) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i].item = item;
                         self.onChange.notify({ "id": id });
@@ -2122,6 +2197,16 @@
 
         function destroy() {
             data = [];
+        }
+
+        function foreach(callback) {
+            self.onChange.lock();
+            for (var i = 0, len = data.length; i < len; ++i) {
+                if (callback(data[i], i, data) !== false) {
+                    self.onChange.notify({ "id": data[i].id });
+                }
+            }
+            self.onChange.notifyLocked();
         }
 
         function filter(callback) {
@@ -2152,14 +2237,13 @@
             return data.length;
         }
 
-
         /*
          * Batch updates
          */
         function addRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.legth; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2167,11 +2251,10 @@
             return self;
         }
 
-
         function updateRows(rows) {
             if (rows.length) {
                 self.onChange.lock();
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     updateRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2183,7 +2266,7 @@
             if (rows.length) {
                 self.onChange.lock();
                 data = [];
-                for (var i = 0; i < rows.length; i++) {
+                for (var i = 0, len = rows.length; i < len; i++) {
                     addRow(rows[i]);
                 }
                 self.onChange.notifyLocked();
@@ -2193,14 +2276,13 @@
 
         function setRowsProperty(propertyName, propertyValue) {
             self.onChange.lock();
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 data[i][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[i].id });
             }
             self.onChange.notifyLocked();
             return self;
         }
-
 
         function deleteRows() {
             if (data.length) {
@@ -2222,7 +2304,6 @@
             return self;
         }
 
-
         function deleteRow(row) {
             if (row instanceof RowData) {
                 deleteRowById(row.id);
@@ -2231,7 +2312,7 @@
         }
 
         function deleteRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     data.splice(i, 1);
                     self.onChange.notify({ "id": id });
@@ -2251,7 +2332,7 @@
         }
 
         function getRowById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return data[i];
                 }
@@ -2267,7 +2348,7 @@
         }
 
         function getRowIndexById(id) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
                     return i;
                 }
@@ -2334,9 +2415,9 @@
         }
 
         function setRowPropertyById(id, propertyName, propertyValue) {
-            for (var i = 0; i < data.length; i++) {
+            for (var i = 0, len = data.length; i < len; i++) {
                 if (data[i].id === id) {
-                    if (propertyName && propertyName in data[i]) {
+                    if (propertyName) {
                         data[i][propertyName] = propertyValue;
                         self.onChange.notify({ "id": id });
                     }
@@ -2347,14 +2428,12 @@
         }
 
         function setRowPropertyByIndex(idx, propertyName, propertyValue) {
-            if (propertyName && propertyName in data[idx]) {
+            if (propertyName && data[idx]) {
                 data[idx][propertyName] = propertyValue;
                 self.onChange.notify({ "id": data[idx].id });
             }
             return self;
         }
-
-
 
         function updateRow(row) {
             if (row instanceof RowData) {
@@ -2365,7 +2444,7 @@
 
         function updateRowById(id, row) {
             if (row instanceof RowData) {
-                for (var i = 0; i < data.length; i++) {
+                for (var i = 0, len = data.length; i < len; i++) {
                     if (data[i].id === id) {
                         data[i] = row;
                         self.onChange.notify({ "id": id });
@@ -2392,7 +2471,7 @@
 
                 if (SmallGrid.Utils.isProperty(settings.rows.idProperty, item)) {
                     row.id = item[settings.rows.idProperty];
-                }else if (settings.rows.newIdType === "number") {
+                } else if (settings.rows.newIdType === "number") {
                     row.id = SmallGrid.Utils.createId();
                 } else {
                     row.id = SmallGrid.Utils.createGuid();
@@ -2419,6 +2498,7 @@
 
             "onChange": SmallGrid.Callback.Create(),
 
+            "foreach": foreach,
             "filter": filter,
             "reduce": reduce,
             "sort": sort,
@@ -2678,10 +2758,11 @@
         }
 
         function buildHeaderColumnHtml(column, opts, isLastColumn) {
-            var html;
+            return "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'>" + buildHeaderCellContentHtml(column) + "</td>";
+        }
 
-            html = "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.name || "") + "</span>";
-
+        function buildHeaderCellContentHtml(column) {
+            var html = "<div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.headerFormatter ? SmallGrid.Cell.HeaderFormatter[column.headerFormatter](column, settings) : (column.name || "")) + "</span>";
 
             if (column.sortable && column.sortOrder !== 0) {
                 html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "' data-click-type='sort'></span>";
@@ -2697,7 +2778,7 @@
                 html += "<span class='" + settings.cssClass.headerResizeHandle + "' data-click-type='resize'></span>";
             }
 
-            return html + "</td>";
+            return html;
         }
 
         function buildLastHeaderColumn(column, opts) {
@@ -2807,22 +2888,18 @@
             var value = "";
 
             if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
-                value = getCellFormatter(column, row);
+                if (column.formatter) {
+                    value = SmallGrid.Cell.Formatter[column.formatter](row.item[column.field], column, row, settings);
+                } else {
+                    value = row.item[column.field];
+                }
             }
             return value;
         }
 
-        function getCellFormatter(column, row) {
-            return column.formatter ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
-        }
-
-        function getCellValue(column, row) {
-            return row.item[column.field];
-        }
-
-
         $.extend(this, {
             "buildCellContentHtml": buildCellContentHtml,
+            "buildHeaderCellContentHtml": buildHeaderCellContentHtml,
             "buildColsHtml": buildColsHtml,
             "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
@@ -3010,6 +3087,22 @@
                 return column.calcWidth - column.width - settings.cellOuterSize.width >= el.content[0].scrollLeft && column.calcWidth < contentSize.width + el.content[0].scrollLeft;
             }
             return false;
+        }
+
+        /* 
+         * Column func
+         */
+        function getColumnNodeByIndex(columnIndex) {
+            if (el.headerTbody[0].rows[0]) {
+                return el.headerTbody[0].rows[0].cells[columnIndex];
+            }
+        }
+
+        function getColumnNodeById(columnId) {
+            var columnIndex = viewModel.getColumnIndexById(columnId);
+            if (columnIndex !== -1) {
+                return getColumnNodeByIndex(columnIndex);
+            }
         }
 
         /*
@@ -3243,7 +3336,7 @@
 
             modelSize.rowsHeight = viewModel.getRowsHeight(settings.cellOuterSize);
             modelSize.columnsWidth = viewModel.getColumnsWidth(settings.cellOuterSize);
-            applyModelChange();
+            applyModelChange(true);
 
             self.onViewResized.notify({});
 
@@ -3270,11 +3363,11 @@
             return visibility;
         }
 
-        function applyModelChange() {
+        function applyModelChange(isResized) {
 
             var visibility = scrollVisibility;
             scrollVisibility = getScrollVisibility(modelSize, contentSize, settings.scrollbarDimensions);
-            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal) {
+            if (scrollVisibility.vertical !== visibility.vertical || scrollVisibility.horisontal !== visibility.horisontal || isResized) {
                 //force chrome hide scrolls
                 el.content.css({ 'overflow': scrollVisibility.vertical || scrollVisibility.horisontal ? 'auto' : 'hidden' });
 
@@ -3459,6 +3552,8 @@
             "getNode": getNode,
             "getRowNodeById": getRowNodeById,
             "getRowNodeByIndex": getRowNodeByIndex,
+            "getColumnNodeById": getColumnNodeById,
+            "getColumnNodeByIndex": getColumnNodeByIndex,
             "isCellVisible": isCellVisible,
             "isColumnVisible": isColumnVisible,
             "isHorisontalScrollVisible": isHorisontalScrollVisible,
@@ -3780,6 +3875,10 @@
         /*
          * Data calculations
          */
+        function requestRowsCallback(callback) {
+            return rowsRequest.getRowsCallback(callback, rowFilters);
+        }
+
         function getRowsHeight(cellOuterSize) {
             rowsTotal = rowsRequest.getRowsTotal(cellOuterSize.height, rowFilters);
             return rowsTotal.height;
@@ -3845,6 +3944,7 @@
             "getRowsTotal": getRowsTotal,
             "getColumnsTotal": getColumnsTotal,
 
+            "requestRowsCallback": requestRowsCallback,
             "requestDataFromRange": requestDataFromRange,
 
             "clearFilterByField": clearFilterByField,
@@ -4636,6 +4736,160 @@
 
     $.extend(true, SmallGrid, {
         "Plugins": {
+            "ColumnCheckbox": ColumnCheckboxPlugin
+        }
+    });
+
+    function ColumnCheckboxPlugin(context, settings) {
+        var self = this,
+            suspended = false;
+        /*
+         * Init && destroy
+         */
+        function init() {
+            //register plugin settings
+            if (!settings.plugins.ColumnCheckbox) {
+                settings.plugins.ColumnCheckbox = {
+                    enabled: false,
+                };
+            }
+
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
+            return self;
+        }
+
+        function destroy() {
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
+        }
+
+        /*
+         * Handlers
+         */
+        function handleHeaderClick(evt) {
+            if (settings.plugins.RowSelection.enabled !== true) return;
+
+            if (isSuspended() === false && evt.type === "checkbox" && evt.column && evt.column.headerFormatter === "Checkbox") {
+                var request = suspend();
+
+                var headerNode = context.view.getColumnNodeById(evt.column.id);
+                if (headerNode) {
+                    headerNode.className += ' ' + settings.cssClass.disabledColor;
+                }
+
+                changeColumnRows(evt.column, evt.column[evt.column.field]);
+
+                if (headerNode) {
+                    headerNode.className.replace(' ' + settings.cssClass.disabledColor, '');
+                }
+
+                resume(request);
+            }
+        }
+
+        /*
+         * Internal
+         */
+        function changeColumnRows(column, value) {
+            if (column) {
+                if (column.headerFormatter === "Checkbox") {
+                    context.columnsModel.setColumnPropertyById(column.id, column.field, !value);
+                }
+                context.rowsModel.items.setItemsProperty(column.field, !value);
+            }
+        }
+
+        function isSuspended() {
+            return suspended;
+        }
+
+        function suspend() {
+            suspended = true;
+            return context.view.suspendRender();
+        }
+
+        function resume(request) {
+            suspended = false;
+            context.view.resumeRender(request);
+        }
+
+        /**
+         * API
+         */
+        function toggleColumnbyId(id, callback) {
+            var column = context.columnsModel.getColumnById(id);
+            if (column && callback && typeof callback === "function") {
+                var request = suspend();
+                context.rowsModel.foreach(function (row) {
+                    return callback(column, row);
+                });
+                resume(request);
+            }
+        }
+
+        function toggleColumnByIndex(idx, callback) {
+            var column = context.columnsModel.getColumnByIndex(idx);
+            if (column && callback && typeof callback === "function") {
+                var request = suspend();
+                context.rowsModel.foreach(function (row) {
+                    return callback(column, row);
+                });
+                resume(request);
+            }
+        }
+
+        function checkColumnById(id) {
+            var column = context.columnsModel.getColumnById(id);
+            if (column) {
+                var request = suspend();
+                changeColumnRows(column, false);
+                resume(request);
+            }
+        }
+
+        function checkColumnByIndex(idx) {
+            var column = context.columnsModel.getColumnByIndex(idx);
+            if (column) {
+                var request = suspend();
+                changeColumnRows(column, false);
+                resume(request);
+            }
+        }
+
+        function uncheckColumnById(id) {
+            var column = context.columnsModel.getColumnById(id);
+            if (column) {
+                var request = suspend();
+                changeColumnRows(column, true);
+                resume(request);
+            }
+        }
+
+        function uncheckColumnByIndex(idx) {
+            var column = context.columnsModel.getColumnByIndex(idx);
+            if (column) {
+                var request = suspend();
+                changeColumnRows(column, true);
+                resume(request);
+            }
+        }
+
+        $.extend(this, {
+            "init": init,
+            "destroy": destroy,
+            "toggleColumnbyId": toggleColumnbyId,
+            "toggleColumnByIndex": toggleColumnByIndex,
+            "checkColumnById": checkColumnById,
+            "checkColumnByIndex": checkColumnByIndex,
+            "uncheckColumnById": uncheckColumnById,
+            "uncheckColumnByIndex": uncheckColumnByIndex
+        });
+    }
+
+})(jQuery, window.SmallGrid = window.SmallGrid || {});(function ($, SmallGrid) {
+    "use strict";
+
+    $.extend(true, SmallGrid, {
+        "Plugins": {
             "ColumnFilterMenu": ColumnFilterMenu
         }
     });
@@ -5096,7 +5350,8 @@
     });
 
     function ColumnSortPlugin(context, settings) {
-        var self = this;
+        var self = this,
+            suspended = false;
 
         /*
          * Init && destroy
@@ -5121,7 +5376,7 @@
          * Handlers
          */
         function handleHeaderClick(evt) {
-            if (evt && (evt.type === "" || evt.type === "sort") && settings.plugins.ColumnSort.enabled === true) {
+            if (isSuspended()===false && evt && (evt.type === "" || evt.type === "sort") && settings.plugins.ColumnSort.enabled === true && evt.column.sortable === true) {
                 var request = context.view.suspendRender();
                 sortColumn(evt.column);
                 context.view.resumeRender(request);
@@ -5136,25 +5391,40 @@
                 context.viewModel.setSorter(new SmallGrid.Query.Sorter(column.field, newSortOrder, column.sortComparer));
             }
         }
+        /*
+         * Internal
+         */
+        function isSuspended() {
+            return suspended;
+        }
 
+        function suspend() {
+            suspended = true;
+            return context.view.suspendRender();
+        }
+
+        function resume(request) {
+            suspended = false;
+            context.view.resumeRender(request);
+        }
         /*
          * Public API
          */
         function sortColumnById(id, sortOrder) {
             var column = context.columnsModel.getColumnById(id);
             if (column) {
-                var request = context.view.suspendRender();
+                var request = suspend();
                 sortColumn(column, sortOrder);
-                context.view.resumeRender(request);
+                resume(request);
             }
         }
 
         function sortColumnByIndex(idx, sortOrder) {
             var column = context.columnsModel.getColumnByIndex(idx);
             if (column) {
-                var request = context.view.suspendRender();
+                var request = suspend();
                 sortColumn(column, sortOrder);
-                context.view.resumeRender(request);
+                resume(request);
             }
         }
 
@@ -5225,9 +5495,9 @@
          * Other
          */
         function updateFooter(newTotalRows, newTotalColumns) {
-            if (newTotalColumns == 0) {
+            if (newTotalColumns === 0) {
                 updateNode(0, 0, 0);
-            } else if (totalRows != newTotalRows) {
+            } else if (totalRows !== newTotalRows) {
                 var rows = context.viewModel.getRows();
                 if (rows.length) {
                     totalRows = newTotalRows;
@@ -5237,7 +5507,7 @@
         }
 
         function updateNode(totalRows, fromRow, toRow) {
-            var el = context.view.getNode('footer')
+            var el = context.view.getNode('footer');
             if (totalRows) {
                 el.html("Showing " + fromRow + " to " + toRow + " of  " + totalRows);
             } else {
@@ -5261,7 +5531,9 @@
 
     function RowSelectionPlugin(context, settings) {
         var self = this,
+            suspended = false,
             selectedIds = [],
+            selectionColumn = null,
             lastFocusedId = null;
         /*
          * Init && destroy
@@ -5276,21 +5548,49 @@
             }
 
             context.view.onCellClick.subscribe(handleCellClick);
+            context.view.onHeaderClick.subscribe(handleHeaderClick);
             return self;
         }
 
         function destroy() {
             context.view.onCellClick.unsubscribe(handleCellClick);
+            context.view.onHeaderClick.unsubscribe(handleHeaderClick);
         }
+
         /*
          * Handlers
          */
+        function handleHeaderClick(evt) {
+            if (settings.plugins.RowSelection.enabled !== true) return;
+
+            if (evt.type === "selection-checkbox" && evt.column && evt.column.headerFormatter === "SelectionCheckbox") {
+
+                var request = suspend();
+
+                var headerNode = context.view.getColumnNodeById(evt.column.id);
+                if (headerNode) {
+                    headerNode.className += ' ' + settings.cssClass.disabledColor;
+                }
+
+                if (!evt.column[evt.column.field]) {
+                    selectAll(evt.column);
+                } else {
+                    deselectAll(evt.column);
+                }
+
+                if (headerNode) {
+                    headerNode.className.replace(' ' + settings.cssClass.disabledColor,'');
+                }
+
+                resume(request);
+            }
+        }
+
         function handleCellClick(evt) {
             if (settings.plugins.RowSelection.enabled !== true) return;
 
-            var request = context.view.suspendRender();
+            var request = suspend();
             if (evt.event.shiftKey === true && settings.plugins.RowSelection.multipleRowSelection === true && lastFocusedId && lastFocusedId !== evt.row.id) {
-
                 selectRowsRangeById(lastFocusedId, evt.row.id);
 
             } else if (evt.event.ctrlKey === true) {
@@ -5303,18 +5603,96 @@
                     selectRowById(evt.row.id);
                 }
             } else {
-                if (isRowSelected(evt.row.id) === false || selectedIds.length > 1) {
+                if (isRowSelected(evt.row.id) === false || selectedIds.length > 0) {
                     deselectAllRows();
                     selectRowById(evt.row.id);
                 }
             }
 
-            context.view.resumeRender(request);
+            resume(request);
 
             if (evt.event.shiftKey === false) lastFocusedId = evt.row.id;
         }
 
-        function selectRow(row) {
+        /*
+         * Internal
+         */
+        function findSelectionColumn() {
+            if (selectionColumn) {
+                selectionColumn = context.columnsModel.getColumnById(selectionColumn.id);
+            }
+
+            if (!selectionColumn) {
+                var columns = context.columnsModel.getColumns();
+                for (var i = 0, len = columns.length; i < len; i++) {
+                    if (columns[i].headerFormatter && columns[i].headerFormatter === "SelectionCheckbox") {
+                        return columns[i];
+                    }
+                }
+            }
+        }
+
+        function selectAll(column, callback) {
+            context.viewModel.requestRowsCallback(function (row, idx) {
+
+                if (typeof callback === "function") {
+                    if (!callback(row, idx)) return false;
+                }
+
+                selectedIds.push(row.id);
+                row.rowCssClass += (row.rowCssClass.length ? " " : "") + settings.cssClass.rowSelected;
+                var rowNode = context.view.getRowNodeById(row.id);
+                if (rowNode) {
+                    rowNode.className = rowNode.className + ' ' + settings.cssClass.rowSelected;
+                }
+
+                if (column) {
+                    row.item[column.field] = true;
+                    var cell = context.view.getCellNodeById(column.id, row.id);
+                    if (cell && column && column.formatter != "") {
+                        cell.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                    }
+                }
+            });
+
+            if (column && !callback) context.columnsModel.setColumnPropertyById(column.id, column.field, true);
+        }
+
+        function deselectAll(column, callback) {
+            if (selectedIds.length) {
+
+                if (selectedIds.length < 3000) {
+                    for (var i = selectedIds.length - 1; i >= 0; i--) {
+                        deselectRow(context.rowsModel.getRowById(selectedIds[i]), column);
+                    }
+                } else {
+
+                    context.rowsModel.foreach(function (row, idx) {
+                        if (typeof callback === "function") {
+                            if (!callback(row, idx)) return false;
+                        }
+
+                        row.rowCssClass = row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '');
+                        var rowNode = context.view.getRowNodeById(row.id);
+                        if (rowNode) {
+                            rowNode.className = rowNode.className.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '');
+                        }
+
+                        if (column) {
+                            row.item[column.field] = false;
+                            var cell = context.view.getCellNodeById(column.id, row.id);
+                            if (cell && column && column.formatter != "") {
+                                cell.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                            }
+                        }
+                    });
+                }
+                selectedIds = [];
+                if (column) context.columnsModel.setColumnPropertyById(column.id, column.field, false);
+            }
+        }
+
+        function selectRow(row, column) {
             if (row) {
                 selectedIds.push(row.id);
 
@@ -5328,10 +5706,18 @@
                     'rowCssClass',
                     row.rowCssClass + (row.rowCssClass.length ? " " : "") + settings.cssClass.rowSelected
                 );
+
+                if (column) {
+                    row.item[column.field] = true;
+                    var cell = context.view.getCellNodeById(column.id, row.id);
+                    if (cell && column && column.formatter != "") {
+                        cell.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                    }
+                }
             }
         }
 
-        function deselectRow(row) {
+        function deselectRow(row, column) {
             if (row) {
                 var idx = selectedIds.indexOf(row.id);
                 if (idx !== -1) {
@@ -5340,7 +5726,7 @@
 
                 var rowNode = context.view.getRowNodeById(row.id);
                 if (rowNode) {
-                    rowNode.className = rowNode.className.replace(' ' + settings.cssClass.rowSelected, '');
+                    rowNode.className = rowNode.className.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '');
                 }
 
                 context.rowsModel.setRowPropertyById(
@@ -5348,57 +5734,75 @@
                     'rowCssClass',
                     row.rowCssClass.replace(' ' + settings.cssClass.rowSelected, '').replace(settings.cssClass.rowSelected, '')
                 );
+
+                if (column) {
+                    row.item[column.field] = false;
+                    var cell = context.view.getCellNodeById(column.id, row.id);
+                    if (cell && column && column.formatter != "") {
+                        cell.innerHTML = context.view.getBuilder().buildCellContentHtml(column, row);
+                    }
+                }
             }
+        }
+
+        function isSuspended() {
+            return suspended;
+        }
+
+        function suspend() {
+            suspended = true;
+            return context.view.suspendRender();
+        }
+
+        function resume(request) {
+            suspended = false;
+            context.view.resumeRender(request);
         }
 
         /*
          * Public API
          */
         function selectRowById(id) {
-            var request = context.view.suspendRender();
-
-            selectRow(context.rowsModel.getRowById(id));
-
-            context.view.resumeRender(request);
+            var request = suspend();
+            selectRow(context.rowsModel.getRowById(id), findSelectionColumn());
+            resume(request);
             return self;
         }
 
         function deselectRowById(id) {
-            var request = context.view.suspendRender();
-            deselectRow(context.rowsModel.getRowById(id));
-            context.view.resumeRender(request);
+            var request = suspend();
+            deselectRow(context.rowsModel.getRowById(id), findSelectionColumn());
+            resume(request);
             return self;
         }
 
         function selectRowByIndex(idx) {
-            var request = context.view.suspendRender();
-
-            selectRow(context.rowsModel.getRowByIndex(idx));
-
-            context.view.resumeRender(request);
+            var request = suspend();
+            selectRow(context.rowsModel.getRowByIndex(idx), findSelectionColumn());
+            resume(request);
             return self;
         }
 
         function deselectRowByIndex(idx) {
-            var request = context.view.suspendRender();
-
-            deselectRow(context.rowsModel.getRowByIndex(idx));
-
-            context.view.resumeRender(request);
+            var request = suspend();
+            deselectRow(context.rowsModel.getRowByIndex(idx), findSelectionColumn());
+            resume(request);
             return self;
         }
 
         function selectRowsRangeByIndex(firstIdx, lastIdx) {
             if (firstIdx > -1 && lastIdx > -1) {
-                var request = context.view.suspendRender();
+                var request = suspend();
 
+                var column = findSelectionColumn();
                 var startIndex = Math.min(lastIdx, firstIdx);
                 var endIndex = Math.max(lastIdx, firstIdx);
 
-                for (var i = startIndex; i <= endIndex; i++) {
-                    selectRow(context.rowsModel.getRowByIndex(i));
-                }
-                context.view.resumeRender(request);
+                selectAll(column, function (row, idx) {
+                    return startIndex <= idx && idx <= endIndex;
+                });
+
+                resume(request);
             }
             return self;
         }
@@ -5407,37 +5811,66 @@
             var firstFocusedIndex = context.rowsModel.getRowIndexById(firstId);
             var lastFocusedIndex = context.rowsModel.getRowIndexById(lastId);
             if (firstFocusedIndex !== -1 && lastFocusedIndex !== -1) {
-                var request = context.view.suspendRender();
+                var request = suspend();
+
+                var column = findSelectionColumn();
                 var startIndex = Math.min(lastFocusedIndex, firstFocusedIndex);
                 var endIndex = Math.max(lastFocusedIndex, firstFocusedIndex);
 
-                for (var i = startIndex; i <= endIndex; i++) {
-                    selectRow(context.rowsModel.getRowByIndex(i));
-                }
-                context.view.resumeRender(request);
+                selectAll(column, function (row, idx) {
+                    return startIndex <= idx && idx <= endIndex;
+                });
+
+                resume(request);
+            }
+        }
+
+        function deselectRowsRangeByIndex(firstIdx, lastIdx) {
+            if (firstIdx > -1 && lastIdx > -1) {
+                var request = suspend();
+
+                var column = findSelectionColumn();
+                var startIndex = Math.min(lastIdx, firstIdx);
+                var endIndex = Math.max(lastIdx, firstIdx);
+
+                deselectAll(column, function (row, idx) {
+                    return startIndex <= idx && idx <= endIndex;
+                });
+
+                resume(request);
+            }
+            return self;
+        }
+
+        function deselectRowsRangeById(firstId, lastId) {
+            var firstFocusedIndex = context.rowsModel.getRowIndexById(firstId);
+            var lastFocusedIndex = context.rowsModel.getRowIndexById(lastId);
+            if (firstFocusedIndex !== -1 && lastFocusedIndex !== -1) {
+                var request = suspend();
+
+                var column = findSelectionColumn();
+                var startIndex = Math.min(lastFocusedIndex, firstFocusedIndex);
+                var endIndex = Math.max(lastFocusedIndex, firstFocusedIndex);
+
+                deselectAll(column, function (row, idx) {
+                    return startIndex <= idx && idx <= endIndex;
+                });
+
+                resume(request);
             }
         }
 
         function deselectAllRows() {
-            var request = context.view.suspendRender();
-            var selectedIds = getSelectedRowsIds().slice();
-            for (var i = 0; i < selectedIds.length; i++) {
-                deselectRowById(selectedIds[i]);
-            }
-
-            context.view.resumeRender(request);
+            var request = suspend();
+            deselectAll(findSelectionColumn());
+            resume(request);
             return self;
         }
 
         function selectAllRows() {
-            var request = context.view.suspendRender();
-
-            var rows = context.rowsModel.getRows();
-            for (var i = 0; i < rows.length; i++) {
-                selectRowById(rows[i]);
-            }
-
-            context.view.resumeRender(request);
+            var request = suspend();
+            selectAll(findSelectionColumn());
+            resume(request);
             return self;
         }
 
@@ -5456,6 +5889,8 @@
             "deselectAllRows": deselectAllRows,
             "deselectRowById": deselectRowById,
             "deselectRowByIndex": deselectRowByIndex,
+            "deselectRowsRangeById": deselectRowsRangeById,
+            "deselectRowsRangeByIndex": deselectRowsRangeByIndex,
             "getSelectedRowsIds": getSelectedRowsIds,
             "isRowSelected": isRowSelected,
             "selectAllRows": selectAllRows,
@@ -5485,6 +5920,7 @@ if (typeof SmallGrid === "undefined") {
         uid: undefined,//internal
         cssClass: {
             disableTextSelection: "disable-text-selection",
+            disabledColor: "disabled-color",
             cell: "grid-cell",
             cellEdit: "grid-cell-edit",
             cellColumnLast: "grid-cell-column-last",
@@ -5544,20 +5980,20 @@ if (typeof SmallGrid === "undefined") {
                 }
             },
             dateFormatter: {
-                locales: 'en-US',
+                locales: 'en-GB',
                 options: {}
             }
         },
 
         plugins: {
             AutoResize: {
-                enabled: true,
+                enabled: true
             },
             ColumnSort: {
-                enabled: true,
+                enabled: true
             },
             ColumnResize: {
-                enabled: true,
+                enabled: true
             },
             RowSelection: {
                 enabled: true,
@@ -5568,17 +6004,20 @@ if (typeof SmallGrid === "undefined") {
                 editOnClick: false,//when true, editor loaded after click
                 autoFocus: true//autofocus edited cell when scrolling
             },
+            ColumnCheckbox: {
+                enabled: true
+            },
             ColumnFilterMenu: {
-                enabled: true,
+                enabled: true
             },
             ColumnPickerMenu: {
-                enabled: true,
+                enabled: true
             },
             Footer: {
-                enabled: false,
+                enabled: false
             },
             CellAlign: {
-                enabled: false,
+                enabled: false
             }
         }
     };

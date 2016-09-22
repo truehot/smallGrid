@@ -115,10 +115,11 @@
         }
 
         function buildHeaderColumnHtml(column, opts, isLastColumn) {
-            var html;
+            return "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'>" + buildHeaderCellContentHtml(column) + "</td>";
+        }
 
-            html = "<td style='height:" + settings.header.height + "px' class='" + buildHeaderColumnCss(column, opts, isLastColumn) + "'><div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.name || "") + "</span>";
-
+        function buildHeaderCellContentHtml(column) {
+            var html = "<div class='" + settings.cssClass.headerCellDiv + "'><span class='" + settings.cssClass.headerColumnName + "'>" + (column.headerFormatter ? SmallGrid.Cell.HeaderFormatter[column.headerFormatter](column, settings) : (column.name || "")) + "</span>";
 
             if (column.sortable && column.sortOrder !== 0) {
                 html += "<span class='" + (column.sortOrder === 1 ? settings.cssClass.headerSortUp : settings.cssClass.headerSortDown) + "' data-click-type='sort'></span>";
@@ -134,7 +135,7 @@
                 html += "<span class='" + settings.cssClass.headerResizeHandle + "' data-click-type='resize'></span>";
             }
 
-            return html + "</td>";
+            return html;
         }
 
         function buildLastHeaderColumn(column, opts) {
@@ -244,22 +245,18 @@
             var value = "";
 
             if (column.field in row.item && (row.editMode === false || column.editMode === false)) {
-                value = getCellFormatter(column, row);
+                if (column.formatter) {
+                    value = SmallGrid.Cell.Formatter[column.formatter](row.item[column.field], column, row, settings);
+                } else {
+                    value = row.item[column.field];
+                }
             }
             return value;
         }
 
-        function getCellFormatter(column, row) {
-            return column.formatter ? SmallGrid.Cell.Formatter[column.formatter](getCellValue(column, row), column, row, settings) : getCellValue(column, row);
-        }
-
-        function getCellValue(column, row) {
-            return row.item[column.field];
-        }
-
-
         $.extend(this, {
             "buildCellContentHtml": buildCellContentHtml,
+            "buildHeaderCellContentHtml": buildHeaderCellContentHtml,
             "buildColsHtml": buildColsHtml,
             "buildHeaderColumnsHtml": buildHeaderColumnsHtml,
             "buildRowsHtml": buildRowsHtml,
