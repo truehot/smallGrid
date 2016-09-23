@@ -1,32 +1,10 @@
 # SmallGrid
+
 SmallGrid is javascript component for displaying tabular data.
 
 ## Demo (beta)
 
 > [Demo link](http://truehot.github.io/smallGrid/examples/example1.html).
-
-## What is done
-- [x] Sorting
-- [x] Filtering
-- [x] Column resizing
-- [x] Rows virtualization
-- [x] Columns virtualization
-- [x] Cell formatters
-- [x] Cell editors
-- [x] View events
-- [x] Support for different row height
-- [x] Css styles for rows/cells
-- [x] Plugins
-
-## Planning
-- [ ] Editor validators
-- [ ] Keyboard support (navigation)
-- [ ] Row details 
-- [ ] Frozen columns
-- [ ] Column types
-- [ ] Fullscreen support
-- [ ] Cell templates
-- [ ] Grouping
 
 ## Requires
 
@@ -60,7 +38,38 @@ Example code:
         var grid = new SmallGrid.Grid.Create($('.small-grid'), items, columns);
     });
 
+## What is done
+
+- [x] Rows virtualization
+- [x] Columns virtualization
+- [x] Cell formatters
+- [x] View events
+- [x] Support for different row height
+- [x] Plugins support
+- [x] Sorting (plugin)
+- [x] Filtering (plugin)
+- [x] Column resizing (plugin)
+- [x] Row selection (plugin)
+- [x] Column checkbox (plugin)
+- [x] Cell editors (plugin)
+- [x] Vertical/Horizontal cell alignment (plugin)
+- [x] Grid footer (plugin)
+- [x] Checkbox column (plugin)
+- [x] Auto resize columns (plugin)
+
+## Planning
+
+- [ ] Editor validators
+- [ ] Keyboard support (navigation)
+- [ ] Row details 
+- [ ] Frozen columns
+- [ ] Column types
+- [ ] Fullscreen support
+- [ ] Cell templates
+- [ ] Grouping
+
 ## Tests
+
 [![Build Status](https://travis-ci.org/truehot/smallGrid.svg?branch=master)](https://travis-ci.org/truehot/smallGrid)
 Test should be run using index.html from project directory in tests folder.
 
